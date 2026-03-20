@@ -6,7 +6,8 @@ sealed interface DataError : RootError {
         SERVER_ERROR,
         BAD_REQUEST,
         REQUEST_TIMEOUT,
-        UNKNOWN
+        UNKNOWN,
+        NO_INTERNET
     }
 
     enum class SerializationError: DataError {

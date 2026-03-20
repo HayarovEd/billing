@@ -68,7 +68,7 @@ dependencies {
     api(libs.ktor.serialization.kotlinx.json)
     api(libs.ktor.client.logging)
     api(libs.ktor.client.andriod)
-    api(libs.ktor.client.websockets)
+    implementation(libs.ktor.serialization.kotlinx.xml)
     implementation(libs.ktor.serialization.kotlinx.json)
 
     //Koin
