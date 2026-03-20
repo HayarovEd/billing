@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -55,4 +56,32 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
+    //datastore
+    api(libs.androidx.datastore.preferences)
+
+    //ktor
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.okhttp)
+    api(libs.ktor.client.content.negotiation)
+    api(libs.ktor.serialization.kotlinx.json)
+    api(libs.ktor.client.logging)
+    api(libs.ktor.client.andriod)
+    api(libs.ktor.client.websockets)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+    //Koin
+    api(libs.koin.core)
+    api(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
+    // Coil
+    implementation(libs.coil.compose)
+
+    //date-time
+    implementation(libs.kotlinx.datetime)
+
+    //navigation
+    implementation(libs.androidx.navigation.compose)
 }
