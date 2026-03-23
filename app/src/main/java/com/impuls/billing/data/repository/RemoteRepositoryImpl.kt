@@ -14,9 +14,12 @@ class RemoteRepositoryImpl(
     private val client: HttpClient
 ): RemoteRepository {
 
-    private val cockie = mutableStateOf("")
+    private val cookie = mutableStateOf("")
 
-    override suspend fun login(username: String, password: String): ResultWork<Unit, DataError> {
+    override suspend fun login(
+        username: String,
+        password: String
+    ): ResultWork<Unit, DataError> {
         return handleResponse {
             val soapRequest = buildString {
                 append("""<?xml version="1.0" encoding="UTF-8"?>""")
@@ -38,16 +41,10 @@ class RemoteRepositoryImpl(
                 setBody(soapRequest)
             }
             response.headers["Set-Cookie"]?.let {
-                cockie.value = it
+                cookie.value = it
             }
 
             val body = response.bodyAsText()
-
-            // Проверка на ошибку
-            /*if (body.contains("<SOAP-ENV:Fault>") || body.contains("<soapenv:Fault>")) {
-                val fault = parseFault(body)
-                throw Exception("${fault.faultstring}: ${fault.detail}")
-            }*/
             parseLoginResponse(body)
         }
     }

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.impuls.billing.ui.login_screen.LoginScreenRoot
+import com.impuls.billing.ui.navigation.NavController
 import com.impuls.billing.ui.theme.BillingTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,8 +12,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BillingTheme {
-                LoginScreenRoot()
+            BillingTheme(
+                dynamicColor = false
+            ) {
+                NavController()
             }
         }
     }

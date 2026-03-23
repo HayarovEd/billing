@@ -14,6 +14,12 @@ sealed interface DataError : RootError {
        FORMAT_ERROR,
     }
 
+    enum class ValidationError: DataError {
+        EMAIL_BLANK,
+        EMAIL_NOT_VALID,
+        PASSWORD_BLANK,
+    }
+
     enum class  DataStore: DataError {
         ERROR_READ_DATA,
         ERROR_WRITE_DATA

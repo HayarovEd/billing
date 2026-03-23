@@ -2,3 +2,7 @@ package com.impuls.billing.domain.utils
 
 const val APP_PREFERENCES = "auth_settings"
 const val BASE_URL = "http://10.222.220.3:34012"
+
+
+const val LAST_EMAIL = "last_email"
+const val LAST_PASSWORD = "last_password"
