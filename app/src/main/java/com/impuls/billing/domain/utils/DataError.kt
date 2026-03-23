@@ -18,6 +18,7 @@ sealed interface DataError : RootError {
         EMAIL_BLANK,
         EMAIL_NOT_VALID,
         PASSWORD_BLANK,
+        LOGIN_PASSWORD_INCORRECT
     }
 
     enum class  DataStore: DataError {

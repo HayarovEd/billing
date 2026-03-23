@@ -4,8 +4,8 @@
 
     <string name="no_internet">Отсутствует интернет</string>
     <string name="server_error">Ошибка сервера</string>
-    <string name="unknown_error">Незивестная ошибка</string>
-    <string name="email_empty">Email не может быть пустым</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="email_empty">Логин не может быть пустым</string>
     <string name="email_unvalid">Неправильный email</string>
     <string name="error_autorization">Ошибка авторизации</string>
     <string name="not_data">Нет данных</string>
@@ -24,7 +24,8 @@
     <string name="request_timeout">Превышен интервал ожидания</string>
 
 
-    <string name="email_required">Email *</string>
+    <string name="email_required">Login *</string>
     <string name="password_required">Пароль *</string>
     <string name="enter">ВХОД</string>
+    <string name="login_password_incorrect">Логин и/или пароль неверные</string>
 </resources>

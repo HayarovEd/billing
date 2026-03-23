@@ -3,54 +3,57 @@ package com.impuls.billing.ui.uikit
 import com.impuls.billing.R
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.uikit.UiText.*
 
 
 fun DataError.asUiText(): UiText {
     return when (this) {
 
-        DataError.Network.NO_INTERNET -> UiText.StringResource(
+        DataError.Network.NO_INTERNET -> StringResource(
             R.string.no_internet
         )
 
-        DataError.Network.SERVER_ERROR -> UiText.StringResource(
+        DataError.Network.SERVER_ERROR -> StringResource(
             R.string.server_error
         )
 
-        DataError.Network.UNKNOWN -> UiText.DynamicString("")
+        DataError.Network.UNKNOWN -> StringResource(
+            R.string.unknown_error
+        )
 
-        DataError.ValidationError.EMAIL_BLANK -> UiText.StringResource(
+        DataError.ValidationError.EMAIL_BLANK -> StringResource(
             R.string.email_empty
         )
-        DataError.ValidationError.EMAIL_NOT_VALID -> UiText.StringResource(
+        DataError.ValidationError.EMAIL_NOT_VALID -> StringResource(
             R.string.email_unvalid
         )
-        DataError.Network.UNAUTHORIZED -> UiText.StringResource(
+        DataError.Network.UNAUTHORIZED -> StringResource(
             R.string.error_autorization
         )
-        DataError.ValidationError.PASSWORD_BLANK -> UiText.StringResource(
+        DataError.ValidationError.PASSWORD_BLANK -> StringResource(
             R.string.password_blank
         )
 
 
         DataError.Network.BAD_REQUEST -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.not_unique_id
             )
         }
         DataError.DataStore.ERROR_READ_DATA -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.read_error_data
             )
         }
 
         DataError.DataStore.ERROR_WRITE_DATA -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.write_error_data
             )
         }
 
         DataError.SerializationError.FORMAT_ERROR -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.error_take_data
             )
         }
@@ -58,20 +61,26 @@ fun DataError.asUiText(): UiText {
 
 
         DataError.LocalDateBase.ERROR_READ_DATA -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.read_error_data
             )
         }
 
         DataError.LocalDateBase.ERROR_WRITE_DATA -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.read_error_data
             )
         }
 
         DataError.Network.REQUEST_TIMEOUT -> {
-            UiText.StringResource(
+            StringResource(
                 R.string.request_timeout
+            )
+        }
+
+        DataError.ValidationError.LOGIN_PASSWORD_INCORRECT -> {
+            StringResource(
+                R.string.login_password_incorrect
             )
         }
     }

@@ -8,6 +8,7 @@ import com.impuls.billing.domain.repository.RemoteRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
+import com.impuls.billing.ui.uikit.model.ResultLogin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -40,9 +41,9 @@ class LoginScreenViewModel(
     fun onAction(action: LoginScreenAction) {
         when (action) {
             LoginScreenAction.OnLogin -> onLogin()
-            is LoginScreenAction.UpdateEmail -> {
+            is LoginScreenAction.UpdateLogin -> {
                 _state.value.copy(
-                    email = action.email,
+                    login = action.login,
                 )
                     .updateState()
             }
@@ -58,10 +59,8 @@ class LoginScreenViewModel(
 
     private fun onLogin() {
         viewModelScope.launch {
-            if (state.value.email.isBlank()) {
+            if (state.value.login.isBlank()) {
                 eventChannel.send(LoginScreenEvent.OnMessage(DataError.ValidationError.EMAIL_BLANK.asUiText()))
-            } else if (Patterns.EMAIL_ADDRESS.matcher(state.value.email).matches()) {
-                eventChannel.send(LoginScreenEvent.OnMessage(DataError.ValidationError.EMAIL_NOT_VALID.asUiText()))
             } else if (state.value.password.isBlank()) {
                 eventChannel.send(LoginScreenEvent.OnMessage(DataError.ValidationError.PASSWORD_BLANK.asUiText()))
             } else {
@@ -70,7 +69,7 @@ class LoginScreenViewModel(
                 )
                     .updateState()
                 when (val result = remoteRepository.login(
-                    username = state.value.email,
+                    username = state.value.login,
                     password = state.value.password
                 )) {
                     is ResultWork.Error -> {
@@ -86,7 +85,15 @@ class LoginScreenViewModel(
                             isLoading = false,
                         )
                             .updateState()
-                        eventChannel.send(LoginScreenEvent.NavigateEvent)
+                        when (val loginResult = result.data) {
+                            is ResultLogin.Error -> {
+                                eventChannel.send(LoginScreenEvent.OnMessage(loginResult.dataError.asUiText()))
+                            }
+                            is ResultLogin.Success -> {
+                                eventChannel.send(LoginScreenEvent.NavigateEvent)
+                            }
+                        }
+
                     }
                 }
             }
@@ -103,7 +110,7 @@ class LoginScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         password = result.data.password,
-                        email = result.data.email
+                        login = result.data.email
                     )
                         .updateState()
                 }

@@ -20,9 +20,13 @@ fun NavController(
         }
         composable<NavigationRoute.Login> {
             LoginScreenRoot(
-
+                onNavigateToAccounts = {
+                    navController.navigate(NavigationRoute.Accounts)
+                }
             )
         }
+        composable<NavigationRoute.Accounts> {
 
+        }
     }
 }

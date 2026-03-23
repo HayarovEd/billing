@@ -8,6 +8,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.serialization.JsonConvertException
 import io.ktor.util.network.UnresolvedAddressException
+import io.ktor.utils.io.ClosedByteChannelException
 
 suspend fun <D> handleResponse(data: suspend () -> D): ResultWork<D, DataError> {
     return try {
@@ -30,6 +31,9 @@ suspend fun <D> handleResponse(data: suspend () -> D): ResultWork<D, DataError> 
     } catch (e: JsonConvertException) {
         e.printStackTrace()
         ResultWork.Error(DataError.SerializationError.FORMAT_ERROR)
+    } catch (e: ClosedByteChannelException) {
+        e.printStackTrace()
+        ResultWork.Error(DataError.ValidationError.LOGIN_PASSWORD_INCORRECT)
     } catch (e: Exception) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.UNKNOWN)
