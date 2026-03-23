@@ -1,12 +1,13 @@
 package com.impuls.billing.ui.login_screen
 
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.impuls.billing.domain.model.LastAuthData
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.RemoteRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.uikit.UiText
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.ResultLogin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,10 +88,16 @@ class LoginScreenViewModel(
                             .updateState()
                         when (val loginResult = result.data) {
                             is ResultLogin.Error -> {
-                                eventChannel.send(LoginScreenEvent.OnMessage(loginResult.dataError.asUiText()))
+                                eventChannel.send(LoginScreenEvent.OnMessage(UiText.DynamicString(loginResult.message)))
                             }
                             is ResultLogin.Success -> {
                                 eventChannel.send(LoginScreenEvent.NavigateEvent)
+                                dataStoreRepository.setLocalAuthorization(
+                                    LastAuthData(
+                                        login = state.value.login,
+                                        password = state.value.password
+                                    )
+                                )
                             }
                         }
 
@@ -110,7 +117,7 @@ class LoginScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         password = result.data.password,
-                        login = result.data.email
+                        login = result.data.login
                     )
                         .updateState()
                 }

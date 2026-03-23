@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.impuls.billing.ui.login_screen.LoginScreenRoot
+import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 
@@ -21,12 +22,12 @@ fun NavController(
         composable<NavigationRoute.Login> {
             LoginScreenRoot(
                 onNavigateToAccounts = {
-                    navController.navigate(NavigationRoute.Accounts)
+                    navController.navigate(NavigationRoute.Profile)
                 }
             )
         }
-        composable<NavigationRoute.Accounts> {
-
+        composable<NavigationRoute.Profile> {
+            ProfileScreenRoot()
         }
     }
 }

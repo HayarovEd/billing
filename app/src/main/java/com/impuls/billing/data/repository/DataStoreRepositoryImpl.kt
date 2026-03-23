@@ -22,7 +22,7 @@ class DataStoreRepositoryImpl(
     override suspend fun setLocalAuthorization(lastAuthData: LastAuthData): ResultWork<Unit, DataError.DataStore> {
         return handleWrite {
             dataStore.edit { settings ->
-                settings[FIELD_LAST_EMAIL] = lastAuthData.email
+                settings[FIELD_LAST_EMAIL] = lastAuthData.login
                 settings[FIELD_LAST_PASSWORD] = lastAuthData.password
             }
         }
@@ -32,7 +32,7 @@ class DataStoreRepositoryImpl(
         return handleReadFlow {
             dataStore.data.map {
                 LastAuthData(
-                    email = it[FIELD_LAST_EMAIL] ?: "",
+                    login = it[FIELD_LAST_EMAIL] ?: "",
                     password = it[FIELD_LAST_PASSWORD] ?: "",
                 )
             }
@@ -43,7 +43,7 @@ class DataStoreRepositoryImpl(
     override suspend fun readStateLocalAuthorization(): ResultWork<LastAuthData, DataError.DataStore> {
         return handleRead {
             LastAuthData(
-                email = dataStore.data.first()[FIELD_LAST_EMAIL] ?: "",
+                login = dataStore.data.first()[FIELD_LAST_EMAIL] ?: "",
                 password = dataStore.data.first()[FIELD_LAST_PASSWORD] ?: "",
             )
         }
