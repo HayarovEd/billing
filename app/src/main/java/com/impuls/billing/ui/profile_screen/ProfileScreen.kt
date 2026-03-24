@@ -148,6 +148,11 @@ private fun ProfileScreenScreen(
                         )
                         Spacer(modifier = modifier.height(10.dp))
                         ProfileRow(
+                            title =  stringResource(R.string.you_enter_as),
+                            content = acc.account.login
+                        )
+                        Spacer(modifier = modifier.height(5.dp))
+                        ProfileRow(
                             title = when (acc.account.type) {
                                 UserType.UL -> stringResource(R.string.name_company)
                                 UserType.FL -> stringResource(R.string.name_fl)

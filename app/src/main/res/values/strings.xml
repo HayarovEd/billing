@@ -51,4 +51,11 @@
     <string name="balance">Баланс</string>
     <string name="code_payment">Код оплаты</string>
     <string name="my_accounts">Мои аккаунты</string>
+    <string name="you_enter_as">Вы вошли как</string>
+    <string name="not_confirm">Не подтвержден</string>
+    <string name="cancel">Отменить</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="send_repeate_code">Отправить код повторно</string>
+    <string name="code_confirm">Код подтверждения</string>
+    <string name="save">Сохранить</string>
 </resources>
