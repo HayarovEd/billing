@@ -3,5 +3,5 @@ package com.impuls.billing.domain.model
 data class ClientAccount(
     val billDeliveryName: String,
     val account: Account,
-    val agreement: Agreement
+    val agreements: List<Agreement>
 )

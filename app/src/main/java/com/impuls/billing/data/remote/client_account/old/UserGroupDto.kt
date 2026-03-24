@@ -1,8 +1,6 @@
-package com.impuls.billing.data.remote.client_account
+package com.impuls.billing.data.remote.client_account.old
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class UserGroupDto(
     val unloadtosorm: Int,
     val sormid: Int,

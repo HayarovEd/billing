@@ -1,14 +1,10 @@
-package com.impuls.billing.data.remote.client_account
+package com.impuls.billing.data.remote.client_account.old
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class AccountDto (
     val uid: Int,
     val doctype: Int,
     val ipaccess: Int,
     val billdelivery: Int,
-    val fulllegalname: String,
     val category: Int,
     val type: Int,
     val oksm: Int,
@@ -23,8 +19,7 @@ data class AccountDto (
     val login: String,
     val pass: String,
     val descr: String,
-    val name: String,
-    val phone: String,
+    val name: String,    val phone: String,
     val fax: String,
     val email: String,
     val mobile: String,

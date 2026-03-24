@@ -30,7 +30,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
+import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.PaymentMethodTYpe
+import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.ProfileRow
@@ -101,6 +104,7 @@ private fun ProfileScreenScreen(
                         .fillMaxSize()
                         .padding(15.dp)
                 ) {
+
                     Text(
                         text = stringResource(R.string.profile),
                         style = MaterialTheme.typography.titleLarge
@@ -108,7 +112,10 @@ private fun ProfileScreenScreen(
                     Spacer(modifier = modifier.height(10.dp))
                     state.account?.let { acc->
                         ProfileRow(
-                            title = if (acc.account.type==0) stringResource(R.string.name_company) else stringResource(R.string.name_fl),
+                            title = when (acc.account.type) {
+                                UserType.UL -> stringResource(R.string.name_company)
+                                UserType.FL -> stringResource(R.string.name_fl)
+                            },
                             content = acc.account.name
                         )
                         Spacer(modifier = modifier.height(5.dp))
@@ -126,7 +133,7 @@ private fun ProfileScreenScreen(
                             title = stringResource(R.string.email),
                             content = acc.account.email
                         )
-                        if (acc.account.type==0) {
+                        if (acc.account.type==UserType.UL) {
                             Spacer(modifier = modifier.height(10.dp))
                             Text(
                                 text = stringResource(R.string.bank_req),
@@ -213,9 +220,9 @@ private fun Preview() {
         account = Account(
             uid = 8273,
             doctype = 0,
-            billDelivery = 4,
+            billDelivery = BillDeliveryType.COURIER,
             category = 0,
-            type = 0,
+            type = UserType.UL,
             oksm = 643,
             wrongActive = 0,
             archive = false,
@@ -248,7 +255,7 @@ private fun Preview() {
             abonentSurname = "",
             abonentPatronymic = ""
         ),
-        agreement = Agreement(
+        agreements = listOf(Agreement(
             agrmId = 8220,
             uid = 8273,
             operId = 7357,
@@ -263,7 +270,7 @@ private fun Preview() {
             installments = 0.0,
             balanceStatus = 1,
             friendAgrmId = 0,
-            paymentMethod = 2,
+            paymentMethod = PaymentMethodTYpe.CREDIT,
             blockDays = 0,
             blockMonths = 0,
             orderPayDay = 0,
@@ -278,7 +285,7 @@ private fun Preview() {
             symbol = "руб",
             username = "ЯЯ_Биллинг(Т_СТ)",
             initialBalance = 0.0
-        )
+        ))
     )
 
 
@@ -308,9 +315,9 @@ private fun Preview1() {
         account = Account(
             uid = 8273,
             doctype = 0,
-            billDelivery = 4,
+            billDelivery = BillDeliveryType.MAIL,
             category = 0,
-            type = 1,
+            type = UserType.FL,
             oksm = 643,
             wrongActive = 0,
             archive = false,
@@ -343,7 +350,7 @@ private fun Preview1() {
             abonentSurname = "",
             abonentPatronymic = ""
         ),
-        agreement = Agreement(
+        agreements = listOf(Agreement(
             agrmId = 8220,
             uid = 8273,
             operId = 7357,
@@ -358,7 +365,7 @@ private fun Preview1() {
             installments = 0.0,
             balanceStatus = 1,
             friendAgrmId = 0,
-            paymentMethod = 2,
+            paymentMethod = PaymentMethodTYpe.ADVANCE,
             blockDays = 0,
             blockMonths = 0,
             orderPayDay = 0,
@@ -373,7 +380,7 @@ private fun Preview1() {
             symbol = "руб",
             username = "ЯЯ_Биллинг(Т_СТ)",
             initialBalance = 0.0
-        )
+        ))
     )
 
 

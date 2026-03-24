@@ -3,9 +3,9 @@ package com.impuls.billing.domain.model
 data class Account (
     val uid: Int,
     val doctype: Int,
-    val billDelivery: Int,
+    val billDelivery: BillDeliveryType,
     val category: Int,
-    val type: Int,
+    val type: UserType,
     val oksm: Int,
     val wrongActive: Int,
     val archive: Boolean,

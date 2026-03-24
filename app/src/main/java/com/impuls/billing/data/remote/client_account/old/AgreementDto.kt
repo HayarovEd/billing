@@ -1,8 +1,6 @@
-package com.impuls.billing.data.remote.client_account
+package com.impuls.billing.data.remote.client_account.old
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class AgreementDto(
     val agrmid: Int,
     val uid: Int,
@@ -20,7 +18,7 @@ data class AgreementDto(
     val promisecredit: Double,
     val installments: Double,
     val balancestrictlimit: Int,
-    val blimit: Int,
+    val blimit: Double,
     val balancestatus: Int,
     val isauto: Int,
     val friendagrmid: Int,

@@ -1,6 +1,8 @@
 package com.impuls.billing.data.repository
 
 import androidx.compose.runtime.mutableStateOf
+import com.impuls.billing.data.mapper.SoapParser
+import com.impuls.billing.data.mapper.toClientAccount
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.repository.RemoteRepository
 import com.impuls.billing.domain.utils.BASE_URL
@@ -14,18 +16,14 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import nl.adaptivity.xmlutil.XmlDeclMode
-import nl.adaptivity.xmlutil.serialization.XML
 
 class RemoteRepositoryImpl(
-    private val client: HttpClient
+    private val client: HttpClient,
 ) : RemoteRepository {
 
     private val cookie = mutableStateOf("")
+    private val soapParser = SoapParser()
 
-    private val xml = XML {
-        xmlDeclMode = XmlDeclMode.Auto
-    }
 
     override suspend fun login(
         username: String,
@@ -69,19 +67,19 @@ class RemoteRepositoryImpl(
                 val soapRequest = buildString {
                     //append("""<?xml version="1.0" encoding="UTF-8"?>""")
                     append(
-               "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" \n" +
-                       "xmlns:urn=\"urn:api3\">\n" +
-                       "   <soapenv:Header/>\n" +
-                       "   <soapenv:Body>\n" +
-                       "      <urn:getClientAccount>\n" +
-                       "         <!--Optional:-->\n" +
-                       "         <flt>\n" +
-                       "            <!--Optional:-->\n" +
-                       "            <activonly>0</activonly>\n" +
-                       "         </flt>\n" +
-                       "      </urn:getClientAccount>\n" +
-                       "   </soapenv:Body>\n" +
-                       "</soapenv:Envelope>".trimIndent()
+                        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" \n" +
+                                "xmlns:urn=\"urn:api3\">\n" +
+                                "   <soapenv:Header/>\n" +
+                                "   <soapenv:Body>\n" +
+                                "      <urn:getClientAccount>\n" +
+                                "         <!--Optional:-->\n" +
+                                "         <flt>\n" +
+                                "            <!--Optional:-->\n" +
+                                "            <activonly>0</activonly>\n" +
+                                "         </flt>\n" +
+                                "      </urn:getClientAccount>\n" +
+                                "   </soapenv:Body>\n" +
+                                "</soapenv:Envelope>".trimIndent()
                     )
                 }
                 val response = client.post(BASE_URL) {
@@ -89,7 +87,7 @@ class RemoteRepositoryImpl(
                     header("Cookie", cookie)
                 }
                 val xml = response.bodyAsText()
-                formClientAccount(xml)
+                soapParser.parseFullSoapResponse(xml).toClientAccount()
             }
         }
     }
