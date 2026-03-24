@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.impuls.billing.domain.repository.RemoteRepository
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.uikit.asUiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -48,13 +49,25 @@ class ProfileScreenViewModel(
 
 
     private fun loadAccountData() {
+        _state.value.copy(
+            isLoading = true,
+        )
+            .updateState()
         viewModelScope.launch {
             when(val result = remoteRepository.getClientAccount()) {
-                is ResultWork.Error<*, *> -> {
-                    println(result.error)
+                is ResultWork.Error -> {
+                    _state.value.copy(
+                        isLoading = false,
+                    )
+                        .updateState()
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
-                is ResultWork.Success<*, *> -> {
-                    println(result.data)
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        isLoading = false,
+                        account = result.data
+                    )
+                        .updateState()
                 }
             }
         }

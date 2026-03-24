@@ -28,4 +28,23 @@
     <string name="password_required">Пароль *</string>
     <string name="enter">ВХОД</string>
     <string name="login_password_incorrect">Логин и/или пароль неверные</string>
+    <string name="profile">Профиль</string>
+    <string name="name_company">Название компании</string>
+    <string name="name_fl">ФИО</string>
+    <string name="phone">Контактный телефон</string>
+    <string name="mobile_phone">Мобильный телефон</string>
+    <string name="email">E-Mail</string>
+    <string name="bank_req">Банковские реквизиты</string>
+    <string name="name_bank">Название банка</string>
+    <string name="name_sub_bank">Наименование отделения банка</string>
+    <string name="bik">БИК</string>
+    <string name="setti">Расчетный счет</string>
+    <string name="corr">Корр. счет</string>
+    <string name="inn">ИНН</string>
+    <string name="ogrn">ОГРН</string>
+    <string name="kpp">КПП</string>
+    <string name="okpo">ОКПО</string>
+    <string name="okved">ОКВЭД</string>
+    <string name="name_treasure">Наименование казначейства</string>
+    <string name="treasure_account">Номер лицевого счета в казначействе</string>
 </resources>

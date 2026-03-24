@@ -1,6 +1,8 @@
 package com.impuls.billing.ui.profile_screen
 
+import com.impuls.billing.domain.model.ClientAccount
+
 data class ProfileScreenState(
-    val paramOne: String = "default",
-    val paramTwo: List<String> = emptyList(),
+    val account: ClientAccount? = null,
+    val isLoading: Boolean = false,
 )
