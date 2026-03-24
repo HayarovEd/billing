@@ -11,6 +11,7 @@ data class Agreement(
     val monthBlockDay: Int,
     val balance: Double,
     val credit: Double,
+    val code: String,
     val promiseCredit: Double,
     val installments: Double,
     val balanceStatus: Int,

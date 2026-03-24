@@ -22,11 +22,12 @@ fun ProfileRow(
     modifier: Modifier = Modifier,
     title: String,
     content: String,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = horizontalArrangement
     ) {
         Text(
             text = "${title}:",

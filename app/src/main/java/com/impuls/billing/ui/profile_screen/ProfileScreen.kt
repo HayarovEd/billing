@@ -1,11 +1,21 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -23,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +90,8 @@ private fun ProfileScreenScreen(
     onAction: (ProfileScreenAction) -> Unit,
     updateVisisbilityDrawerState: () -> Unit,
 ) {
+
+    val windowSize = LocalWindowInfo.current.containerDpSize
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -102,15 +115,38 @@ private fun ProfileScreenScreen(
                     modifier = modifier
                         .padding(contentPadding)
                         .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                         .padding(15.dp)
                 ) {
-
-                    Text(
-                        text = stringResource(R.string.profile),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Spacer(modifier = modifier.height(10.dp))
                     state.account?.let { acc->
+                        Text(
+                            text = stringResource(R.string.my_accounts),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = modifier.height(10.dp))
+                        LazyVerticalGrid (
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .heightIn(max = windowSize.height/2),
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(acc.agreements) {
+                                ItemAgreement(
+                                    agreement = it,
+                                    onClick = {
+
+                                    }
+                                )
+                            }
+                        }
+                        Spacer(modifier = modifier.height(10.dp))
+                        Text(
+                            text = stringResource(R.string.profile),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = modifier.height(10.dp))
                         ProfileRow(
                             title = when (acc.account.type) {
                                 UserType.UL -> stringResource(R.string.name_company)
@@ -284,7 +320,8 @@ private fun Preview() {
             bCheck = "0000-00-00",
             symbol = "руб",
             username = "ЯЯ_Биллинг(Т_СТ)",
-            initialBalance = 0.0
+            initialBalance = 0.0,
+            code = ""
         ))
     )
 
@@ -379,7 +416,8 @@ private fun Preview1() {
             bCheck = "0000-00-00",
             symbol = "руб",
             username = "ЯЯ_Биллинг(Т_СТ)",
-            initialBalance = 0.0
+            initialBalance = 0.0,
+            code = ""
         ))
     )
 

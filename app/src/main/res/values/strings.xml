@@ -47,4 +47,8 @@
     <string name="okved">ОКВЭД</string>
     <string name="name_treasure">Наименование казначейства</string>
     <string name="treasure_account">Номер лицевого счета в казначействе</string>
+    <string name="number_contract">Номер договора</string>
+    <string name="balance">Баланс</string>
+    <string name="code_payment">Код оплаты</string>
+    <string name="my_accounts">Мои аккаунты</string>
 </resources>

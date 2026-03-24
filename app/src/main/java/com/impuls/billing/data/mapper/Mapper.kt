@@ -354,7 +354,8 @@ fun GetClientAccountResponse.toClientAccount(): ClientAccount {
                 bCheck = it.bcheck,
                 symbol = it.symbol,
                 username = it.username,
-                initialBalance = it.initialbalance
+                initialBalance = it.initialbalance,
+                code = it.code
             )
         }
     )
