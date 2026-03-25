@@ -1,13 +1,18 @@
 package com.impuls.billing.data.mapper
 
 import com.impuls.billing.data.remote.client_account.GetClientAccountResponse
+import com.impuls.billing.data.remote.image_data.ImageDataResponse
+import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
 import com.impuls.billing.domain.utils.convertUserType
+import com.impuls.billing.domain.utils.toLocalDateTime
 
 
 /*fun formClientAccount(xml: String): ClientAccount {
@@ -358,6 +363,20 @@ fun GetClientAccountResponse.toClientAccount(): ClientAccount {
                 code = it.code
             )
         }
+    )
+}
+
+fun PaymentTokenReponse.convertToPaymentToken(): PaymentToken {
+    return PaymentToken(
+        token = token,
+        ttl = ttl.toLocalDateTime()
+    )
+}
+
+fun ImageDataResponse.convertToImageData(): ImageData {
+    return ImageData(
+        color = result.color,
+        image = result.image
     )
 }
 

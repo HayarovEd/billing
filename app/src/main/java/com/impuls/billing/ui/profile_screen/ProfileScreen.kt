@@ -55,7 +55,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileScreenRoot(
-    viewModel: ProfileScreenViewModel = koinViewModel()
+    viewModel: ProfileScreenViewModel = koinViewModel(),
+    onNavigateToPayment: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -83,7 +84,8 @@ fun ProfileScreenRoot(
                     if (isClosed) open() else close()
                 }
             }
-        }
+        },
+        onNavigateToPayment = onNavigateToPayment
     )
 }
 
@@ -95,6 +97,7 @@ private fun ProfileScreenScreen(
     snakeBarHostState: SnackbarHostState,
     onAction: (ProfileScreenAction) -> Unit,
     updateVisisbilityDrawerState: () -> Unit,
+    onNavigateToPayment: (String) -> Unit,
 ) {
     var visiblePhoneDialog by retain { mutableStateOf(false) }
     var visibleEmailDialog by retain { mutableStateOf(false) }
@@ -144,7 +147,7 @@ private fun ProfileScreenScreen(
                                 ItemAgreement(
                                     agreement = it,
                                     onClick = {
-
+                                        onNavigateToPayment(it.code)
                                     }
                                 )
                             }
@@ -389,7 +392,8 @@ private fun Preview() {
             drawerState = drawerState,
             snakeBarHostState = snackBarState,
             onAction = {},
-            updateVisisbilityDrawerState = {}
+            updateVisisbilityDrawerState = {},
+            onNavigateToPayment = {},
         )
     }
 }
@@ -487,7 +491,8 @@ private fun Preview1() {
             drawerState = drawerState,
             snakeBarHostState = snackBarState,
             onAction = {},
-            updateVisisbilityDrawerState = {}
+            updateVisisbilityDrawerState = {},
+            onNavigateToPayment = {},
         )
     }
 }
@@ -509,7 +514,8 @@ private fun Preview2() {
             drawerState = drawerState,
             snakeBarHostState = snackBarState,
             onAction = {},
-            updateVisisbilityDrawerState = {}
+            updateVisisbilityDrawerState = {},
+            onNavigateToPayment = {},
         )
     }
 }

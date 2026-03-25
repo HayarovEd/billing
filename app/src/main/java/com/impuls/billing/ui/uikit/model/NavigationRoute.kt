@@ -16,7 +16,9 @@ sealed class NavigationRoute {
     data object Profile : NavigationRoute()
 
     @Serializable
-    data object Payment : NavigationRoute()
+    data class Payment(
+        val number: String
+    ) : NavigationRoute()
 
     @Serializable
     data object Bill : NavigationRoute()

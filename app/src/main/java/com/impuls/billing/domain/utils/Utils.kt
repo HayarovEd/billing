@@ -3,6 +3,7 @@ package com.impuls.billing.domain.utils
 import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.PaymentMethodTYpe
 import com.impuls.billing.domain.model.UserType
+import kotlinx.datetime.LocalDateTime
 
 
 fun findInXmlString(
@@ -44,4 +45,15 @@ fun convertPaymentMethodTYpe(number: Int): PaymentMethodTYpe {
         2 -> PaymentMethodTYpe.MIXED
         else -> PaymentMethodTYpe.ADVANCE
     }
+}
+
+fun String.toLocalDateTime(): LocalDateTime {
+    val parts = split(" ")
+    val datePart = parts[0]
+    val timePart = parts[1]
+
+    val dateParts = datePart.split("-")
+    val formattedDate = "${dateParts[2]}-${dateParts[1]}-${dateParts[0]}"
+
+    return LocalDateTime.parse("${formattedDate}T${timePart}")
 }

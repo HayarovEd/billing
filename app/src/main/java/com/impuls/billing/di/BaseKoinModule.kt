@@ -18,10 +18,12 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.serialization.kotlinx.xml.xml
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.json.Json
 import nl.adaptivity.xmlutil.serialization.XML
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -56,6 +58,11 @@ val baseModule = module {
             }
             install(Logging) {
                 logger = Logger.DEFAULT
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                })
             }
         }
     }
