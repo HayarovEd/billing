@@ -1,4 +1,4 @@
-package com.impuls.billing.data.remote.client_account.old
+package com.impuls.billing.data.remote.client_account
 
 
 data class AgreementDto(

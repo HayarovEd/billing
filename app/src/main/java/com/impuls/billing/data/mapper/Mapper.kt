@@ -1,6 +1,6 @@
 package com.impuls.billing.data.mapper
 
-import com.impuls.billing.data.remote.client_account.old.GetClientAccountResponse
+import com.impuls.billing.data.remote.client_account.GetClientAccountResponse
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount

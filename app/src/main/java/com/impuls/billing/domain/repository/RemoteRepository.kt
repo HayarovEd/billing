@@ -8,4 +8,14 @@ import com.impuls.billing.ui.uikit.model.ResultLogin
 interface RemoteRepository {
     suspend fun login(username: String, password: String): ResultWork<ResultLogin, DataError>
     suspend fun getClientAccount(): ResultWork<ClientAccount, DataError>
+    suspend fun setClientMobilePhone(uid: Int, phone: String): ResultWork<Boolean, DataError>
+    suspend fun validateClientMobileNumber(): ResultWork<Int, DataError>
+    suspend fun setClientEmail(uid: Int, email: String): ResultWork<Boolean, DataError>
+    suspend fun validateClientEmail(): ResultWork<Int, DataError>
+    suspend fun confirmValidateClientMobileNumber(
+        id: Int,
+        code: String
+    ): ResultWork<Boolean, DataError>
+
+    suspend fun confirmValidateClientEmail(id: Int, code: String): ResultWork<Boolean, DataError>
 }

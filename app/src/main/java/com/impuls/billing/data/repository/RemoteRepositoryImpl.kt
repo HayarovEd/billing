@@ -65,21 +65,10 @@ class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val soapRequest = buildString {
-                    //append("""<?xml version="1.0" encoding="UTF-8"?>""")
                     append(
-                        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" \n" +
-                                "xmlns:urn=\"urn:api3\">\n" +
-                                "   <soapenv:Header/>\n" +
-                                "   <soapenv:Body>\n" +
-                                "      <urn:getClientAccount>\n" +
-                                "         <!--Optional:-->\n" +
-                                "         <flt>\n" +
-                                "            <!--Optional:-->\n" +
-                                "            <activonly>0</activonly>\n" +
-                                "         </flt>\n" +
-                                "      </urn:getClientAccount>\n" +
-                                "   </soapenv:Body>\n" +
-                                "</soapenv:Envelope>".trimIndent()
+                        setBaseAppend(
+                            "<urn:getClientAccount>\n</urn:getClientAccount>\n"
+                        )
                     )
                 }
                 val response = client.post(BASE_URL) {
@@ -91,6 +80,149 @@ class RemoteRepositoryImpl(
             }
         }
     }
+
+    override suspend fun setClientMobilePhone(
+        uid: Int,
+        phone: String
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse {
+                val soapRequest = buildString {
+                    append(
+                        setBaseAppend(
+                            " <urn:setClientInfo>\n" +
+                                    "         <val>\n" +
+                                    "            <userid>${uid}</userid>\n" +
+                                    "            <mobile>${phone}</mobile>\n" +
+                                    "         </val>\n" +
+                                    "      </urn:setClientInfo>"
+                        )
+                    )
+                }
+                val response = client.post(BASE_URL) {
+                    setBody(soapRequest)
+                    header("Cookie", cookie)
+                }
+                val xml = response.bodyAsText()
+                soapParser.parseSetClientInfoResponse(xml) == 1
+            }
+        }
+    }
+
+
+    override suspend fun validateClientMobileNumber(): ResultWork<Int, DataError> {
+        return handleResponse {
+            val soapRequest = buildString {
+                append(
+                    setBaseAppend(
+                        "<urn:validateClientMobileNumber/>\n"
+                    )
+                )
+            }
+            val response = client.post(BASE_URL) {
+                setBody(soapRequest)
+                header("Cookie", cookie)
+            }
+            val xml = response.bodyAsText()
+            soapParser.parseSetClientInfoResponse(xml)
+        }
+    }
+
+    override suspend fun confirmValidateClientMobileNumber(
+        id: Int,
+        code: String,
+    ): ResultWork<Boolean, DataError> {
+        return handleResponse {
+            val soapRequest = buildString {
+                append(
+                    setBaseAppend(
+                       " <urn:confirmValidateClientMobileNumber>\n" +
+                               "         <id>$id/id>\n" +
+                               "         <code>$code</code>\n" +
+                               "      </urn:confirmValidateClientMobileNumber>\n"
+                    )
+                )
+            }
+            val response = client.post(BASE_URL) {
+                setBody(soapRequest)
+                header("Cookie", cookie)
+            }
+            val xml = response.bodyAsText()
+            soapParser.parseSetClientInfoResponse(xml) == 1
+        }
+    }
+
+    override suspend fun setClientEmail(
+        uid: Int,
+        email: String
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse {
+                val soapRequest = buildString {
+                    append(
+                        setBaseAppend(
+                            " <urn:setClientInfo>\n" +
+                                    "         <val>\n" +
+                                    "            <userid>${uid}</userid>\n" +
+                                    "            <email>${email}</email>\n" +
+                                    "         </val>\n" +
+                                    "      </urn:setClientInfo>"
+                        )
+                    )
+                }
+                val response = client.post(BASE_URL) {
+                    setBody(soapRequest)
+                    header("Cookie", cookie)
+                }
+                val xml = response.bodyAsText()
+                soapParser.parseSetClientInfoResponse(xml) == 1
+            }
+        }
+    }
+
+
+    override suspend fun validateClientEmail(): ResultWork<Int, DataError> {
+        return handleResponse {
+            val soapRequest = buildString {
+                append(
+                    setBaseAppend(
+                        "  <urn:validateClientEmail/>\n"
+                    )
+                )
+            }
+            val response = client.post(BASE_URL) {
+                setBody(soapRequest)
+                header("Cookie", cookie)
+            }
+            val xml = response.bodyAsText()
+            soapParser.parseSetClientInfoResponse(xml)
+        }
+    }
+
+    override suspend fun confirmValidateClientEmail(
+        id: Int,
+        code: String,
+    ): ResultWork<Boolean, DataError> {
+        return handleResponse {
+            val soapRequest = buildString {
+                append(
+                    setBaseAppend(
+                        " <urn:confirmValidateClientEmail>\n" +
+                                "         <id>$id/id>\n" +
+                                "         <code>$code</code>\n" +
+                                "      </urn:confirmValidateClientEmail>\n"
+                    )
+                )
+            }
+            val response = client.post(BASE_URL) {
+                setBody(soapRequest)
+                header("Cookie", cookie)
+            }
+            val xml = response.bodyAsText()
+            soapParser.parseSetClientInfoResponse(xml) == 1
+        }
+    }
+
 
     private fun parseLoginResponse(xml: String): ResultLogin {
         // Простой парсинг через regex (для продакшена лучше использовать XML парсер)
@@ -105,5 +237,15 @@ class RemoteRepositoryImpl(
         )
     }
 
+
+    private fun setBaseAppend(innerContent: String): String {
+        return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" \n" +
+                "xmlns:urn=\"urn:api3\">\n" +
+                "   <soapenv:Header/>\n" +
+                "   <soapenv:Body>\n" +
+                innerContent +
+                "   </soapenv:Body>\n" +
+                "</soapenv:Envelope>".trimIndent()
+    }
 
 }

@@ -27,7 +27,7 @@ import com.impuls.billing.ui.uikit.UiTextField
 @Composable
 fun ContentDialogSetContent(
     modifier: Modifier = Modifier,
-    decription: String,
+    description: String,
     title: String,
     content: String,
     code: String,
@@ -37,7 +37,7 @@ fun ContentDialogSetContent(
     onUpdateCode: (String) -> Unit,
     onConfirmContent: () -> Unit,
     onConfirmCode: () -> Unit,
-    onRecendCode: () -> Unit,
+    onRecentCode: () -> Unit,
     onCancel: () -> Unit,
 ) {
     Card(
@@ -55,7 +55,7 @@ fun ContentDialogSetContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = decription,
+                text = description,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = modifier.height(5.dp))
@@ -88,14 +88,16 @@ fun ContentDialogSetContent(
                 ) {
                     Text(
                         text = stringResource(R.string.cancel),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
                 Spacer(modifier = modifier.width(3.dp))
 
                 OutlinedButton(
-                    modifier = modifier.weight(2f),
-                    onClick =  if (isShowRepeatSendCode) onConfirmCode else onConfirmContent,
+                    modifier = modifier.weight(1f),
+                    onClick = if (isShowRepeatSendCode)
+                        onConfirmCode
+                    else onConfirmContent,
                     shape = RoundedCornerShape(5.dp),
                     border = BorderStroke(
                         width = 1.dp,
@@ -103,15 +105,17 @@ fun ContentDialogSetContent(
                     )
                 ) {
                     Text(
-                        text = if (isShowRepeatSendCode) stringResource(R.string.confirm) else stringResource(R.string.save),
-                        style = MaterialTheme.typography.labelMedium
+                        text = if (isShowRepeatSendCode) stringResource(R.string.confirm) else stringResource(
+                            R.string.save
+                        ),
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
             Spacer(modifier = modifier.height(5.dp))
             if (isShowRepeatSendCode) {
                 OutlinedButton(
-                    onClick = onRecendCode,
+                    onClick = onRecentCode,
                     enabled = count == 0,
                     shape = RoundedCornerShape(5.dp),
                     border = BorderStroke(
@@ -125,7 +129,7 @@ fun ContentDialogSetContent(
                         }($count)"
                     Text(
                         text = buttonText,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
@@ -163,7 +167,7 @@ private fun RowWithTextField(
 private fun Preview() {
     BillingTheme {
         ContentDialogSetContent(
-            decription = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
+            description = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
             content = "88888",
             code = "",
             count = 8,
@@ -174,7 +178,7 @@ private fun Preview() {
             onCancel = {},
             onConfirmCode = {},
             onConfirmContent = {},
-            onRecendCode = {},
+            onRecentCode = {},
         )
     }
 }
@@ -184,7 +188,7 @@ private fun Preview() {
 private fun Preview2() {
     BillingTheme {
         ContentDialogSetContent(
-            decription = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
+            description = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
             content = "88888",
             code = "5655",
             count = 8,
@@ -195,7 +199,7 @@ private fun Preview2() {
             onCancel = {},
             onConfirmCode = {},
             onConfirmContent = {},
-            onRecendCode = {},
+            onRecentCode = {},
         )
     }
 }
@@ -205,7 +209,7 @@ private fun Preview2() {
 private fun Preview3() {
     BillingTheme {
         ContentDialogSetContent(
-            decription = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
+            description = "Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.",
             content = "88888",
             code = "",
             count = 0,
@@ -216,7 +220,7 @@ private fun Preview3() {
             onCancel = {},
             onConfirmCode = {},
             onConfirmContent = {},
-            onRecendCode = {},
+            onRecentCode = {},
         )
     }
 }

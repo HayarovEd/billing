@@ -58,4 +58,10 @@
     <string name="send_repeate_code">Отправить код повторно</string>
     <string name="code_confirm">Код подтверждения</string>
     <string name="save">Сохранить</string>
+    <string name="desc_phone">\"Если у Вас изменился номер, пожалуйста, укажите его в соответствующем поле.\",</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="set_phone">Установить телефон</string>
+    <string name="desc_email">Если у Вас изменился E-mail, пожалуйста, укажите его в соответствующем поле.</string>
+    <string name="email_adrress">E-mail адрес</string>
+    <string name="set_email">Установить email</string>
 </resources>

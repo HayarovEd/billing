@@ -13,16 +13,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 
 class ProfileScreenViewModel(
     private val remoteRepository: RemoteRepository
 ) : ViewModel() {
 
 
-
     private val _state = MutableStateFlow(ProfileScreenState())
     val state = _state
         .onStart {
+            _state.value.copy(
+                isLoading = true,
+            )
+                .updateState()
             loadAccountData()
         }
         .stateIn(
@@ -34,27 +38,41 @@ class ProfileScreenViewModel(
     private val eventChannel = Channel<ProfileScreenEvent>()
     val events = eventChannel.receiveAsFlow()
 
+
     fun onAction(action: ProfileScreenAction) {
         when (action) {
-            else -> {
-                // TODO("Handle actions")
-                /*viewModelScope.launch {
-                    eventChannel.send(
-                        //TODO
-                    )
-                }*/
+            is ProfileScreenAction.UpdatePhone -> {
+                updatePhone(action.phone)
+            }
+
+            is ProfileScreenAction.ConfirmEmail -> {
+                confirmValidateClientEmail(action.code)
+            }
+
+            is ProfileScreenAction.ConfirmPhone -> {
+                confirmValidateClientMobileNumber(action.code)
+            }
+
+            ProfileScreenAction.ResentCodeEmail -> {
+                timer()
+                validateEmail()
+            }
+
+            ProfileScreenAction.ResentCodePhone -> {
+                timer()
+                validateMobilePhone()
+            }
+
+            is ProfileScreenAction.UpdateEmail -> {
+                updateEmail(action.email)
             }
         }
     }
 
 
     private fun loadAccountData() {
-        _state.value.copy(
-            isLoading = true,
-        )
-            .updateState()
         viewModelScope.launch {
-            when(val result = remoteRepository.getClientAccount()) {
+            when (val result = remoteRepository.getClientAccount()) {
                 is ResultWork.Error -> {
                     _state.value.copy(
                         isLoading = false,
@@ -62,6 +80,7 @@ class ProfileScreenViewModel(
                         .updateState()
                     eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
+
                 is ResultWork.Success -> {
                     _state.value.copy(
                         isLoading = false,
@@ -69,6 +88,140 @@ class ProfileScreenViewModel(
                     )
                         .updateState()
                 }
+            }
+        }
+    }
+
+
+    private fun updatePhone(phone: String) {
+        state.value.account?.let { account ->
+            viewModelScope.launch {
+                when (val result = remoteRepository.setClientMobilePhone(
+                    uid = account.account.uid,
+                    phone = phone
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadAccountData()
+                        validateMobilePhone()
+                        timer()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateMobilePhone() {
+        viewModelScope.launch {
+            when (val result = remoteRepository.validateClientMobileNumber()) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        phoneRet = result.data
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun confirmValidateClientMobileNumber(code: String) {
+        state.value.phoneRet?.let {
+            viewModelScope.launch {
+                when (val result = remoteRepository.confirmValidateClientMobileNumber(
+                    id = it,
+                    code = code
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadAccountData()
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    private fun updateEmail(email: String) {
+        state.value.account?.let { account ->
+            viewModelScope.launch {
+                when (val result = remoteRepository.setClientEmail(
+                    uid = account.account.uid,
+                    email = email
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadAccountData()
+                        validateEmail()
+                        timer()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateEmail() {
+        viewModelScope.launch {
+            when (val result = remoteRepository.validateClientEmail()) {
+                is ResultWork.Error -> {
+                   // eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        emailRet = result.data
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun confirmValidateClientEmail(code: String) {
+        state.value.phoneRet?.let {
+            viewModelScope.launch {
+                when (val result = remoteRepository.confirmValidateClientEmail(
+                    id = it,
+                    code = code
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadAccountData()
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun timer(count: Int = 10) {
+        viewModelScope.launch {
+            _state.value.copy(
+                count = count
+            )
+                .updateState()
+            for (i in count downTo 0) {
+                _state.value.copy(
+                    count = i
+                )
+                    .updateState()
+                delay(1000)
             }
         }
     }

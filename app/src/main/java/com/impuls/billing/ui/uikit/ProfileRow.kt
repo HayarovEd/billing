@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.uikit
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -19,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.impuls.billing.R
+import com.impuls.billing.ui.profile_screen.ContentDialogSetContent
 import com.impuls.billing.ui.theme.BillingTheme
 
 @Composable
@@ -49,13 +53,59 @@ fun ProfileRow(
 fun ProfileRowWithSave(
     modifier: Modifier = Modifier,
     title: String,
+    count: Int,
+    description: String,
+    subTitle: String,
     content: String,
     defaultContent: String,
     isConfirmed: Boolean,
-    onClickSave: (String) -> Unit,
-    onConfirm: (String) -> Unit,
+    isShowDialog: Boolean,
+    onConfirmContent: (String) -> Unit,
+    onConfirmCode: (String) -> Unit,
+    onRecentCode: () -> Unit,
+    updateVisibleDialog: (Boolean) -> Unit,
 ) {
     var currentContent by retain { mutableStateOf(content) }
+    var currentCode by retain { mutableStateOf("") }
+    var isShowRepeatSendCode by remember { mutableStateOf(false) }
+  //  var isShowDialog by retain { mutableStateOf(false) }
+
+
+    if (isShowDialog) {
+        Dialog(
+            onDismissRequest = {
+                updateVisibleDialog(false)
+                isShowRepeatSendCode = false
+            }
+        ) {
+            ContentDialogSetContent(
+                description = description,
+                title = subTitle,
+                content = currentContent,
+                code = currentCode,
+                count = count,
+                isShowRepeatSendCode = isShowRepeatSendCode,
+                onUpdateContent = {
+                    currentContent = it
+                },
+                onUpdateCode = {
+                    currentCode = it
+                },
+                onCancel = {
+                    updateVisibleDialog(false)
+                    isShowRepeatSendCode = false
+                },
+                onRecentCode = onRecentCode,
+                onConfirmContent = {
+                    onConfirmContent(currentContent)
+                    isShowRepeatSendCode = true
+                },
+                onConfirmCode = {
+                    onConfirmCode(currentCode)
+                }
+            )
+        }
+    }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -70,6 +120,11 @@ fun ProfileRowWithSave(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
+                modifier = modifier.clickable(
+                    onClick = {
+                        updateVisibleDialog(true)
+                    }
+                ),
                 text = content.ifBlank { defaultContent },
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.secondary,
@@ -108,11 +163,17 @@ private fun Preview1() {
     BillingTheme {
         ProfileRowWithSave(
             title = "Контактный телефон",
+            description = stringResource(R.string.desc_phone),
             content = "555-5555",
+            count = 0,
+            isShowDialog = false,
             defaultContent = "Установить телефон",
+            subTitle = stringResource(R.string.phone_number),
             isConfirmed = true,
-            onClickSave = {},
-            onConfirm = {}
+            onConfirmContent = {},
+            onConfirmCode = {},
+            onRecentCode = {},
+            updateVisibleDialog = {}
         )
     }
 }
@@ -126,10 +187,16 @@ private fun Preview2() {
         ProfileRowWithSave(
             title = "Контактный телефон",
             content = "555-5555",
+            count = 0,
+            isShowDialog = false,
             defaultContent = "Установить телефон",
+            description = stringResource(R.string.desc_phone),
+            subTitle = stringResource(R.string.phone_number),
             isConfirmed = false,
-            onClickSave = {},
-            onConfirm = {}
+            onConfirmContent = {},
+            onConfirmCode = {},
+            onRecentCode = {},
+            updateVisibleDialog = {}
         )
     }
 }
@@ -145,10 +212,16 @@ private fun Preview1n() {
         ProfileRowWithSave(
             title = "Контактный телефон",
             content = "",
+            count = 0,
+            isShowDialog = false,
             defaultContent = "Установить телефон",
+            description = stringResource(R.string.desc_phone),
+            subTitle = stringResource(R.string.phone_number),
             isConfirmed = false,
-            onClickSave = {},
-            onConfirm = {}
+            onConfirmContent = {},
+            onConfirmCode = {},
+            onRecentCode = {},
+            updateVisibleDialog = {}
         )
     }
 }
