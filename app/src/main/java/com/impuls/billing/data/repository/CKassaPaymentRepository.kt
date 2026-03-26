@@ -3,12 +3,15 @@ package com.impuls.billing.data.repository
 import com.impuls.billing.data.mapper.convertCompanyPayment
 import com.impuls.billing.data.mapper.convertToImageData
 import com.impuls.billing.data.mapper.convertToPaymentToken
+import com.impuls.billing.data.mapper.convertToResultCheck
+import com.impuls.billing.data.remote.check_account.SuccessCheckLsResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.data.remote.payment.base_data.CompanyPaymentResponse
 import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentToken
+import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
 import com.impuls.billing.domain.utils.BODY_CKASSA_INIT_SERVICE
 import com.impuls.billing.domain.utils.CONTENT_TYPE
@@ -34,7 +37,7 @@ import kotlinx.coroutines.withContext
 
 class CKassaPaymentRepository(
     private val client: HttpClient,
-): PaymentRepository {
+) : PaymentRepository {
 
     /*override*/ suspend fun loadPaymentService(
 
@@ -58,9 +61,10 @@ class CKassaPaymentRepository(
     override suspend fun loadPaymentData(): ResultWork<CompanyPayment, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse {
-                val result = client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/provider-info/$NUMBER_NPO_CODIT") {
-                    contentType(ContentType.Application.Json)
-                }
+                val result =
+                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/provider-info/$NUMBER_NPO_CODIT") {
+                        contentType(ContentType.Application.Json)
+                    }
                 result.call.body<CompanyPaymentResponse>().convertCompanyPayment()
             }
         }
@@ -69,9 +73,10 @@ class CKassaPaymentRepository(
     override suspend fun loadToken(): ResultWork<PaymentToken, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse {
-                val result = client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/csrf/create/$NUMBER_NPO_CODIT") {
-                    contentType(ContentType.Application.Json)
-                }
+                val result =
+                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/csrf/create/$NUMBER_NPO_CODIT") {
+                        contentType(ContentType.Application.Json)
+                    }
                 result.call.body<PaymentTokenReponse>().convertToPaymentToken()
             }
         }
@@ -83,10 +88,28 @@ class CKassaPaymentRepository(
     ): ResultWork<ImageData, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse {
-                val result = client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
-                    contentType(ContentType.Application.Json)
-                }
+                val result =
+                    client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
+                        contentType(ContentType.Application.Json)
+                    }
                 result.call.body<ImageDataResponse>().convertToImageData()
+            }
+        }
+    }
+
+    override suspend fun checkAccount(
+        number: String,
+    ): ResultWork<ResultCheck, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse {
+                val result =
+                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/check-pers-acc/$NUMBER_NPO_CODIT") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            "{\"properties\":{\"Л_СЧЕТ\":\"$number\"}}"
+                        )
+                    }
+                result.call.body<SuccessCheckLsResponse>().convertToResultCheck()
             }
         }
     }

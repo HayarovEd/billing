@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Result(
+data class ResultImage(
     @SerialName("color")
     val color: String,
     @SerialName("image")

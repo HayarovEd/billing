@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ImageDataResponse(
     @SerialName("result")
-    val result: Result,
+    val result: ResultImage,
     @SerialName("status")
     val status: Int
 )

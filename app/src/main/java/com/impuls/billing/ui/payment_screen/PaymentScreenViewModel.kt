@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 
 class PaymentScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -31,6 +32,7 @@ class PaymentScreenViewModel(
     val state = _state
         .onStart {
             loadInitialData()
+            checkLs()
         }
         .stateIn(
             scope = viewModelScope,
@@ -118,6 +120,30 @@ class PaymentScreenViewModel(
                         .updateState()
                 }
             }
+        }
+    }
+
+    private fun checkLs() {
+
+        viewModelScope.launch {
+            delay(300)
+            state.value.number?.let { nmb->
+                when (val result = paymentRepository.checkAccount(
+                    number = nmb
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        _state.value.copy(
+                            resultCheck = result.data
+                        )
+                            .updateState()
+                    }
+                }
+            }
+
         }
     }
 
