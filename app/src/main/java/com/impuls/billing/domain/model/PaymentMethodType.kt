@@ -1,6 +1,6 @@
 package com.impuls.billing.domain.model
 
-enum class PaymentMethodTYpe(
+enum class PaymentMethodType(
     val number: Int
 ) {
     ADVANCE(0),

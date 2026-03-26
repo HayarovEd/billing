@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.payment_screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,8 +33,6 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
-import com.impuls.billing.ui.uikit.ProfileRow
-import com.impuls.billing.ui.uikit.UiTextField
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -46,6 +44,7 @@ fun PaymentScreenRoot(
 
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -73,6 +72,16 @@ private fun PaymentScreen(
     onAction: (PaymentScreenAction) -> Unit,
     navigateToBack: () -> Unit,
 ) {
+    BackHandler {
+        onAction(PaymentScreenAction.UpdatePaymentScreenType(
+            backSwitcher(
+                methodType = state.paymentScreenType,
+                onBack = navigateToBack
+            )
+        ))
+
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
     ) { contentPadding ->
@@ -87,107 +96,89 @@ private fun PaymentScreen(
                 CircularProgressIndicator()
             }
         } else {
-            state.resultCheck?.let { check ->
-                if (check.code == 0) {
-                    Column(
-                        modifier = modifier
-                            .padding(contentPadding)
-                            .fillMaxSize()
-                            .padding(15.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.add_balance),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = modifier.height(10.dp))
-                        Text(
-                            text = stringResource(R.string.add_balance_desc),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                        state.companyPayment?.let { company ->
-                            state.imageData?.let {
-                                TitleCompany(
-                                    name = company.name,
-                                    image = it.image,
-                                    colorString = it.color
+            Box(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .fillMaxSize()
+                    .padding(15.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                state.resultCheck?.let { check ->
+                    if (check.code == 0) {
+                        when (state.paymentScreenType) {
+                            PaymentScreenType.ENTER_AMOUNT -> {
+                                AmountTypeUi(
+                                    companyPayment = state.companyPayment,
+                                    imageData = state.imageData,
+                                    number = state.number,
+                                    amountString = state.amountString,
+                                    typeErrorAmount = state.typeErrorAmount,
+                                    updateAmount = {
+                                        onAction(PaymentScreenAction.UpdateAmount(it))
+                                    },
+                                    updateScreen = {
+                                        onAction(PaymentScreenAction.UpdatePaymentScreenType(
+                                            PaymentScreenType.CHOOSE_PAYMENT_METHOD))
+                                    }
                                 )
                             }
-                        }
-                        Spacer(modifier = modifier.height(10.dp))
-                        ProfileRow(
-                            title = stringResource(R.string.ladger_account),
-                            content = state.number ?: ""
-                        )
-                        Spacer(modifier = modifier.height(10.dp))
-                        UiTextField(
-                            content = state.amountString,
-                            label = stringResource(R.string.amount_to_pay),
-                            isOnlyDigit = true,
-                            keyboardType = KeyboardType.Number,
-                            error = when (state.typeErrorAmount) {
-                                TypeErrorAmount.NO_ERROR -> ""
-                                TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
-                                TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
-                                TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
-                                TypeErrorAmount.BLANK -> stringResource(R.string.text_not_blank)
-                            },
-                            isError = state.typeErrorAmount != TypeErrorAmount.NO_ERROR,
-                            onClickContent = {
-                                onAction(PaymentScreenAction.UpdateAmount(it))
-                            }
-                        )
-                        Spacer(modifier = modifier.height(10.dp))
-                        Button(
-                            modifier = modifier.fillMaxWidth(),
-                            onClick = {
-
-                            },
-                            shape = RoundedCornerShape(5.dp),
-                            enabled = state.typeErrorAmount == TypeErrorAmount.NO_ERROR,
-                            border = BorderStroke(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        ) {
-                            Text(
-                                text = stringResource(R.string.next),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                } else {
-                    Box(
-                        modifier = modifier
-                            .padding(contentPadding)
-                            .fillMaxSize()
-                            .padding(15.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = check.message ?: "",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = modifier.height(10.dp))
-                            Button(
-                                modifier = modifier.fillMaxWidth(),
-                                onClick = navigateToBack,
-                                shape = RoundedCornerShape(5.dp),
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.onBackground
+                            PaymentScreenType.CHOOSE_PAYMENT_METHOD -> {
+                                ChooseMethodUi(
+                                    imageData = state.imageData,
+                                    chosenMethod = state.chosenMethod,
+                                    amount = state.amountString,
+                                    onBack = {
+                                        onAction(PaymentScreenAction.UpdatePaymentScreenType(
+                                            PaymentScreenType.ENTER_AMOUNT))
+                                    },
+                                    updateScreen = {
+                                        /*  onAction(PaymentScreenAction.UpdatePaymentScreenType(
+                                              PaymentScreenType.ENTER_AMOUNT))*/
+                                    },
+                                    updateSelectedMethod = {
+                                        onAction(PaymentScreenAction.UpdateMethodPayment(it))
+                                    }
                                 )
+                            }
+                            PaymentScreenType.CARD -> TODO()
+                            PaymentScreenType.ENTER_PHONE -> TODO()
+                            PaymentScreenType.SBER_PAY -> TODO()
+                            PaymentScreenType.SBP -> TODO()
+                        }
+                    } else {
+                        Box(
+                            modifier = modifier
+                                .padding(contentPadding)
+                                .fillMaxSize()
+                                .padding(15.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = stringResource(R.string.go_back),
-                                    style = MaterialTheme.typography.labelSmall
+                                    text = check.message ?: "",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.error
                                 )
+                                Spacer(modifier = modifier.height(10.dp))
+                                Button(
+                                    modifier = modifier.fillMaxWidth(),
+                                    onClick = navigateToBack,
+                                    shape = RoundedCornerShape(5.dp),
+                                    border = BorderStroke(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.go_back),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
                             }
-                        }
 
+                        }
                     }
                 }
             }

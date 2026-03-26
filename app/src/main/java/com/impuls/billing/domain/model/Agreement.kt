@@ -16,7 +16,7 @@ data class Agreement(
     val installments: Double,
     val balanceStatus: Int,
     val friendAgrmId: Int,
-    val paymentMethod: PaymentMethodTYpe,
+    val paymentMethod: PaymentMethodType,
     val blockDays: Int,
     val blockMonths: Int,
     val orderPayDay: Int,

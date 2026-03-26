@@ -1,7 +1,7 @@
 package com.impuls.billing.domain.utils
 
 import com.impuls.billing.domain.model.BillDeliveryType
-import com.impuls.billing.domain.model.PaymentMethodTYpe
+import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import kotlinx.datetime.LocalDateTime
 
@@ -38,12 +38,12 @@ fun convertToBoolean(number: Int): Boolean {
     }
 }
 
-fun convertPaymentMethodTYpe(number: Int): PaymentMethodTYpe {
+fun convertPaymentMethodTYpe(number: Int): PaymentMethodType {
     return when (number) {
-        0 -> PaymentMethodTYpe.ADVANCE
-        1 -> PaymentMethodTYpe.CREDIT
-        2 -> PaymentMethodTYpe.MIXED
-        else -> PaymentMethodTYpe.ADVANCE
+        0 -> PaymentMethodType.ADVANCE
+        1 -> PaymentMethodType.CREDIT
+        2 -> PaymentMethodType.MIXED
+        else -> PaymentMethodType.ADVANCE
     }
 }
 

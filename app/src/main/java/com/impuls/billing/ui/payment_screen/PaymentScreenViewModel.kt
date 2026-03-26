@@ -51,6 +51,20 @@ class PaymentScreenViewModel(
                 )
                     .updateState()
             }
+
+            is PaymentScreenAction.UpdatePaymentScreenType -> {
+                _state.value.copy(
+                    paymentScreenType = action.paymentScreenType,
+                )
+                    .updateState()
+            }
+
+            is PaymentScreenAction.UpdateMethodPayment -> {
+                _state.value.copy(
+                    chosenMethod = action.typePayment,
+                )
+                    .updateState()
+            }
         }
     }
 

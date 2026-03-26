@@ -44,7 +44,7 @@ import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.ClientAccount
-import com.impuls.billing.domain.model.PaymentMethodTYpe
+import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
@@ -363,7 +363,7 @@ private fun Preview() {
                 installments = 0.0,
                 balanceStatus = 1,
                 friendAgrmId = 0,
-                paymentMethod = PaymentMethodTYpe.CREDIT,
+                paymentMethod = PaymentMethodType.CREDIT,
                 blockDays = 0,
                 blockMonths = 0,
                 orderPayDay = 0,
@@ -462,7 +462,7 @@ private fun Preview1() {
                 installments = 0.0,
                 balanceStatus = 1,
                 friendAgrmId = 0,
-                paymentMethod = PaymentMethodTYpe.ADVANCE,
+                paymentMethod = PaymentMethodType.ADVANCE,
                 blockDays = 0,
                 blockMonths = 0,
                 orderPayDay = 0,

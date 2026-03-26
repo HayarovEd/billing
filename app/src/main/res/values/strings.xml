@@ -74,4 +74,8 @@
     <string name="big_range">Сумма, максимум 100 000 ₽</string>
     <string name="text_not_blank">Поле не может быть пустым</string>
     <string name="next">Продолжить</string>
+    <string name="rub_symbol">₽</string>
+    <string name="choose_payment">Выберите способ оплаты</string>
+    <string name="bank_card">Банковской картой</string>
+    <string name="comission">Комиссия</string>
 </resources>

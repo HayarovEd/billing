@@ -1,11 +1,13 @@
 package com.impuls.billing.ui.payment_screen
 
+import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 
 data class PaymentScreenState(
+    val paymentScreenType: PaymentScreenType = PaymentScreenType.ENTER_AMOUNT,
     val number: String? = null,
     val companyPayment: CompanyPayment? = null,
     val isLoading: Boolean = false,
@@ -13,6 +15,7 @@ data class PaymentScreenState(
     val imageData: ImageData? = null,
     val resultCheck: ResultCheck? = null,
     val amountString: String = "",
+    val chosenMethod: TypePayment? = null,
 ) {
     val amountNull = amountString.toIntOrNull()
     val typeErrorAmount = if (amountNull == null) {
@@ -31,4 +34,33 @@ enum class TypeErrorAmount {
     LESS_RANGE,
     BIG_RANGE,
     BLANK
+}
+
+enum class PaymentScreenType {
+    ENTER_AMOUNT,
+    CHOOSE_PAYMENT_METHOD,
+    CARD,
+    ENTER_PHONE,
+    SBER_PAY,
+    SBP
+}
+
+enum class TypePayment(val comission: Int, val icons: List<Int>) {
+    CARD(
+        comission = 0,
+        icons = listOf(
+            R.drawable.visaa,
+            R.drawable.master,
+            R.drawable.mir_logo,
+            R.drawable.pay_union_pay
+        )
+    ),
+    SBER_PAY(
+        comission = 0,
+        icons = listOf(R.drawable.sber_pay)
+    ),
+    SBP(
+        comission = 0,
+        icons = listOf(R.drawable.sbp)
+    ),
 }
