@@ -19,7 +19,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 
 class PaymentScreenViewModel(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val paymentRepository: PaymentRepository,
 ) : ViewModel() {
 
@@ -68,6 +68,13 @@ class PaymentScreenViewModel(
 
             PaymentScreenAction.Payment -> {
                 toPay()
+            }
+
+            is PaymentScreenAction.UpdatePhone -> {
+                _state.value.copy(
+                    paymentPhone = action.phone,
+                )
+                    .updateState()
             }
         }
     }
@@ -169,7 +176,16 @@ class PaymentScreenViewModel(
                 TypePayment.CARD -> {
                     requestCardPay()
                 }
-                TypePayment.SBER_PAY -> TODO()
+                TypePayment.SBER_PAY -> {
+                    if (state.value.paymentPhone.isBlank()) {
+                        _state.value.copy(
+                            paymentScreenType = PaymentScreenType.ENTER_PHONE,
+                        )
+                            .updateState()
+                    } else {
+                        sendPush()
+                    }
+                }
                 TypePayment.SBP -> TODO()
             }
         }
@@ -213,6 +229,9 @@ class PaymentScreenViewModel(
 
             }
         }
+    }
+
+    private fun sendPush() {
 
     }
 

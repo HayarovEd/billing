@@ -162,7 +162,28 @@ private fun PaymentScreen(
                                 )
                             }
 
-                            PaymentScreenType.ENTER_PHONE -> TODO()
+                            PaymentScreenType.ENTER_PHONE -> {
+                                PhoneTypeUi(
+                                    imageData = state.imageData,
+                                    phone = state.paymentPhone,
+                                    amount = state.amountString,
+                                    updatePhone = {
+                                        onAction(
+                                            PaymentScreenAction.UpdatePhone(it)
+                                        )
+                                    },
+                                    updateScreen = {
+                                        onAction(PaymentScreenAction.Payment)
+                                    },
+                                    onBack = {
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.CHOOSE_PAYMENT_METHOD
+                                            )
+                                        )
+                                    }
+                                )
+                            }
                             PaymentScreenType.SBER_PAY -> TODO()
                             PaymentScreenType.SBP -> TODO()
                         }

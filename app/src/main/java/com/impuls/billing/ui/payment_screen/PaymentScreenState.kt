@@ -18,6 +18,7 @@ data class PaymentScreenState(
     val amountString: String = "",
     val chosenMethod: TypePayment? = null,
     val paymentCard: PaymentCard? = null,
+    val paymentPhone: String = "",
 ) {
     val amountNull = amountString.toIntOrNull()
     val typeErrorAmount = if (amountNull == null) {

@@ -5,6 +5,7 @@ import com.impuls.billing.data.mapper.convertToImageData
 import com.impuls.billing.data.mapper.convertToPaymentToken
 import com.impuls.billing.data.mapper.convertToResultCheck
 import com.impuls.billing.data.mapper.toPaymentCard
+import com.impuls.billing.data.mapper.toPaymentSber
 import com.impuls.billing.data.remote.check_account.SuccessCheckLsResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.data.remote.payment.base_data.CompanyPaymentResponse
@@ -12,10 +13,15 @@ import com.impuls.billing.data.remote.payment_card.PayCardRequest
 import com.impuls.billing.data.remote.payment_card.PaymentCardResponse
 import com.impuls.billing.data.remote.payment_card.PaymentToolDto
 import com.impuls.billing.data.remote.payment_card.PropertiesCardDto
+import com.impuls.billing.data.remote.payment_sberpay.PaymentCberToolDto
+import com.impuls.billing.data.remote.payment_sberpay.PaymentSberRequest
+import com.impuls.billing.data.remote.payment_sberpay.PaymentSberResponse
+import com.impuls.billing.data.remote.payment_sberpay.PropertiesSberDto
 import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
+import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
@@ -147,6 +153,41 @@ class CKassaPaymentRepository(
                         )
                     }
                 result.call.body<PaymentCardResponse>().toPaymentCard()
+            }
+        }
+    }
+
+    override suspend fun paySber(
+        amount: Int,
+        comission: Int,
+        greenZone: Boolean,
+        offline: Boolean,
+        payCurrency: String,
+        type: String,
+        ledgerAccount: String,
+        phone: String,
+    ): ResultWork<PaymentSber, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse {
+                val result =
+                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/do-pay/$NUMBER_NPO_CODIT") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            PaymentSberRequest(
+                                amount = amount * 100,
+                                comission = comission,
+                                greenZone = greenZone,
+                                offline = offline,
+                                payCurrency = payCurrency,
+                                paymentTool = PaymentCberToolDto(
+                                    phone = phone,
+                                    type = type
+                                ),
+                                properties = PropertiesSberDto(ledgerAccount = ledgerAccount)
+                            )
+                        )
+                    }
+                result.call.body<PaymentSberResponse>().toPaymentSber()
             }
         }
     }

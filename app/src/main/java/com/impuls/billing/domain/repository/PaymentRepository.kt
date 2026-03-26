@@ -3,6 +3,7 @@ package com.impuls.billing.domain.repository
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
+import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.utils.DataError
@@ -22,4 +23,15 @@ interface PaymentRepository {
         type: String = "NEW_CARD",
         ledgerAccount: String
     ): ResultWork<PaymentCard, DataError>
+
+    suspend fun paySber(
+        amount: Int,
+        comission: Int,
+        greenZone: Boolean = false,
+        offline: Boolean = false,
+        payCurrency: String,
+        type: String = "SBERPAY",
+        ledgerAccount: String,
+        phone: String
+    ): ResultWork<PaymentSber, DataError>
 }
