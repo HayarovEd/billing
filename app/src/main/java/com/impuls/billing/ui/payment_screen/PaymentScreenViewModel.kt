@@ -45,13 +45,11 @@ class PaymentScreenViewModel(
 
     fun onAction(action: PaymentScreenAction) {
         when (action) {
-            else -> {
-                // TODO("Handle actions")
-                /*viewModelScope.launch {
-                    eventChannel.send(
-                        //TODO
-                    )
-                }*/
+            is PaymentScreenAction.UpdateAmount -> {
+                _state.value.copy(
+                    amountString = action.amount,
+                )
+                    .updateState()
             }
         }
     }

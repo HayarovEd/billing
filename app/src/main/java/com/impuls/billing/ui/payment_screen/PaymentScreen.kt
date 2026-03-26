@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,6 +33,8 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.ProfileRow
+import com.impuls.billing.ui.uikit.UiTextField
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -104,7 +104,7 @@ private fun PaymentScreen(
                             text = stringResource(R.string.add_balance_desc),
                             style = MaterialTheme.typography.labelMedium
                         )
-                        state.companyPayment?.let { company->
+                        state.companyPayment?.let { company ->
                             state.imageData?.let {
                                 TitleCompany(
                                     name = company.name,
@@ -113,7 +113,47 @@ private fun PaymentScreen(
                                 )
                             }
                         }
+                        Spacer(modifier = modifier.height(10.dp))
+                        ProfileRow(
+                            title = stringResource(R.string.ladger_account),
+                            content = state.number ?: ""
+                        )
+                        Spacer(modifier = modifier.height(10.dp))
+                        UiTextField(
+                            content = state.amountString,
+                            label = stringResource(R.string.amount_to_pay),
+                            isOnlyDigit = true,
+                            keyboardType = KeyboardType.Number,
+                            error = when (state.typeErrorAmount) {
+                                TypeErrorAmount.NO_ERROR -> ""
+                                TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
+                                TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
+                                TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
+                                TypeErrorAmount.BLANK -> stringResource(R.string.text_not_blank)
+                            },
+                            isError = state.typeErrorAmount != TypeErrorAmount.NO_ERROR,
+                            onClickContent = {
+                                onAction(PaymentScreenAction.UpdateAmount(it))
+                            }
+                        )
+                        Spacer(modifier = modifier.height(10.dp))
+                        Button(
+                            modifier = modifier.fillMaxWidth(),
+                            onClick = {
 
+                            },
+                            shape = RoundedCornerShape(5.dp),
+                            enabled = state.typeErrorAmount == TypeErrorAmount.NO_ERROR,
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.next),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     }
                 } else {
                     Box(

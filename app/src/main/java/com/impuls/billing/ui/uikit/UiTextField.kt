@@ -27,6 +27,7 @@ fun UiTextField(
     modifier: Modifier = Modifier,
     content: String,
     label: String,
+    error: String = "",
     trailingIcon: ImageVector? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -36,6 +37,7 @@ fun UiTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     isOnlyDigit: Boolean = false,
     maxLines: Int = 1,
+    isError: Boolean = false,
     onClickContent: (String) -> Unit,
     onClickTrailingIcon: () -> Unit = {},
 ) {
@@ -59,7 +61,15 @@ fun UiTextField(
         enabled = enabled,
         readOnly = readOnly,
         textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
-        // cursorBrush = SolidColor(colors.cursorColor(isError).value),
+        isError = isError,
+        supportingText = {
+            if (isError) {
+                Text(
+                    text = error,
+                    style = Typography.labelSmall
+                )
+            }
+        },
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
@@ -139,6 +149,8 @@ private fun UiTextFieldView4() {
         UiTextField(
             content = "world!",
             label = "hallo",
+            error = "error",
+            isError = true,
             onClickContent = {}
         )
     }

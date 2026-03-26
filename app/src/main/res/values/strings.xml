@@ -67,4 +67,11 @@
     <string name="go_back">Вернуться</string>
     <string name="add_balance">Пополнить баланс</string>
     <string name="add_balance_desc">Вы можете пополнять свой лицевой счет удобным для Вас способом через платежные терминалы, через банк, со счета мобильного телефона или при помощи банковской карты</string>
+    <string name="ladger_account">Лицевой счет</string>
+    <string name="amount_to_pay">Сумма к оплате</string>
+    <string name="no_digit">Не число</string>
+    <string name="less_range">Сумма, минимум 50 ₽</string>
+    <string name="big_range">Сумма, максимум 100 000 ₽</string>
+    <string name="text_not_blank">Поле не может быть пустым</string>
+    <string name="next">Продолжить</string>
 </resources>
