@@ -2,11 +2,16 @@ package com.impuls.billing.data.mapper
 
 import com.impuls.billing.data.remote.check_account.SuccessCheckLsResponse
 import com.impuls.billing.data.remote.payment.base_data.CompanyPaymentResponse
+import com.impuls.billing.data.remote.payment_card.PaymentCardResponse
 import com.impuls.billing.domain.model.payment.Comission
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.Mask
+import com.impuls.billing.domain.model.payment.PaymentCard
+import com.impuls.billing.domain.model.payment.ReceiptCard
+import com.impuls.billing.domain.model.payment.ResultCard
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.model.payment.Term
+import com.impuls.billing.domain.model.payment.WayToPayCard
 
 fun CompanyPaymentResponse.convertCompanyPayment(): CompanyPayment {
     return CompanyPayment(
@@ -67,5 +72,29 @@ fun SuccessCheckLsResponse.convertToResultCheck(): ResultCheck {
         code = result.code,
         message = result.message,
         details = result.details
+    )
+}
+
+fun PaymentCardResponse.toPaymentCard(): PaymentCard {
+    return PaymentCard(
+        failUrl = failUrl,
+        receipt = ReceiptCard(
+            createDate = receipt.createDate,
+            fiscalUrl = receipt.fiscalUrl,
+            fnsUrl = receipt.fnsUrl,
+            infoUrl = receipt.infoUrl,
+            regPayNum = receipt.regPayNum
+        ),
+        result = ResultCard(
+            code = result.code,
+            details = result.details,
+            message = result.message
+        ),
+        successUrl = successUrl,
+        wayToPay = WayToPayCard(
+            methodType = wayToPay.methodType,
+            type = wayToPay.type,
+            url = wayToPay.url
+        )
     )
 }

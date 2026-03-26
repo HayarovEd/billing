@@ -78,4 +78,5 @@
     <string name="choose_payment">Выберите способ оплаты</string>
     <string name="bank_card">Банковской картой</string>
     <string name="comission">Комиссия</string>
+    <string name="pay_to_card">Оплата картой</string>
 </resources>

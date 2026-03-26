@@ -73,12 +73,14 @@ private fun PaymentScreen(
     navigateToBack: () -> Unit,
 ) {
     BackHandler {
-        onAction(PaymentScreenAction.UpdatePaymentScreenType(
-            backSwitcher(
-                methodType = state.paymentScreenType,
-                onBack = navigateToBack
+        onAction(
+            PaymentScreenAction.UpdatePaymentScreenType(
+                backSwitcher(
+                    methodType = state.paymentScreenType,
+                    onBack = navigateToBack
+                )
             )
-        ))
+        )
 
     }
 
@@ -117,30 +119,49 @@ private fun PaymentScreen(
                                         onAction(PaymentScreenAction.UpdateAmount(it))
                                     },
                                     updateScreen = {
-                                        onAction(PaymentScreenAction.UpdatePaymentScreenType(
-                                            PaymentScreenType.CHOOSE_PAYMENT_METHOD))
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.CHOOSE_PAYMENT_METHOD
+                                            )
+                                        )
                                     }
                                 )
                             }
+
                             PaymentScreenType.CHOOSE_PAYMENT_METHOD -> {
                                 ChooseMethodUi(
                                     imageData = state.imageData,
                                     chosenMethod = state.chosenMethod,
                                     amount = state.amountString,
                                     onBack = {
-                                        onAction(PaymentScreenAction.UpdatePaymentScreenType(
-                                            PaymentScreenType.ENTER_AMOUNT))
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.ENTER_AMOUNT
+                                            )
+                                        )
                                     },
                                     updateScreen = {
-                                        /*  onAction(PaymentScreenAction.UpdatePaymentScreenType(
-                                              PaymentScreenType.ENTER_AMOUNT))*/
+                                          onAction(PaymentScreenAction.Payment)
                                     },
                                     updateSelectedMethod = {
                                         onAction(PaymentScreenAction.UpdateMethodPayment(it))
                                     }
                                 )
                             }
-                            PaymentScreenType.CARD -> TODO()
+
+                            PaymentScreenType.CARD -> {
+                                PaymentCardUi(
+                                    url = state.paymentCard?.wayToPay?.url,
+                                    onBack = {
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.CHOOSE_PAYMENT_METHOD
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+
                             PaymentScreenType.ENTER_PHONE -> TODO()
                             PaymentScreenType.SBER_PAY -> TODO()
                             PaymentScreenType.SBP -> TODO()

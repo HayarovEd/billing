@@ -65,6 +65,10 @@ class PaymentScreenViewModel(
                 )
                     .updateState()
             }
+
+            PaymentScreenAction.Payment -> {
+                toPay()
+            }
         }
     }
 
@@ -141,7 +145,7 @@ class PaymentScreenViewModel(
             delay(300)
             state.value.number?.let { nmb->
                 when (val result = paymentRepository.checkAccount(
-                    number = "595142026"//nmb
+                    number = nmb
                 )) {
                     is ResultWork.Error -> {
                         eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
@@ -155,8 +159,61 @@ class PaymentScreenViewModel(
                     }
                 }
             }
-
         }
+    }
+
+
+    private fun toPay() {
+        state.value.chosenMethod?.let { method->
+            when (method) {
+                TypePayment.CARD -> {
+                    requestCardPay()
+                }
+                TypePayment.SBER_PAY -> TODO()
+                TypePayment.SBP -> TODO()
+            }
+        }
+    }
+
+    private fun requestCardPay() {
+        state.value.companyPayment?.let { company->
+            viewModelScope.launch {
+                state.value.amountNull?.let { amount->
+                    _state.value.copy(
+                        isLoading = true,
+                        paymentCard = null,
+                    )
+                        .updateState()
+                    state.value.number?.let {
+                        when (val result = paymentRepository.payCard(
+                            payCurrency = company.currency,
+                            amount = amount,
+                            comission = 0,
+                            ledgerAccount = it
+                        )) {
+                            is ResultWork.Error -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                )
+                                    .updateState()
+                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                            }
+                            is ResultWork.Success -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                    paymentScreenType = PaymentScreenType.CARD,
+                                    paymentCard = result.data
+                                )
+                                    .updateState()
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+
     }
 
 

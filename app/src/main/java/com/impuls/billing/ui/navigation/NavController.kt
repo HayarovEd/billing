@@ -12,7 +12,7 @@ import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 @Composable
 fun NavController(
-    startDestination: NavigationRoute = NavigationRoute.Login,
+    startDestination: NavigationRoute = NavigationRoute.Payment("595142026"),
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
