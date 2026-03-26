@@ -64,4 +64,7 @@
     <string name="desc_email">Если у Вас изменился E-mail, пожалуйста, укажите его в соответствующем поле.</string>
     <string name="email_adrress">E-mail адрес</string>
     <string name="set_email">Установить email</string>
+    <string name="go_back">Вернуться</string>
+    <string name="add_balance">Пополнить баланс</string>
+    <string name="add_balance_desc">Вы можете пополнять свой лицевой счет удобным для Вас способом через платежные терминалы, через банк, со счета мобильного телефона или при помощи банковской карты</string>
 </resources>

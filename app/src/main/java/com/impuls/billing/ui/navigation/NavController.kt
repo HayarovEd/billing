@@ -36,7 +36,11 @@ fun NavController(
         }
 
         composable<NavigationRoute.Payment> {
-            PaymentScreenRoot()
+            PaymentScreenRoot(
+                navigateToBack = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }

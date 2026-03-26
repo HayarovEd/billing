@@ -129,7 +129,7 @@ class PaymentScreenViewModel(
             delay(300)
             state.value.number?.let { nmb->
                 when (val result = paymentRepository.checkAccount(
-                    number = nmb
+                    number = "595142026"//nmb
                 )) {
                     is ResultWork.Error -> {
                         eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
