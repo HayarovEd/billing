@@ -22,8 +22,13 @@ import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.PhoneVisualTransformation
 import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.UiTextField
+
+private const val mask = "+0(000)000-00-00"
+private  const val maskNumber = '0'
+
 
 @Composable
 fun PhoneTypeUi(
@@ -74,9 +79,10 @@ fun PhoneTypeUi(
         UiTextField(
             content = phone,
             label = "",
+            visualTransformation = PhoneVisualTransformation(mask, maskNumber),
             keyboardType = KeyboardType.Phone,
-            onClickContent = {
-                updatePhone(it)
+            onClickContent = { str ->
+                updatePhone(str.take(mask.count { it == maskNumber }))
             }
         )
         Spacer(modifier = modifier.height(20.dp))

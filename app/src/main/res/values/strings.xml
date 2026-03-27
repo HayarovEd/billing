@@ -80,6 +80,6 @@
     <string name="comission">Комиссия</string>
     <string name="pay_to_card">Оплата картой</string>
     <string name="sberpay_payment">Оплата через SberPay</string>
-    <string name="enter_number_phone">Введите номер телефона, к которому подключен СберБанк Онлайн</string>
+    <string name="enter_number_phone">Введите номер телефона, к которому подключен СберБанк Онлайн в формате 7xxxxxxxxxx</string>
     <string name="get_push">Получить пуш</string>
 </resources>
