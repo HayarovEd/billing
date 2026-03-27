@@ -2,7 +2,6 @@ package com.impuls.billing.data.repository
 
 import com.impuls.billing.data.mapper.convertCompanyPayment
 import com.impuls.billing.data.mapper.convertToImageData
-import com.impuls.billing.data.mapper.convertToPaymentToken
 import com.impuls.billing.data.mapper.convertToResultCheck
 import com.impuls.billing.data.mapper.toCheckPaymentStatus
 import com.impuls.billing.data.mapper.toPaymentCard
@@ -21,14 +20,12 @@ import com.impuls.billing.data.remote.payment_sberpay.PaymentSberRequest
 import com.impuls.billing.data.remote.payment_sberpay.PaymentSberResponse
 import com.impuls.billing.data.remote.payment_sberpay.PropertiesSberDto
 import com.impuls.billing.data.remote.payment_sbp.PaymentSbpResponse
-import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
 import com.impuls.billing.domain.model.payment.CheckPaymentStatus
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
 import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentSbp
-import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
 import com.impuls.billing.domain.utils.DataError
@@ -57,18 +54,6 @@ class CKassaPaymentRepository(
                         contentType(ContentType.Application.Json)
                     }
                 result.call.body<CompanyPaymentResponse>().convertCompanyPayment()
-            }
-        }
-    }
-
-    override suspend fun loadToken(): ResultWork<PaymentToken, DataError> {
-        return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/csrf/create/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                    }
-                result.call.body<PaymentTokenReponse>().convertToPaymentToken()
             }
         }
     }

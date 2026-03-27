@@ -7,7 +7,6 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
 import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentSbp
-import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 
 data class PaymentScreenState(
@@ -15,7 +14,6 @@ data class PaymentScreenState(
     val number: String? = null,
     val companyPayment: CompanyPayment? = null,
     val isLoading: Boolean = false,
-    val paymentToken: PaymentToken? = null,
     val imageData: ImageData? = null,
     val resultCheck: ResultCheck? = null,
     val amountString: String = "",

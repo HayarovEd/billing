@@ -120,20 +120,6 @@ class PaymentScreenViewModel(
                 }
             }
         }
-        viewModelScope.launch {
-            when (val result = paymentRepository.loadToken()) {
-                is ResultWork.Error -> {
-                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                }
-
-                is ResultWork.Success -> {
-                    _state.value.copy(
-                        paymentToken = result.data
-                    )
-                        .updateState()
-                }
-            }
-        }
     }
 
     private fun loadImage(
