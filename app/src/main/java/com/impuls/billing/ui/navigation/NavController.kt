@@ -1,0 +1,46 @@
+package com.impuls.billing.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.impuls.billing.ui.login_screen.LoginScreenRoot
+import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
+import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
+import com.impuls.billing.ui.uikit.model.NavigationRoute
+
+
+@Composable
+fun NavController(
+    startDestination: NavigationRoute = NavigationRoute.Payment("595142026"),
+) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = startDestination) {
+
+        composable<NavigationRoute.Splash> {
+
+        }
+        composable<NavigationRoute.Login> {
+            LoginScreenRoot(
+                onNavigateToAccounts = {
+                    navController.navigate(NavigationRoute.Profile)
+                }
+            )
+        }
+        composable<NavigationRoute.Profile> {
+            ProfileScreenRoot(
+                onNavigateToPayment = {
+                    navController.navigate(NavigationRoute.Payment(it))
+                }
+            )
+        }
+
+        composable<NavigationRoute.Payment> {
+            PaymentScreenRoot(
+                navigateToBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+    }
+}
