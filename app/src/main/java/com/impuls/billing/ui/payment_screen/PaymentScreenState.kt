@@ -1,9 +1,11 @@
 package com.impuls.billing.ui.payment_screen
 
 import com.impuls.billing.R
+import com.impuls.billing.domain.model.payment.CheckPaymentStatus
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
+import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 
@@ -19,6 +21,8 @@ data class PaymentScreenState(
     val chosenMethod: TypePayment? = null,
     val paymentCard: PaymentCard? = null,
     val paymentPhone: String = "",
+    val paymentSber: PaymentSber? = null,
+    val checkPaymentStatus: CheckPaymentStatus? = null,
 ) {
     val amountNull = amountString.toIntOrNull()
     val typeErrorAmount = if (amountNull == null) {

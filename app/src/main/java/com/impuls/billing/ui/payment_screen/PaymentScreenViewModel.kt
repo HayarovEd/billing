@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.impuls.billing.domain.repository.PaymentRepository
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.uikit.asTextMessage
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +76,10 @@ class PaymentScreenViewModel(
                     paymentPhone = action.phone,
                 )
                     .updateState()
+            }
+
+            PaymentScreenAction.CheckPayment -> {
+                checkPayment()
             }
         }
     }
@@ -197,7 +202,7 @@ class PaymentScreenViewModel(
                 state.value.amountNull?.let { amount->
                     _state.value.copy(
                         isLoading = true,
-                        paymentCard = null,
+                        paymentSber = null,
                     )
                         .updateState()
                     state.value.number?.let {
@@ -217,7 +222,7 @@ class PaymentScreenViewModel(
                             is ResultWork.Success -> {
                                 _state.value.copy(
                                     isLoading = false,
-                                    paymentScreenType = PaymentScreenType.CARD,
+                                    paymentScreenType = PaymentScreenType.SBER_PAY,
                                     paymentCard = result.data
                                 )
                                     .updateState()
@@ -232,7 +237,70 @@ class PaymentScreenViewModel(
     }
 
     private fun sendPush() {
+        state.value.companyPayment?.let { company->
+            viewModelScope.launch {
+                state.value.amountNull?.let { amount->
+                    _state.value.copy(
+                        isLoading = true,
+                        paymentCard = null,
+                    )
+                        .updateState()
+                    state.value.number?.let {
+                        when (val result = paymentRepository.paySber(
+                            payCurrency = company.currency,
+                            amount = amount,
+                            comission = 0,
+                            phone = state.value.paymentPhone,
+                            ledgerAccount = it
+                        )) {
+                            is ResultWork.Error -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                )
+                                    .updateState()
+                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                            }
+                            is ResultWork.Success -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                    paymentScreenType = PaymentScreenType.SBER_PAY,
+                                    paymentSber = result.data
+                                )
+                                    .updateState()
+                            }
+                        }
+                    }
 
+                }
+
+            }
+        }
+    }
+
+    private fun checkPayment() {
+        viewModelScope.launch {
+            when (state.value.paymentScreenType) {
+                PaymentScreenType.CARD -> {
+
+                }
+                PaymentScreenType.SBER_PAY -> {
+                    state.value.paymentSber?.let { sber ->
+                        when (val result = paymentRepository.checkStatusPayment(sber.receipt.regPayNum)) {
+                            is ResultWork.Error -> {
+                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                            }
+                            is ResultWork.Success -> {
+                                eventChannel.send(PaymentScreenEvent.OnMessage(result.data.state.asTextMessage()))
+                            }
+                        }
+                    }
+                }
+                PaymentScreenType.SBP -> {
+
+                }
+                else -> {}
+            }
+        }
     }
 
 

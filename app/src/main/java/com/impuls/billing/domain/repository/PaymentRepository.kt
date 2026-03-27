@@ -1,5 +1,6 @@
 package com.impuls.billing.domain.repository
 
+import com.impuls.billing.domain.model.payment.CheckPaymentStatus
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
@@ -34,4 +35,6 @@ interface PaymentRepository {
         ledgerAccount: String,
         phone: String
     ): ResultWork<PaymentSber, DataError>
+
+    suspend fun checkStatusPayment(regPayNum: String): ResultWork<CheckPaymentStatus, DataError>
 }

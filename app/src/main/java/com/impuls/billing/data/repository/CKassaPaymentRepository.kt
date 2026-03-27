@@ -4,9 +4,11 @@ import com.impuls.billing.data.mapper.convertCompanyPayment
 import com.impuls.billing.data.mapper.convertToImageData
 import com.impuls.billing.data.mapper.convertToPaymentToken
 import com.impuls.billing.data.mapper.convertToResultCheck
+import com.impuls.billing.data.mapper.toCheckPaymentStatus
 import com.impuls.billing.data.mapper.toPaymentCard
 import com.impuls.billing.data.mapper.toPaymentSber
 import com.impuls.billing.data.remote.check_account.SuccessCheckLsResponse
+import com.impuls.billing.data.remote.check_status_payment.CheckPaymentStatusResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.data.remote.payment.base_data.CompanyPaymentResponse
 import com.impuls.billing.data.remote.payment_card.PayCardRequest
@@ -18,6 +20,7 @@ import com.impuls.billing.data.remote.payment_sberpay.PaymentSberRequest
 import com.impuls.billing.data.remote.payment_sberpay.PaymentSberResponse
 import com.impuls.billing.data.remote.payment_sberpay.PropertiesSberDto
 import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
+import com.impuls.billing.domain.model.payment.CheckPaymentStatus
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.PaymentCard
@@ -25,23 +28,14 @@ import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentToken
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
-import com.impuls.billing.domain.utils.BODY_CKASSA_INIT_SERVICE
-import com.impuls.billing.domain.utils.CONTENT_TYPE
-import com.impuls.billing.domain.utils.CONTENT_TYPE_X_GWT
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.NUMBER_NPO_CODIT
 import com.impuls.billing.domain.utils.ResultWork
-import com.impuls.billing.domain.utils.X_GWT_MODULE_BASE
-import com.impuls.billing.domain.utils.X_GWT_MODULE_BASE_VALUE
-import com.impuls.billing.domain.utils.X_GWT_PERMUTATION
-import com.impuls.billing.domain.utils.X_GWT_PERMUTATION_VALUE
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -51,24 +45,6 @@ class CKassaPaymentRepository(
     private val client: HttpClient,
 ) : PaymentRepository {
 
-    /*override*/ suspend fun loadPaymentService(
-
-    ): ResultWork<Unit, DataError> {
-        return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result = client.post("https://ckassa.ru/payment/payment/PaymentService") {
-                    contentType(ContentType.Application.Json)
-                    header(X_GWT_PERMUTATION, X_GWT_PERMUTATION_VALUE)
-                    header(X_GWT_MODULE_BASE, X_GWT_MODULE_BASE_VALUE)
-                    header(CONTENT_TYPE, CONTENT_TYPE_X_GWT)
-                    setBody(
-                        BODY_CKASSA_INIT_SERVICE
-                    )
-                }
-                val stringResult = result.bodyAsText()
-            }
-        }
-    }
 
     override suspend fun loadPaymentData(): ResultWork<CompanyPayment, DataError> {
         return withContext(Dispatchers.IO) {
@@ -188,6 +164,23 @@ class CKassaPaymentRepository(
                         )
                     }
                 result.call.body<PaymentSberResponse>().toPaymentSber()
+            }
+        }
+    }
+
+
+
+
+    override suspend fun checkStatusPayment(
+        regPayNum: String
+    ): ResultWork<CheckPaymentStatus, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse {
+                val result =
+                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/payment-info/$regPayNum") {
+                        contentType(ContentType.Application.Json)
+                    }
+                result.call.body<CheckPaymentStatusResponse>().toCheckPaymentStatus()
             }
         }
     }

@@ -141,7 +141,7 @@ private fun PaymentScreen(
                                         )
                                     },
                                     updateScreen = {
-                                          onAction(PaymentScreenAction.Payment)
+                                        onAction(PaymentScreenAction.Payment)
                                     },
                                     updateSelectedMethod = {
                                         onAction(PaymentScreenAction.UpdateMethodPayment(it))
@@ -184,7 +184,24 @@ private fun PaymentScreen(
                                     }
                                 )
                             }
-                            PaymentScreenType.SBER_PAY -> TODO()
+
+                            PaymentScreenType.SBER_PAY -> {
+                                SberPayTypeUi(
+                                    imageData = state.imageData,
+                                    amount = state.amountString,
+                                    checkPayment = {
+                                        onAction(PaymentScreenAction.CheckPayment)
+                                    },
+                                    onBack = {
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.CHOOSE_PAYMENT_METHOD
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+
                             PaymentScreenType.SBP -> TODO()
                         }
                     } else {

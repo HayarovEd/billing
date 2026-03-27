@@ -6,4 +6,5 @@ sealed interface PaymentScreenAction {
     class UpdateMethodPayment(val typePayment: TypePayment): PaymentScreenAction
     data object Payment: PaymentScreenAction
     class UpdatePhone(val phone: String): PaymentScreenAction
+    data object CheckPayment: PaymentScreenAction
 }

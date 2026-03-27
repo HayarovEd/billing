@@ -1,6 +1,7 @@
 package com.impuls.billing.ui.uikit
 
 import com.impuls.billing.R
+import com.impuls.billing.domain.model.payment.StatusPayment
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.UiText.*
@@ -88,4 +89,33 @@ fun DataError.asUiText(): UiText {
 
 fun ResultWork.Error<*, DataError>.asErrorUiText(): UiText {
     return error.asUiText()
+}
+
+fun StatusPayment.asTextMessage(): UiText {
+    return when (this) {
+        StatusPayment.CREATED_ERROR -> StringResource(
+            R.string.error_create
+        )
+        StatusPayment.PAYED -> StringResource(
+            R.string.payment_payed
+        )
+        StatusPayment.CREATED -> StringResource(
+            R.string.payment_created
+        )
+        StatusPayment.REJECTED -> StringResource(
+            R.string.payment_rejected
+        )
+        StatusPayment.REFUNDED -> StringResource(
+            R.string.pay_refunded
+        )
+        StatusPayment.HOLDED -> StringResource(
+            R.string.payment_holded
+        )
+        StatusPayment.PROCESSED -> StringResource(
+            R.string.payment_processed
+        )
+        StatusPayment.ERROR -> StringResource(
+            R.string.payment_error
+        )
+    }
 }

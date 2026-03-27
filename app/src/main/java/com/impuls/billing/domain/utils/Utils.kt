@@ -3,6 +3,7 @@ package com.impuls.billing.domain.utils
 import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
+import com.impuls.billing.domain.model.payment.StatusPayment
 import kotlinx.datetime.LocalDateTime
 
 
@@ -56,4 +57,18 @@ fun String.toLocalDateTime(): LocalDateTime {
     val formattedDate = "${dateParts[2]}-${dateParts[1]}-${dateParts[0]}"
 
     return LocalDateTime.parse("${formattedDate}T${timePart}")
+}
+
+fun convertToStatusPayment(string: String): StatusPayment {
+    return when (string.lowercase()) {
+        "created_error" -> StatusPayment.CREATED_ERROR
+        "created" -> StatusPayment.CREATED
+        "rejected" -> StatusPayment.REJECTED
+        "refunded" -> StatusPayment.REFUNDED
+        "payed" -> StatusPayment.PAYED
+        "holded" -> StatusPayment.HOLDED
+        "processed" -> StatusPayment.PROCESSED
+        "error" -> StatusPayment.ERROR
+        else -> StatusPayment.ERROR
+    }
 }

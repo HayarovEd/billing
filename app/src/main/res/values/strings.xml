@@ -82,4 +82,14 @@
     <string name="sberpay_payment">Оплата через SberPay</string>
     <string name="enter_number_phone">Введите номер телефона, к которому подключен СберБанк Онлайн в формате 7xxxxxxxxxx</string>
     <string name="get_push">Получить пуш</string>
+    <string name="sberpay_desc">1.\tСейчас на телефон придёт пуш-уведомление или СМС.\n2.\tЧтобы подтвердить платеж нажмите на пуш и перейдите в приложение СберБанк Онлайн. Или позвоните по телефону из СМС.</string>
+    <string name="sberpay_warning">!\tЕсли вы не получили пуш, проверьте в приложении банка раздел «Уведомления»</string>
+    <string name="error_create">Ошибка при создании платежа</string>
+    <string name="payment_created">Платеж создан, но не оплачен</string>
+    <string name="payment_rejected">Платеж отменен</string>
+    <string name="pay_refunded">Оплата возвращена</string>
+    <string name="payment_payed">Платеж оплачен</string>
+    <string name="payment_holded">Денежные средства заморожены</string>
+    <string name="payment_processed">Платеж оплачен и успешно проведен. Не может смениться, т.к. транзакция уже завершена.</string>
+    <string name="payment_error">Ошибка при проведении (платеж оплачен, но при проведении платежа возникла ошибка)</string>
 </resources>
