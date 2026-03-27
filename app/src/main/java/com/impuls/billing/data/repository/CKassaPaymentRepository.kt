@@ -28,6 +28,7 @@ import com.impuls.billing.domain.model.payment.PaymentSber
 import com.impuls.billing.domain.model.payment.PaymentSbp
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
+import com.impuls.billing.domain.utils.BASE_PAYMENT_URL
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.NUMBER_NPO_CODIT
 import com.impuls.billing.domain.utils.ResultWork
@@ -50,7 +51,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/provider-info/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}provider-info/$NUMBER_NPO_CODIT") {
                         contentType(ContentType.Application.Json)
                     }
                 result.call.body<CompanyPaymentResponse>().convertCompanyPayment()
@@ -79,7 +80,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/check-pers-acc/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}check-pers-acc/$NUMBER_NPO_CODIT") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             "{\"properties\":{\"Л_СЧЕТ\":\"$number\"}}"
@@ -102,7 +103,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/do-pay/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             PayCardRequest(
@@ -134,7 +135,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/do-pay/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             PaymentSberRequest(
@@ -169,7 +170,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/do-pay/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             PayCardRequest(
@@ -197,7 +198,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse {
                 val result =
-                    client.post("https://pfapi.ckassa.ru/api-shop/rs/payform/payment-info/$regPayNum") {
+                    client.post("${BASE_PAYMENT_URL}payment-info/$regPayNum") {
                         contentType(ContentType.Application.Json)
                     }
                 result.call.body<CheckPaymentStatusResponse>().toCheckPaymentStatus()

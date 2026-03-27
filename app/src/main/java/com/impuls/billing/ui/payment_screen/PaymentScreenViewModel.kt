@@ -220,7 +220,7 @@ class PaymentScreenViewModel(
                             is ResultWork.Success -> {
                                 _state.value.copy(
                                     isLoading = false,
-                                    paymentScreenType = PaymentScreenType.SBER_PAY,
+                                    paymentScreenType = PaymentScreenType.CARD,
                                     paymentCard = result.data
                                 )
                                     .updateState()
