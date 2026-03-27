@@ -92,4 +92,6 @@
     <string name="payment_holded">Денежные средства заморожены</string>
     <string name="payment_processed">Платеж оплачен и успешно проведен. Не может смениться, т.к. транзакция уже завершена.</string>
     <string name="payment_error">Ошибка при проведении (платеж оплачен, но при проведении платежа возникла ошибка)</string>
+    <string name="sbprpay_desc">1.\tНажмите «Оплатить»\n2.\tВыберите приложение вашего банка, с помощью которого хотите оплатить\n3.\tПодтвердите платеж</string>
+    <string name="do_payment">Оплатить</string>
 </resources>

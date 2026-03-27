@@ -81,6 +81,14 @@ class PaymentScreenViewModel(
             PaymentScreenAction.CheckPayment -> {
                 checkPayment()
             }
+
+            PaymentScreenAction.SendSpbLink -> {
+                state.value.paymentSbp?.let { sbp ->
+                    viewModelScope.launch {
+                        eventChannel.send(PaymentScreenEvent.SendLink(sbp.wayToPay.url))
+                    }
+                }
+            }
         }
     }
 
@@ -155,7 +163,7 @@ class PaymentScreenViewModel(
 
         viewModelScope.launch {
             delay(300)
-            state.value.number?.let { nmb->
+            state.value.number?.let { nmb ->
                 when (val result = paymentRepository.checkAccount(
                     number = nmb
                 )) {
@@ -176,11 +184,12 @@ class PaymentScreenViewModel(
 
 
     private fun toPay() {
-        state.value.chosenMethod?.let { method->
+        state.value.chosenMethod?.let { method ->
             when (method) {
                 TypePayment.CARD -> {
                     requestCardPay()
                 }
+
                 TypePayment.SBER_PAY -> {
                     if (state.value.paymentPhone.isBlank()) {
                         _state.value.copy(
@@ -191,15 +200,18 @@ class PaymentScreenViewModel(
                         sendPush()
                     }
                 }
-                TypePayment.SBP -> TODO()
+
+                TypePayment.SBP -> {
+                    requestSbpPay()
+                }
             }
         }
     }
 
     private fun requestCardPay() {
-        state.value.companyPayment?.let { company->
+        state.value.companyPayment?.let { company ->
             viewModelScope.launch {
-                state.value.amountNull?.let { amount->
+                state.value.amountNull?.let { amount ->
                     _state.value.copy(
                         isLoading = true,
                         paymentSber = null,
@@ -209,7 +221,6 @@ class PaymentScreenViewModel(
                         when (val result = paymentRepository.payCard(
                             payCurrency = company.currency,
                             amount = amount,
-                            comission = 0,
                             ledgerAccount = it
                         )) {
                             is ResultWork.Error -> {
@@ -219,6 +230,7 @@ class PaymentScreenViewModel(
                                     .updateState()
                                 eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
                             }
+
                             is ResultWork.Success -> {
                                 _state.value.copy(
                                     isLoading = false,
@@ -237,9 +249,9 @@ class PaymentScreenViewModel(
     }
 
     private fun sendPush() {
-        state.value.companyPayment?.let { company->
+        state.value.companyPayment?.let { company ->
             viewModelScope.launch {
-                state.value.amountNull?.let { amount->
+                state.value.amountNull?.let { amount ->
                     _state.value.copy(
                         isLoading = true,
                         paymentCard = null,
@@ -249,7 +261,6 @@ class PaymentScreenViewModel(
                         when (val result = paymentRepository.paySber(
                             payCurrency = company.currency,
                             amount = amount,
-                            comission = 0,
                             phone = state.value.paymentPhone,
                             ledgerAccount = it
                         )) {
@@ -260,6 +271,7 @@ class PaymentScreenViewModel(
                                     .updateState()
                                 eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
                             }
+
                             is ResultWork.Success -> {
                                 _state.value.copy(
                                     isLoading = false,
@@ -277,27 +289,66 @@ class PaymentScreenViewModel(
         }
     }
 
+    private fun requestSbpPay() {
+        state.value.companyPayment?.let { company ->
+            viewModelScope.launch {
+                state.value.amountNull?.let { amount ->
+                    _state.value.copy(
+                        isLoading = true,
+                        paymentCard = null,
+                    )
+                        .updateState()
+                    state.value.number?.let {
+                        when (val result = paymentRepository.paySbp(
+                            payCurrency = company.currency,
+                            amount = amount,
+                            ledgerAccount = it
+                        )) {
+                            is ResultWork.Error -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                )
+                                    .updateState()
+                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                            }
+
+                            is ResultWork.Success -> {
+                                _state.value.copy(
+                                    isLoading = false,
+                                    paymentScreenType = PaymentScreenType.SBP,
+                                    paymentSbp = result.data
+                                )
+                                    .updateState()
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
+
     private fun checkPayment() {
         viewModelScope.launch {
             when (state.value.paymentScreenType) {
-                PaymentScreenType.CARD -> {
-
-                }
+                PaymentScreenType.CARD -> {}
                 PaymentScreenType.SBER_PAY -> {
                     state.value.paymentSber?.let { sber ->
-                        when (val result = paymentRepository.checkStatusPayment(sber.receipt.regPayNum)) {
+                        when (val result =
+                            paymentRepository.checkStatusPayment(sber.receipt.regPayNum)) {
                             is ResultWork.Error -> {
                                 eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
                             }
+
                             is ResultWork.Success -> {
                                 eventChannel.send(PaymentScreenEvent.OnMessage(result.data.state.asTextMessage()))
                             }
                         }
                     }
                 }
-                PaymentScreenType.SBP -> {
 
-                }
+                PaymentScreenType.SBP -> {}
                 else -> {}
             }
         }

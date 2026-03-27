@@ -33,6 +33,7 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.openSbpUrl
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -53,6 +54,10 @@ fun PaymentScreenRoot(
                     context
                 )
             )
+
+            is PaymentScreenEvent.SendLink -> {
+                openSbpUrl(context, event.url)
+            }
         }
     }
 
@@ -202,7 +207,22 @@ private fun PaymentScreen(
                                 )
                             }
 
-                            PaymentScreenType.SBP -> TODO()
+                            PaymentScreenType.SBP -> {
+                                SbpPayTypeui(
+                                    imageData = state.imageData,
+                                    amount = state.amountString,
+                                    doPayment = {
+                                        onAction(PaymentScreenAction.SendSpbLink)
+                                    },
+                                    onBack = {
+                                        onAction(
+                                            PaymentScreenAction.UpdatePaymentScreenType(
+                                                PaymentScreenType.CHOOSE_PAYMENT_METHOD
+                                            )
+                                        )
+                                    }
+                                )
+                            }
                         }
                     } else {
                         Box(
