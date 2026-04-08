@@ -6,13 +6,23 @@ import com.impuls.billing.domain.utils.ResultWork
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.isSuccess
 import io.ktor.serialization.JsonConvertException
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ClosedByteChannelException
 
-suspend fun <D> handleResponse(data: suspend () -> D): ResultWork<D, DataError> {
+suspend fun <D> handleResponse(response: HttpResponse, data: suspend (HttpResponse) -> D): ResultWork<D, DataError> {
     return try {
-        ResultWork.Success(data())
+        if (response.status.isSuccess()) {
+            ResultWork.Success(data(response))
+        } else {
+            when (response.status.value) {
+                400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
+                401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
+                else -> ResultWork.Error(DataError.Network.UNKNOWN)
+            }
+        }
     } catch (e: ClientRequestException) {
         when (e.response.status.value) {
             400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)

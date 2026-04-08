@@ -7,17 +7,15 @@ import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.RemoteRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
-import com.impuls.billing.ui.uikit.UiText
 import com.impuls.billing.ui.uikit.asUiText
-import com.impuls.billing.ui.uikit.model.ResultLogin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.channels.Channel
 
 class LoginScreenViewModel(
     private val remoteRepository: RemoteRepository,
@@ -86,21 +84,13 @@ class LoginScreenViewModel(
                             isLoading = false,
                         )
                             .updateState()
-                        when (val loginResult = result.data) {
-                            is ResultLogin.Error -> {
-                                eventChannel.send(LoginScreenEvent.OnMessage(UiText.DynamicString(loginResult.message)))
-                            }
-                            is ResultLogin.Success -> {
-                                eventChannel.send(LoginScreenEvent.NavigateEvent)
-                                dataStoreRepository.setLocalAuthorization(
-                                    LastAuthData(
-                                        login = state.value.login,
-                                        password = state.value.password
-                                    )
-                                )
-                            }
-                        }
-
+                        eventChannel.send(LoginScreenEvent.NavigateEvent)
+                        dataStoreRepository.setLocalAuthorization(
+                            LastAuthData(
+                                login = state.value.login,
+                                password = state.value.password
+                            )
+                        )
                     }
                 }
             }

@@ -49,12 +49,12 @@ class CKassaPaymentRepository(
 
     override suspend fun loadPaymentData(): ResultWork<CompanyPayment, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}provider-info/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                    }
-                result.call.body<CompanyPaymentResponse>().convertCompanyPayment()
+            handleResponse(
+                response = client.post("${BASE_PAYMENT_URL}provider-info/$NUMBER_NPO_CODIT") {
+                    contentType(ContentType.Application.Json)
+                }
+            ) {
+                it.call.body<CompanyPaymentResponse>().convertCompanyPayment()
             }
         }
     }
@@ -64,12 +64,10 @@ class CKassaPaymentRepository(
         service: String,
     ): ResultWork<ImageData, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
-                        contentType(ContentType.Application.Json)
-                    }
-                result.call.body<ImageDataResponse>().convertToImageData()
+            handleResponse( client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
+                contentType(ContentType.Application.Json)
+            }) {
+               it.call.body<ImageDataResponse>().convertToImageData()
             }
         }
     }
@@ -78,15 +76,13 @@ class CKassaPaymentRepository(
         number: String,
     ): ResultWork<ResultCheck, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}check-pers-acc/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            "{\"properties\":{\"Л_СЧЕТ\":\"$number\"}}"
-                        )
-                    }
-                result.call.body<SuccessCheckLsResponse>().convertToResultCheck()
+            handleResponse(client.post("${BASE_PAYMENT_URL}check-pers-acc/$NUMBER_NPO_CODIT") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    "{\"properties\":{\"Л_СЧЕТ\":\"$number\"}}"
+                )
+            }) {
+                it.call.body<SuccessCheckLsResponse>().convertToResultCheck()
             }
         }
     }
@@ -101,23 +97,21 @@ class CKassaPaymentRepository(
         ledgerAccount: String
     ): ResultWork<PaymentCard, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            PayCardRequest(
-                                amount = amount * 100,
-                                comission = comission,
-                                greenZone = greenZone,
-                                offline = offline,
-                                payCurrency = payCurrency,
-                                paymentTool = PaymentToolDto(type = type),
-                                properties = PropertiesCardDto(ledgerAccount = ledgerAccount)
-                            )
-                        )
-                    }
-                result.call.body<PaymentCardResponse>().toPaymentCard()
+            handleResponse(client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    PayCardRequest(
+                        amount = amount * 100,
+                        comission = comission,
+                        greenZone = greenZone,
+                        offline = offline,
+                        payCurrency = payCurrency,
+                        paymentTool = PaymentToolDto(type = type),
+                        properties = PropertiesCardDto(ledgerAccount = ledgerAccount)
+                    )
+                )
+            }) {
+                it.call.body<PaymentCardResponse>().toPaymentCard()
             }
         }
     }
@@ -133,26 +127,24 @@ class CKassaPaymentRepository(
         phone: String,
     ): ResultWork<PaymentSber, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            PaymentSberRequest(
-                                amount = amount * 100,
-                                comission = comission,
-                                greenZone = greenZone,
-                                offline = offline,
-                                payCurrency = payCurrency,
-                                paymentTool = PaymentCberToolDto(
-                                    phone = phone,
-                                    type = type
-                                ),
-                                properties = PropertiesSberDto(ledgerAccount = ledgerAccount)
-                            )
-                        )
-                    }
-                result.call.body<PaymentSberResponse>().toPaymentSber()
+            handleResponse( client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    PaymentSberRequest(
+                        amount = amount * 100,
+                        comission = comission,
+                        greenZone = greenZone,
+                        offline = offline,
+                        payCurrency = payCurrency,
+                        paymentTool = PaymentCberToolDto(
+                            phone = phone,
+                            type = type
+                        ),
+                        properties = PropertiesSberDto(ledgerAccount = ledgerAccount)
+                    )
+                )
+            }) {
+                it.call.body<PaymentSberResponse>().toPaymentSber()
             }
         }
     }
@@ -168,23 +160,23 @@ class CKassaPaymentRepository(
         ledgerAccount: String,
     ): ResultWork<PaymentSbp, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            PayCardRequest(
-                                amount = amount * 100,
-                                comission = comission,
-                                greenZone = greenZone,
-                                offline = offline,
-                                payCurrency = payCurrency,
-                                paymentTool = PaymentToolDto(type = type),
-                                properties = PropertiesCardDto(ledgerAccount = ledgerAccount)
-                            )
+            handleResponse(
+                client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        PayCardRequest(
+                            amount = amount * 100,
+                            comission = comission,
+                            greenZone = greenZone,
+                            offline = offline,
+                            payCurrency = payCurrency,
+                            paymentTool = PaymentToolDto(type = type),
+                            properties = PropertiesCardDto(ledgerAccount = ledgerAccount)
                         )
-                    }
-                result.call.body<PaymentSbpResponse>().toPaymentSbp()
+                    )
+                }
+            ) {
+                it.call.body<PaymentSbpResponse>().toPaymentSbp()
             }
         }
     }
@@ -196,12 +188,12 @@ class CKassaPaymentRepository(
         regPayNum: String
     ): ResultWork<CheckPaymentStatus, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse {
-                val result =
-                    client.post("${BASE_PAYMENT_URL}payment-info/$regPayNum") {
-                        contentType(ContentType.Application.Json)
-                    }
-                result.call.body<CheckPaymentStatusResponse>().toCheckPaymentStatus()
+            handleResponse(
+                client.post("${BASE_PAYMENT_URL}payment-info/$regPayNum") {
+                    contentType(ContentType.Application.Json)
+                }
+            ) {
+                it.call.body<CheckPaymentStatusResponse>().toCheckPaymentStatus()
             }
         }
     }
