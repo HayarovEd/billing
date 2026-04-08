@@ -80,6 +80,7 @@ class LoginScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
+                        dataStoreRepository.saveBearer(result.data.token)
                         _state.value.copy(
                             isLoading = false,
                         )

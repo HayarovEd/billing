@@ -15,3 +15,4 @@ const val BODY_CKASSA_INIT_SERVICE = "7|1|6|$X_GWT_MODULE_BASE_VALUE|$X_GWT_PERM
 
 const val LAST_EMAIL = "last_email"
 const val LAST_PASSWORD = "last_password"
+const val LABEL_BEARER = "label_bearer"

@@ -11,4 +11,7 @@ interface DataStoreRepository {
     suspend fun setLocalAuthorization(lastAuthData: LastAuthData): ResultWork<Unit, DataError.DataStore>
     fun getLocalAuthorization(): Flow<ResultWork<LastAuthData, DataError.DataStore>>
     suspend fun readStateLocalAuthorization(): ResultWork<LastAuthData, DataError.DataStore>
+    suspend fun removeBearer()
+    suspend fun getBearer(): Flow<String?>
+    suspend fun saveBearer(bearer: String)
 }
