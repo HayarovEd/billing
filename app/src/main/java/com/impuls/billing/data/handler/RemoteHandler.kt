@@ -1,4 +1,4 @@
-package com.impuls.billing.data.repository
+package com.impuls.billing.data.handler
 
 
 import com.impuls.billing.domain.utils.DataError
@@ -12,7 +12,10 @@ import io.ktor.serialization.JsonConvertException
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ClosedByteChannelException
 
-suspend fun <D> handleResponse(response: HttpResponse, data: suspend (HttpResponse) -> D): ResultWork<D, DataError> {
+suspend fun <D> handleResponse(
+    response: HttpResponse,
+    data: suspend (HttpResponse) -> D
+): ResultWork<D, DataError> {
     return try {
         if (response.status.isSuccess()) {
             ResultWork.Success(data(response))

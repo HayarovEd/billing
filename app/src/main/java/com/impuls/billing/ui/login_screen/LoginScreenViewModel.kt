@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.impuls.billing.domain.model.LastAuthData
 import com.impuls.billing.domain.repository.DataStoreRepository
-import com.impuls.billing.domain.repository.RemoteRepository
+import com.impuls.billing.domain.repository.AuthRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel(
-    private val remoteRepository: RemoteRepository,
+    private val authRepository: AuthRepository,
     private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
@@ -67,7 +67,7 @@ class LoginScreenViewModel(
                     isLoading = true,
                 )
                     .updateState()
-                when (val result = remoteRepository.login(
+                when (val result = authRepository.login(
                     username = state.value.login,
                     password = state.value.password
                 )) {

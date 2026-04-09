@@ -2,7 +2,10 @@ package com.impuls.billing.ui.profile_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.impuls.billing.domain.repository.RemoteRepository
+import com.impuls.billing.domain.repository.AccountRepository
+import com.impuls.billing.domain.repository.AuthRepository
+import com.impuls.billing.domain.repository.DataStoreRepository
+import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +17,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlin.time.Clock
 
 class ProfileScreenViewModel(
-    private val remoteRepository: RemoteRepository
+    private val authRepository: AuthRepository,
+    private val accountRepository: AccountRepository,
+    private val dataStoreRepository: DataStoreRepository,
+    private val jwtRepository: JwtRepository,
 ) : ViewModel() {
 
 
@@ -27,7 +34,17 @@ class ProfileScreenViewModel(
                 isLoading = true,
             )
                 .updateState()
-            loadAccountData()
+            loadData(
+                action = {
+                    loadAccountData(it)
+                },
+                navigate = {
+                    viewModelScope.launch {
+                        eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                    }
+                }
+            )
+
         }
         .stateIn(
             scope = viewModelScope,
@@ -70,9 +87,9 @@ class ProfileScreenViewModel(
     }
 
 
-    private fun loadAccountData() {
+    private fun loadAccountData(token: String) {
         viewModelScope.launch {
-            when (val result = remoteRepository.getClientAccount()) {
+            when (val result = accountRepository.getClientAccount(token)) {
                 is ResultWork.Error -> {
                     _state.value.copy(
                         isLoading = false,
@@ -96,7 +113,7 @@ class ProfileScreenViewModel(
     private fun updatePhone(phone: String) {
         state.value.account?.let { account ->
             viewModelScope.launch {
-                when (val result = remoteRepository.setClientMobilePhone(
+                when (val result = authRepository.setClientMobilePhone(
                     uid = account.account.uid,
                     phone = phone
                 )) {
@@ -105,7 +122,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                        //loadAccountData()
                         validateMobilePhone()
                         timer()
                     }
@@ -116,7 +133,7 @@ class ProfileScreenViewModel(
 
     private fun validateMobilePhone() {
         viewModelScope.launch {
-            when (val result = remoteRepository.validateClientMobileNumber()) {
+            when (val result = authRepository.validateClientMobileNumber()) {
                 is ResultWork.Error -> {
                     eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
@@ -134,7 +151,7 @@ class ProfileScreenViewModel(
     private fun confirmValidateClientMobileNumber(code: String) {
         state.value.phoneRet?.let {
             viewModelScope.launch {
-                when (val result = remoteRepository.confirmValidateClientMobileNumber(
+                when (val result = authRepository.confirmValidateClientMobileNumber(
                     id = it,
                     code = code
                 )) {
@@ -143,7 +160,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                      //  loadAccountData()
                     }
                 }
             }
@@ -155,7 +172,7 @@ class ProfileScreenViewModel(
     private fun updateEmail(email: String) {
         state.value.account?.let { account ->
             viewModelScope.launch {
-                when (val result = remoteRepository.setClientEmail(
+                when (val result = authRepository.setClientEmail(
                     uid = account.account.uid,
                     email = email
                 )) {
@@ -164,7 +181,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                       // loadAccountData()
                         validateEmail()
                         timer()
                     }
@@ -175,7 +192,7 @@ class ProfileScreenViewModel(
 
     private fun validateEmail() {
         viewModelScope.launch {
-            when (val result = remoteRepository.validateClientEmail()) {
+            when (val result = authRepository.validateClientEmail()) {
                 is ResultWork.Error -> {
                    // eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
@@ -193,7 +210,7 @@ class ProfileScreenViewModel(
     private fun confirmValidateClientEmail(code: String) {
         state.value.phoneRet?.let {
             viewModelScope.launch {
-                when (val result = remoteRepository.confirmValidateClientEmail(
+                when (val result = authRepository.confirmValidateClientEmail(
                     id = it,
                     code = code
                 )) {
@@ -202,7 +219,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                       // loadAccountData()
                     }
                 }
             }
@@ -222,6 +239,32 @@ class ProfileScreenViewModel(
                 )
                     .updateState()
                 delay(1000)
+            }
+        }
+    }
+
+
+    fun loadData(
+        action: (String) -> Unit,
+        navigate: () -> Unit
+    ) {
+        viewModelScope.launch {
+            dataStoreRepository.getBearer().collect { token ->
+                if (token!=null) {
+                    val expired = jwtRepository.decodeJwt(token)?.expired
+                    expired?.let { exp ->
+                        if (exp < Clock.System.now().epochSeconds) {
+                            dataStoreRepository.removeBearer()
+                            navigate()
+                        } else {
+                            action(token)
+                        }
+                    }
+                } else {
+                    viewModelScope.launch {
+                        navigate()
+                    }
+                }
             }
         }
     }

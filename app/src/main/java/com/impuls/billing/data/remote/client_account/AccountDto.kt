@@ -1,69 +1,81 @@
 package com.impuls.billing.data.remote.client_account
 
-data class AccountDto (
-    val uid: Int,
-    val doctype: Int,
-    val ipaccess: Int,
-    val billdelivery: Int,
-    val category: Int,
-    val type: Int,
-    val oksm: Int,
-    val templ: Int,
-    val wrongactive: Int,
-    val archive: Int,
-    val ownership: Int,
-    val mobileisconfirmed: Boolean,
-    val emailisconfirmed: Boolean,
-    val offerisaccepted: Boolean,
-    val soleproprietor: Boolean,
-    val login: String,
-    val pass: String,
-    val descr: String,
-    val name: String,    val phone: String,
-    val fax: String,
-    val email: String,
-    val mobile: String,
-    val bankname: String,
-    val branchbankname: String,
-    val treasuryname: String,
-    val treasuryaccount: String,
-    val bik: String,
-    val settl: String,
-    val corr: String,
-    val kpp: String,
-    val inn: String,
-    val ogrn: String,
-    val okpo: String,
-    val okved: String,
-    val gendiru: String,
-    val glbuhgu: String,
-    val kontperson: String,
-    val actonwhat: String,
-    val passsernum: String,
-    val passno: String,
-    val passissuedate: String,
-    val passissuedep: String,
-    val passissueplace: String,
-    val birthdate: String,
-    val birthplace: String,
-    val lastmoddate: String,
-    val wrongdate: String,
-    val okato: String,
-    val uuid: String,
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AccountDto(
+    @SerialName("abonentname")
     val abonentname: String,
-    val abonentsurname: String,
+    @SerialName("abonentpatronymic")
     val abonentpatronymic: String,
-    val managerid: Int,
-    val managername: String,
-    val managerlogin: String,
-    val swift: String,
-    val kio: String,
-    val bicbei: String,
-    val iban: String,
-    val bankcorr: String,
-    val bankcorrcode: String,
-    val bankcorraccount: String,
-    val currency: String,
-    val resident: Int,
-    val vatonfiscalization: Int
+    @SerialName("abonentsurname")
+    val abonentsurname: String,
+    @SerialName("archive")
+    val archive: Int,
+    @SerialName("bankname")
+    val bankname: String,
+    @SerialName("bik")
+    val bik: String,
+    @SerialName("billdelivery")
+    val billdelivery: Int,
+    @SerialName("branchbankname")
+    val branchbankname: String,
+    @SerialName("category")
+    val category: Int,
+    @SerialName("corr")
+    val corr: String,
+    @SerialName("descr")
+    val descr: String,
+    @SerialName("doctype")
+    val doctype: Int,
+    @SerialName("email")
+    val email: String,
+    @SerialName("emailisconfirmed")
+    val emailisconfirmed: Boolean,
+    @SerialName("fax")
+    val fax: String,
+    @SerialName("inn")
+    val inn: String,
+    @SerialName("kpp")
+    val kpp: String,
+    @SerialName("login")
+    val login: String,
+    @SerialName("mobile")
+    val mobile: String,
+    @SerialName("mobileisconfirmed")
+    val mobileisconfirmed: Boolean,
+    @SerialName("name")
+    val name: String,
+    @SerialName("offerisaccepted")
+    val offerisaccepted: Boolean,
+    @SerialName("ogrn")
+    val ogrn: String,
+    @SerialName("okpo")
+    val okpo: String,
+    @SerialName("oksm")
+    val oksm: Int,
+    @SerialName("okved")
+    val okved: String,
+    @SerialName("ownership")
+    val ownership: Int,
+    @SerialName("pass")
+    val pass: String,
+    @SerialName("phone")
+    val phone: String,
+    @SerialName("settl")
+    val settl: String,
+    @SerialName("soleproprietor")
+    val soleproprietor: Boolean,
+    @SerialName("treasuryaccount")
+    val treasuryaccount: String,
+    @SerialName("treasuryname")
+    val treasuryname: String,
+    @SerialName("type")
+    val type: Int,
+    @SerialName("uid")
+    val uid: Int,
+    @SerialName("wrongactive")
+    val wrongactive: Int
 )

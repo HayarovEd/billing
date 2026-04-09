@@ -1,5 +1,6 @@
 package com.impuls.billing.data.repository
 
+import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.convertCompanyPayment
 import com.impuls.billing.data.mapper.convertToImageData
 import com.impuls.billing.data.mapper.convertToResultCheck
@@ -64,10 +65,10 @@ class CKassaPaymentRepository(
         service: String,
     ): ResultWork<ImageData, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse( client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
+            handleResponse(client.get("https://cabinet.ckassa.ru/payframe/api/personalization?category=$category&service=$service") {
                 contentType(ContentType.Application.Json)
             }) {
-               it.call.body<ImageDataResponse>().convertToImageData()
+                it.call.body<ImageDataResponse>().convertToImageData()
             }
         }
     }
@@ -127,7 +128,7 @@ class CKassaPaymentRepository(
         phone: String,
     ): ResultWork<PaymentSber, DataError> {
         return withContext(Dispatchers.IO) {
-            handleResponse( client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+            handleResponse(client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     PaymentSberRequest(

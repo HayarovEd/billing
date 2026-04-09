@@ -31,6 +31,9 @@ fun NavController(
             ProfileScreenRoot(
                 onNavigateToPayment = {
                     navController.navigate(NavigationRoute.Payment(it))
+                },
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.Login)
                 }
             )
         }

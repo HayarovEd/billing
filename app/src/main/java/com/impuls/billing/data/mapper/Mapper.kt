@@ -1,6 +1,6 @@
 package com.impuls.billing.data.mapper
 
-import com.impuls.billing.data.remote.client_account.GetClientAccountResponse
+import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
@@ -12,48 +12,48 @@ import com.impuls.billing.domain.utils.convertToBoolean
 import com.impuls.billing.domain.utils.convertUserType
 
 
-fun GetClientAccountResponse.toClientAccount(): ClientAccount {
+fun ClientAccountResponse.toClientAccount(): ClientAccount {
     return ClientAccount(
-        billDeliveryName = ret.billdeliveryname,
+        billDeliveryName = billDeliveryName,
         account = Account(
-            uid = ret.account.uid,
-            doctype = ret.account.doctype,
-            billDelivery = convertBillDeliveryType(ret.account.billdelivery),
-            category = ret.account.category,
-            type = convertUserType(ret.account.type),
-            oksm = ret.account.oksm,
-            wrongActive = ret.account.wrongactive,
-            archive = convertToBoolean(ret.account.archive),
-            ownerShip = ret.account.ownership,
-            mobileIsConfirmed = ret.account.mobileisconfirmed,
-            emailIsConfirmed = ret.account.emailisconfirmed,
-            offerIsAccepted = ret.account.offerisaccepted,
-            soleProprietor = ret.account.soleproprietor,
-            login = ret.account.login,
-            password = ret.account.pass,
-            description = ret.account.descr,
-            name = ret.account.name,
-            phone = ret.account.phone,
-            fax = ret.account.fax,
-            email = ret.account.email,
-            mobile = ret.account.mobile,
-            bankName = ret.account.bankname,
-            branchBankName = ret.account.branchbankname,
-            treasuryName = ret.account.treasuryname,
-            treasuryAccount = ret.account.treasuryaccount,
-            bik = ret.account.bik,
-            setti = ret.account.settl,
-            corr = ret.account.corr,
-            kpp = ret.account.kpp,
-            inn = ret.account.inn,
-            ogrn = ret.account.ogrn,
-            okpo = ret.account.okpo,
-            okved = ret.account.okved,
-            abonentName = ret.account.abonentname,
-            abonentSurname = ret.account.abonentsurname,
-            abonentPatronymic = ret.account.abonentpatronymic
+            uid = account.uid,
+            doctype = account.doctype,
+            billDelivery = convertBillDeliveryType(account.billdelivery),
+            category = account.category,
+            type = convertUserType(account.type),
+            oksm = account.oksm,
+            wrongActive = account.wrongactive,
+            archive = convertToBoolean(account.archive),
+            ownerShip = account.ownership,
+            mobileIsConfirmed = account.mobileisconfirmed,
+            emailIsConfirmed = account.emailisconfirmed,
+            offerIsAccepted = account.offerisaccepted,
+            soleProprietor = account.soleproprietor,
+            login = account.login,
+            password = account.pass,
+            description = account.descr,
+            name = account.name,
+            phone = account.phone,
+            fax = account.fax,
+            email = account.email,
+            mobile = account.mobile,
+            bankName = account.bankname,
+            branchBankName = account.branchbankname,
+            treasuryName = account.treasuryname,
+            treasuryAccount = account.treasuryaccount,
+            bik = account.bik,
+            setti = account.settl,
+            corr = account.corr,
+            kpp = account.kpp,
+            inn = account.inn,
+            ogrn = account.ogrn,
+            okpo = account.okpo,
+            okved = account.okved,
+            abonentName = account.abonentname,
+            abonentSurname = account.abonentsurname,
+            abonentPatronymic = account.abonentpatronymic
         ),
-        agreements = ret.agreements.map { 
+        agreements = agreements.map { 
             Agreement(
                 agrmId = it.agrmid,
                 uid = it.uid,

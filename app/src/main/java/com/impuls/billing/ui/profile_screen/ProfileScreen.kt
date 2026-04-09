@@ -57,6 +57,7 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreenRoot(
     viewModel: ProfileScreenViewModel = koinViewModel(),
     onNavigateToPayment: (String) -> Unit,
+    onNavigateToLogin: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -70,6 +71,10 @@ fun ProfileScreenRoot(
                     context
                 )
             )
+
+            ProfileScreenEvent.NavigateEvent -> {
+                onNavigateToLogin()
+            }
         }
     }
 

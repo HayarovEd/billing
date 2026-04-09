@@ -1,9 +1,10 @@
 package com.impuls.billing.data.repository
 
+import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.remote.TokenDto
 import com.impuls.billing.data.remote.requests.LoginRequest
 import com.impuls.billing.domain.model.ClientAccount
-import com.impuls.billing.domain.repository.RemoteRepository
+import com.impuls.billing.domain.repository.AuthRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.model.ResultLogin
@@ -14,9 +15,9 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-class RemoteRepositoryImpl(
+class AuthRepositoryImpl(
     private val client: HttpClient,
-) : RemoteRepository {
+) : AuthRepository {
 
 
 
@@ -38,27 +39,6 @@ class RemoteRepositoryImpl(
                 ResultLogin(it.body<TokenDto>().token)
             }
         )
-    }
-
-
-    override suspend fun getClientAccount(): ResultWork<ClientAccount, DataError> {
-        return TODO()/* withContext(Dispatchers.IO) {
-            handleResponse {
-                val soapRequest = buildString {
-                    append(
-                        setBaseAppend(
-                            "<urn:getClientAccount>\n</urn:getClientAccount>\n"
-                        )
-                    )
-                }
-                val response = client.post(BASE_URL) {
-                    setBody(soapRequest)
-                    header("Cookie", cookie)
-                }
-                val xml = response.bodyAsText()
-                soapParser.parseFullSoapResponse(xml).toClientAccount()
-            }
-        }*/
     }
 
     override suspend fun setClientMobilePhone(
