@@ -7,18 +7,26 @@ import androidx.navigation.compose.rememberNavController
 import com.impuls.billing.ui.login_screen.LoginScreenRoot
 import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
 import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
+import com.impuls.billing.ui.splash_screen.SplashScreenRoot
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 
 @Composable
 fun NavController(
-    startDestination: NavigationRoute = NavigationRoute.Login/*Payment("595142026")*/,
+    startDestination: NavigationRoute = NavigationRoute.Splash/*Payment("595142026")*/,
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable<NavigationRoute.Splash> {
-
+            SplashScreenRoot(
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.Login)
+                },
+                onNavigateToProfile = {
+                    navController.navigate(NavigationRoute.Profile)
+                }
+            )
         }
         composable<NavigationRoute.Login> {
             LoginScreenRoot(
@@ -34,6 +42,7 @@ fun NavController(
                 },
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.Login)
+                   // navController.popBackStack(NavigationRoute.Login, false)
                 }
             )
         }
