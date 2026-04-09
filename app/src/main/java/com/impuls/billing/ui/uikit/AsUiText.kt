@@ -84,6 +84,8 @@ fun DataError.asUiText(): UiText {
                 R.string.login_password_incorrect
             )
         }
+
+        is DataError.CustomError -> DynamicString(message)
     }
 }
 

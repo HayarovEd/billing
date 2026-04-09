@@ -1,6 +1,9 @@
 package com.impuls.billing.domain.utils
 
 sealed interface DataError : RootError {
+
+    class CustomError(val message: String): DataError
+
     enum class Network: DataError {
         UNAUTHORIZED,
         SERVER_ERROR,
