@@ -13,23 +13,23 @@ data class AccountDto(
     @SerialName("abonentsurname")
     val abonentsurname: String,
     @SerialName("archive")
-    val archive: Int,
+    val archive: Long,
     @SerialName("bankname")
     val bankname: String,
     @SerialName("bik")
     val bik: String,
     @SerialName("billdelivery")
-    val billdelivery: Int,
+    val billdelivery: Long,
     @SerialName("branchbankname")
     val branchbankname: String,
     @SerialName("category")
-    val category: Int,
+    val category: Long,
     @SerialName("corr")
     val corr: String,
     @SerialName("descr")
     val descr: String,
     @SerialName("doctype")
-    val doctype: Int,
+    val doctype: Long,
     @SerialName("email")
     val email: String,
     @SerialName("emailisconfirmed")
@@ -55,11 +55,11 @@ data class AccountDto(
     @SerialName("okpo")
     val okpo: String,
     @SerialName("oksm")
-    val oksm: Int,
+    val oksm: Long,
     @SerialName("okved")
     val okved: String,
     @SerialName("ownership")
-    val ownership: Int,
+    val ownership: Long,
     @SerialName("pass")
     val pass: String,
     @SerialName("phone")
@@ -73,9 +73,9 @@ data class AccountDto(
     @SerialName("treasuryname")
     val treasuryname: String,
     @SerialName("type")
-    val type: Int,
+    val type: Long,
     @SerialName("uid")
-    val uid: Int,
+    val uid: Long,
     @SerialName("wrongactive")
-    val wrongactive: Int
+    val wrongactive: Long
 )

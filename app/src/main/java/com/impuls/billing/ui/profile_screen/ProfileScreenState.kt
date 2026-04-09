@@ -6,6 +6,6 @@ data class ProfileScreenState(
     val account: ClientAccount? = null,
     val isLoading: Boolean = false,
     val count: Int = 0,
-    val phoneRet: Int? = null,
-    val emailRet: Int? = null,
+    val phoneRet: Long? = null,
+    val emailRet: Long? = null,
 )

@@ -15,35 +15,35 @@ fun findInXmlString(
     return pattern.find(xml)?.groupValues?.get(1)
 }
 
-fun convertBillDeliveryType(number: Int): BillDeliveryType {
+fun convertBillDeliveryType(number: Long): BillDeliveryType {
     return when (number) {
-        0 -> BillDeliveryType.COURIER
-        1 -> BillDeliveryType.MAIL
-        2 -> BillDeliveryType.YOURSELF
-        4 -> BillDeliveryType.EMAIL
+        0L -> BillDeliveryType.COURIER
+        1L -> BillDeliveryType.MAIL
+        2L -> BillDeliveryType.YOURSELF
+        4L -> BillDeliveryType.EMAIL
         else -> BillDeliveryType.OTHER
     }
 }
 
-fun convertUserType(number: Int): UserType {
+fun convertUserType(number: Long): UserType {
     return when (number) {
-        1 -> UserType.UL
+        1L -> UserType.UL
         else -> UserType.FL
     }
 }
 
-fun convertToBoolean(number: Int): Boolean {
+fun convertToBoolean(number: Long): Boolean {
     return when (number) {
-        1 -> true
+        1L -> true
         else -> false
     }
 }
 
-fun convertPaymentMethodTYpe(number: Int): PaymentMethodType {
+fun convertPaymentMethodTYpe(number: Long): PaymentMethodType {
     return when (number) {
-        0 -> PaymentMethodType.ADVANCE
-        1 -> PaymentMethodType.CREDIT
-        2 -> PaymentMethodType.MIXED
+        0L -> PaymentMethodType.ADVANCE
+        1L -> PaymentMethodType.CREDIT
+        2L -> PaymentMethodType.MIXED
         else -> PaymentMethodType.ADVANCE
     }
 }

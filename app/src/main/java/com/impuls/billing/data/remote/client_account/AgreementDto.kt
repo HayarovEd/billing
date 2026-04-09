@@ -7,27 +7,27 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AgreementDto(
     @SerialName("agrmid")
-    val agrmid: Int,
+    val agrmid: Long,
     @SerialName("BCheck")
     val bCheck: String,
     @SerialName("BNotify")
-    val bNotify: Int,
+    val bNotify: Long,
     @SerialName("balance")
     val balance: Double,
     @SerialName("balancestatus")
-    val balancestatus: Int,
+    val balancestatus: Long,
     @SerialName("bcheck")
     val bcheck: String,
     @SerialName("blockamount")
     val blockamount: Double,
     @SerialName("blockdays")
-    val blockdays: Int,
+    val blockdays: Long,
     @SerialName("blockmonths")
-    val blockmonths: Int,
+    val blockmonths: Long,
     @SerialName("blockorders")
-    val blockorders: Int,
+    val blockorders: Long,
     @SerialName("bnotify")
-    val bnotify: Int,
+    val bnotify: Long,
     @SerialName("closedon")
     val closedon: String,
     @SerialName("code")
@@ -35,41 +35,41 @@ data class AgreementDto(
     @SerialName("credit")
     val credit: Double,
     @SerialName("curid")
-    val curid: Int,
+    val curid: Long,
     @SerialName("date")
     val date: String,
     @SerialName("friendagrmid")
-    val friendagrmid: Int,
+    val friendagrmid: Long,
     @SerialName("initialbalance")
     val initialbalance: Double,
     @SerialName("installments")
     val installments: Double,
     @SerialName("isdefault")
-    val isdefault: Int,
+    val isdefault: Long,
     @SerialName("monthblockday")
-    val monthblockday: Int,
+    val monthblockday: Long,
     @SerialName("number")
     val number: String,
     @SerialName("operid")
-    val operid: Int,
+    val operid: Long,
     @SerialName("orderpayday")
-    val orderpayday: Int,
+    val orderpayday: Long,
     @SerialName("ownerid")
-    val ownerid: Int,
+    val ownerid: Long,
     @SerialName("paymentmethod")
-    val paymentmethod: Int,
+    val paymentmethod: Long,
     @SerialName("penaltymethod")
-    val penaltymethod: Int,
+    val penaltymethod: Long,
     @SerialName("promisecredit")
     val promisecredit: Double,
     @SerialName("symbol")
     val symbol: String,
     @SerialName("uid")
-    val uid: Int,
+    val uid: Long,
     @SerialName("username")
     val username: String,
     @SerialName("VGroups")
-    val vGroups: Int,
+    val vGroups: Long,
     @SerialName("vgroups")
-    val vgroups: Int
+    val vgroups: Long
 )
