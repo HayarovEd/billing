@@ -31,7 +31,7 @@
     <string name="profile">Профиль</string>
     <string name="name_company">Название компании</string>
     <string name="name_fl">ФИО</string>
-    <string name="phone">Контактный телефон</string>
+    <string name="phone">Телефон</string>
     <string name="mobile_phone">Мобильный телефон</string>
     <string name="email">E-Mail</string>
     <string name="bank_req">Банковские реквизиты</string>
@@ -109,4 +109,11 @@
     <string name="recend_code">Отправить код повторно</string>
     <string name="success_update_password">Пароль успешно изменен</string>
     <string name="enter_new_password">Введите новый\nпароль</string>
+    <string name="id">ID: %1$d</string>
+    <string name="code_agreement">Код договора</string>
+    <string name="credit_limit">Кредитный лимит</string>
+    <string name="promise_credit">Обещанный кредит</string>
+    <string name="overdue_dept">⚠️ Просроченная задолженность</string>
+    <string name="high_credit_utilization">⚠️ Высокое использование кредита</string>
+    <string name="normal_credit">✓</string>
 </resources>

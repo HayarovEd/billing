@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +34,7 @@ fun ItemAgreement(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 15.dp),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
         onClick = onClick
     ) {
         Column(
@@ -39,15 +43,16 @@ fun ItemAgreement(
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileRow(
-                title = stringResource(R.string.number_contract),
-                content = agreement.number,
-                horizontalArrangement = Arrangement.Center
+            Text(
+                text = agreement.number,
+                style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = modifier.height(5.dp))
             ProfileRow(
                 title = stringResource(R.string.balance),
                 content = "${"%.2f".format(agreement.balance)} ${agreement.symbol}",
+                styleTitle =  MaterialTheme.typography.titleMedium,
+                styleContent =  MaterialTheme.typography.titleMedium.copy(color = if (agreement.balance<=0.0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary),
                 horizontalArrangement = Arrangement.Center
             )
             Spacer(modifier = modifier.height(5.dp))

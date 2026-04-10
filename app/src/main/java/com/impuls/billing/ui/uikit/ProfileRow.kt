@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,8 @@ fun ProfileRow(
     modifier: Modifier = Modifier,
     title: String,
     content: String,
+    styleTitle: TextStyle = MaterialTheme.typography.bodySmall,
+    styleContent: TextStyle = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween,
 ) {
     Row(
@@ -40,11 +43,11 @@ fun ProfileRow(
     ) {
         Text(
             text = "${title}:",
-            style = MaterialTheme.typography.bodySmall
+            style = styleTitle
         )
         Text(
             text = content,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+            style = styleContent
         )
     }
 }

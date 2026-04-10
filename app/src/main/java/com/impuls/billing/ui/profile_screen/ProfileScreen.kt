@@ -7,13 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -26,11 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,8 +41,6 @@ import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
-import com.impuls.billing.ui.uikit.ProfileRow
-import com.impuls.billing.ui.uikit.ProfileRowWithSave
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -104,8 +95,7 @@ private fun ProfileScreenScreen(
     updateVisisbilityDrawerState: () -> Unit,
     onNavigateToPayment: (String) -> Unit,
 ) {
-    var visiblePhoneDialog by retain { mutableStateOf(false) }
-    var visibleEmailDialog by retain { mutableStateOf(false) }
+
     val windowSize = LocalWindowInfo.current.containerDpSize
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -131,57 +121,15 @@ private fun ProfileScreenScreen(
                     modifier = modifier
                         .padding(contentPadding)
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
                         .padding(15.dp)
                 ) {
                     state.account?.let { acc ->
-                        Text(
-                            text = stringResource(R.string.my_accounts),
-                            style = MaterialTheme.typography.titleLarge
+                        UserCard(
+                            account = acc.account,
+                            onClickPhone = {},
+                            onClickEmail = {}
                         )
-                        Spacer(modifier = modifier.height(10.dp))
-                        LazyVerticalGrid(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .heightIn(max = windowSize.height / 2),
-                            columns = GridCells.Fixed(2),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(acc.agreements) {
-                                ItemAgreement(
-                                    agreement = it,
-                                    onClick = {
-                                        onNavigateToPayment(it.code)
-                                    }
-                                )
-                            }
-                        }
-                        Spacer(modifier = modifier.height(10.dp))
-                        Text(
-                            text = stringResource(R.string.profile),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = modifier.height(10.dp))
-                        ProfileRow(
-                            title = stringResource(R.string.you_enter_as),
-                            content = acc.account.login
-                        )
-                        Spacer(modifier = modifier.height(5.dp))
-                        ProfileRow(
-                            title = when (acc.account.type) {
-                                UserType.UL -> stringResource(R.string.name_company)
-                                UserType.FL -> stringResource(R.string.name_fl)
-                            },
-                            content = acc.account.name
-                        )
-                        Spacer(modifier = modifier.height(5.dp))
-                        ProfileRow(
-                            title = stringResource(R.string.phone),
-                            content = acc.account.phone
-                        )
-                        Spacer(modifier = modifier.height(5.dp))
-                        ProfileRowWithSave(
+                       /* ProfileRowWithSave(
                             title = stringResource(R.string.mobile_phone),
                             description = stringResource(R.string.desc_phone),
                             subTitle = stringResource(R.string.phone_number),
@@ -225,77 +173,25 @@ private fun ProfileScreenScreen(
                             updateVisibleDialog = {
                                 visibleEmailDialog = it
                             }
-                        )
-                        /*ProfileRow(
-                            title = stringResource(R.string.email),
-                            content = acc.account.email
                         )*/
-                        if (acc.account.type == UserType.UL) {
-                            Spacer(modifier = modifier.height(10.dp))
-                            Text(
-                                text = stringResource(R.string.bank_req),
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                            Spacer(modifier = modifier.height(10.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.name_bank),
-                                content = acc.account.bankName
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.name_sub_bank),
-                                content = acc.account.branchBankName
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.bik),
-                                content = acc.account.bik
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.setti),
-                                content = acc.account.setti
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.corr),
-                                content = acc.account.corr
-                            )
-                            Spacer(modifier = modifier.height(10.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.inn),
-                                content = acc.account.inn
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.ogrn),
-                                content = acc.account.ogrn
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.kpp),
-                                content = acc.account.kpp
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.okpo),
-                                content = acc.account.okpo
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.okved),
-                                content = acc.account.okved
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.name_treasure),
-                                content = acc.account.treasuryName
-                            )
-                            Spacer(modifier = modifier.height(5.dp))
-                            ProfileRow(
-                                title = stringResource(R.string.treasure_account),
-                                content = acc.account.treasuryAccount
-                            )
+                        Text(
+                            text = stringResource(R.string.my_accounts),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = modifier.height(10.dp))
+                        LazyColumn (
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            items(acc.agreements) {
+                                AgreementCard(
+                                    agreement = it,
+                                    onClick = {
+                                        onNavigateToPayment(it.code)
+                                    }
+                                )
+                            }
                         }
                     }
                 }

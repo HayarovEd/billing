@@ -46,7 +46,7 @@ fun SplashScreenRoot(
 private fun SplashScreen(
     modifier: Modifier = Modifier,
 ) {
-    Scaffold() { paddingValues ->
+    Scaffold { paddingValues ->
         Box(
             modifier = modifier
                 .padding(paddingValues)
