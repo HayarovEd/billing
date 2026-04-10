@@ -9,6 +9,7 @@ import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -52,6 +53,24 @@ class LoginScreenViewModel(
                     password = action.password,
                 )
                     .updateState()
+            }
+
+            is LoginScreenAction.RecoverPassword -> {
+                recoverPassword()
+            }
+
+            is LoginScreenAction.UpdateRecoverType -> {
+                _state.value.copy(
+                    type = action.recoverType,
+                )
+                    .updateState()
+            }
+
+            is LoginScreenAction.ConfirmWithCode -> {
+                updatePasswordByCode(
+                    code = action.code,
+                    password = action.password
+                )
             }
         }
     }
@@ -114,6 +133,65 @@ class LoginScreenViewModel(
                 }
             }
 
+        }
+    }
+
+    private fun recoverPassword() {
+        viewModelScope.launch {
+            timer()
+            when (val result = authRepository.recoverPassword(
+                login = state.value.login,
+                transport = state.value.type.number
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(LoginScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        destination = result.data.destination
+                    )
+                        .updateState()
+                    eventChannel.send(LoginScreenEvent.openConfirmDialog)
+                }
+            }
+        }
+    }
+
+    private fun updatePasswordByCode(
+        code: String,
+        password: String
+    ) {
+        viewModelScope.launch {
+            when (val result = authRepository.updatePasswordByCode(
+                login = state.value.login,
+                code = code,
+                password = password
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(LoginScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    eventChannel.send(LoginScreenEvent.OnMessage(DataError.SuccessWork.SUCCESS_UPDATE_PASSWORD.asUiText()))
+                }
+            }
+        }
+    }
+
+    private fun timer(count: Int = 10) {
+        viewModelScope.launch {
+            _state.value.copy(
+                count = count
+            )
+                .updateState()
+            for (i in count downTo 0) {
+                _state.value.copy(
+                    count = i
+                )
+                    .updateState()
+                delay(1000)
+            }
         }
     }
 

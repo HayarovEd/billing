@@ -1,10 +1,12 @@
 package com.impuls.billing.data.mapper
 
+import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
@@ -94,6 +96,13 @@ fun ImageDataResponse.convertToImageData(): ImageData {
     return ImageData(
         color = result.color,
         image = result.image
+    )
+}
+
+fun RecoverPasswordDto.convertToRecoverPassword(): RecoverPassword {
+    return RecoverPassword(
+        recordId = recordId,
+        destination = destination
     )
 }
 

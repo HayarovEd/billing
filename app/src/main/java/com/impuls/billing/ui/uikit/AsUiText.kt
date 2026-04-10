@@ -86,6 +86,11 @@ fun DataError.asUiText(): UiText {
         }
 
         is DataError.CustomError -> DynamicString(message)
+        DataError.SuccessWork.SUCCESS_UPDATE_PASSWORD -> {
+            StringResource(
+                R.string.success_update_password
+            )
+        }
     }
 }
 

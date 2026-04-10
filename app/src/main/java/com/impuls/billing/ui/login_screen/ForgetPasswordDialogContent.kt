@@ -37,11 +37,13 @@ import com.impuls.billing.ui.uikit.UiTextField
 @Composable
 fun ForgetPasswordDialogContent(
     modifier: Modifier = Modifier,
+    login: String,
+    recoverType: RecoverType,
     onCloseClick: () -> Unit,
-    onRecoverClick: (String, Long) -> Unit,
+    updateLogin: (String) -> Unit,
+    updateRecoverType: (RecoverType) -> Unit,
+    onRecoverClick: () -> Unit,
 ) {
-    var login by retain { mutableStateOf("") }
-    var recoverType by retain { mutableStateOf(RevocerType.SMS) }
     var isOpenMenu by retain { mutableStateOf(false) }
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -68,7 +70,7 @@ fun ForgetPasswordDialogContent(
             UiTextField(
                 content = login,
                 label = "${stringResource(R.string.login)}:",
-                onClickContent = { login = it }
+                onClickContent = { updateLogin(it) }
             )
             Spacer(modifier = modifier.height(5.dp))
             Row(
@@ -92,7 +94,7 @@ fun ForgetPasswordDialogContent(
                         },
                         expanded = isOpenMenu
                     ) {
-                        RevocerType.entries.forEach {
+                        RecoverType.entries.forEach {
                             DropdownMenuItem(
                                 text = {
                                     Text(
@@ -103,7 +105,7 @@ fun ForgetPasswordDialogContent(
                                     )
                                        },
                                 onClick = {
-                                    recoverType = it
+                                    updateRecoverType(it)
                                     isOpenMenu = false
                                 }
                             )
@@ -142,7 +144,7 @@ fun ForgetPasswordDialogContent(
                 OutlinedButton(
                     modifier = modifier.weight(3f),
                     enabled = login.isNotBlank(),
-                    onClick = { onRecoverClick(login, recoverType.number) },
+                    onClick = { onRecoverClick() },
                     shape = RoundedCornerShape(5.dp),
                     border = BorderStroke(
                         width = 1.dp,
@@ -166,8 +168,12 @@ fun ForgetPasswordDialogContent(
 private fun Preview() {
     BillingTheme {
         ForgetPasswordDialogContent(
+            login = "",
+            recoverType = RecoverType.SMS,
             onCloseClick = {},
-            onRecoverClick = {_,_->}
+            onRecoverClick = {},
+            updateLogin = {},
+            updateRecoverType = {}
         )
     }
 }

@@ -49,12 +49,20 @@ fun LoginScreenRoot(
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     var isShowPassword by retain { mutableStateOf(false) }
+    var isOpenLoginDialog by retain { mutableStateOf(false) }
+    var isOpenPasswordDialog by retain { mutableStateOf(false) }
+    var isOpenConfirmPasswordDialog by retain { mutableStateOf(false) }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             LoginScreenEvent.NavigateEvent -> onNavigateToAccounts()
             is LoginScreenEvent.OnMessage -> {
                 snakeBarHostState.showSnackbar(event.message.asString(context))
+            }
+
+            LoginScreenEvent.openConfirmDialog -> {
+                isOpenPasswordDialog = false
+                isOpenConfirmPasswordDialog = true
             }
         }
     }
@@ -63,9 +71,21 @@ fun LoginScreenRoot(
         state = state,
         snakeBarHostState = snakeBarHostState,
         isShowPassword = isShowPassword,
+        isOpenLoginDialog = isOpenLoginDialog,
+        isOpenPasswordDialog = isOpenPasswordDialog,
+        isOpenConfirmPasswordDialog = isOpenConfirmPasswordDialog,
         onAction = viewModel::onAction,
         updateIsShowPassword = {
             isShowPassword = !isShowPassword
+        },
+        updateIsShowLoginDialog = {
+            isOpenLoginDialog = it
+        },
+        updateIsShowPasswordDialog = {
+            isOpenPasswordDialog = it
+        },
+        updateIsShowConfirmPasswordDialog = {
+            isOpenConfirmPasswordDialog = it
         }
     )
 }
@@ -75,22 +95,25 @@ private fun LoginScreen(
     modifier: Modifier = Modifier,
     state: LoginScreenState,
     isShowPassword: Boolean,
+    isOpenLoginDialog: Boolean,
+    isOpenPasswordDialog: Boolean,
+    isOpenConfirmPasswordDialog: Boolean,
     snakeBarHostState: SnackbarHostState,
     onAction: (LoginScreenAction) -> Unit,
     updateIsShowPassword: () -> Unit,
+    updateIsShowLoginDialog: (Boolean) -> Unit,
+    updateIsShowPasswordDialog: (Boolean) -> Unit,
+    updateIsShowConfirmPasswordDialog: (Boolean) -> Unit,
 ) {
-    var isOpenLoginDialog by retain { mutableStateOf(false) }
-    var isOpenPasswordDialog by retain { mutableStateOf(false) }
-
     if (isOpenLoginDialog) {
         Dialog(
             onDismissRequest = {
-                isOpenLoginDialog = false
+                updateIsShowLoginDialog(false)
             }
         ) {
             ForgetLoginDialogContent(
                 onCloseClick = {
-                    isOpenLoginDialog = false
+                    updateIsShowLoginDialog(false)
                 }
             )
         }
@@ -99,17 +122,54 @@ private fun LoginScreen(
     if (isOpenPasswordDialog) {
         Dialog(
             onDismissRequest = {
-                isOpenPasswordDialog = false
+                updateIsShowPasswordDialog(false)
             }
         ) {
             ForgetPasswordDialogContent(
+                login = state.login,
+                recoverType = state.type,
                 onCloseClick = {
-                    isOpenPasswordDialog = false
+                    updateIsShowPasswordDialog(false)
                 },
-                onRecoverClick = { login, number->
-
+                updateLogin = {
+                    onAction(LoginScreenAction.UpdateLogin(it))
+                },
+                onRecoverClick = {
+                    onAction(LoginScreenAction.RecoverPassword)
+                },
+                updateRecoverType = {
+                    onAction(LoginScreenAction.UpdateRecoverType(it))
                 }
             )
+        }
+    }
+
+    if (isOpenConfirmPasswordDialog) {
+        Dialog(
+            onDismissRequest = {
+                updateIsShowConfirmPasswordDialog(false)
+            }
+        ) {
+            ConfirmPasswordDialogContent(
+                count = state.count,
+                destination = state.destination,
+                type = state.type,
+                onCloseClick = {
+                    updateIsShowConfirmPasswordDialog(false)
+                },
+                onRecentClick = {
+                    onAction(LoginScreenAction.RecoverPassword)
+                },
+                onConfirmClick = { code, password ->
+                    onAction(
+                        LoginScreenAction.ConfirmWithCode(
+                            code = code,
+                            password = password
+                        )
+                    )
+                },
+
+                )
         }
     }
 
@@ -169,7 +229,7 @@ private fun LoginScreen(
                 Spacer(modifier = modifier.height(15.dp))
                 TextButton(
                     onClick = {
-                        isOpenLoginDialog = true
+                        updateIsShowLoginDialog(true)
                     }
                 ) {
                     Text(
@@ -182,7 +242,7 @@ private fun LoginScreen(
                 Spacer(modifier = modifier.height(5.dp))
                 TextButton(
                     onClick = {
-                        isOpenPasswordDialog = true
+                        updateIsShowPasswordDialog(true)
                     }
                 ) {
                     Text(
@@ -209,8 +269,14 @@ private fun Preview() {
             state = LoginScreenState(),
             snakeBarHostState = snackBarState,
             isShowPassword = true,
+            isOpenLoginDialog = false,
+            isOpenPasswordDialog = false,
+            isOpenConfirmPasswordDialog = false,
             onAction = {},
-            updateIsShowPassword = {}
+            updateIsShowPassword = {},
+            updateIsShowLoginDialog = {},
+            updateIsShowPasswordDialog = {},
+            updateIsShowConfirmPasswordDialog = {},
         )
     }
 }
@@ -229,15 +295,46 @@ private fun Preview1() {
         LoginScreen(
             state = LoginScreenState(
                 login = "login1",
-                password = "pass"
+                password = "pass",
             ),
             snakeBarHostState = snackBarState,
+            isOpenLoginDialog = false,
+            isOpenPasswordDialog = true,
             isShowPassword = false,
+            isOpenConfirmPasswordDialog = false,
             onAction = {},
-            updateIsShowPassword = {}
+            updateIsShowPassword = {},
+            updateIsShowPasswordDialog = {},
+            updateIsShowLoginDialog = {},
+            updateIsShowConfirmPasswordDialog = {},
         )
     }
 }
+
+@Preview(
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+private fun Preview2() {
+    val snackBarState = remember { SnackbarHostState() }
+    BillingTheme {
+        LoginScreen(
+            state = LoginScreenState(),
+            snakeBarHostState = snackBarState,
+            isShowPassword = true,
+            isOpenLoginDialog = false,
+            isOpenPasswordDialog = false,
+            isOpenConfirmPasswordDialog = true,
+            onAction = {},
+            updateIsShowPassword = {},
+            updateIsShowLoginDialog = {},
+            updateIsShowPasswordDialog = {},
+            updateIsShowConfirmPasswordDialog = {},
+        )
+    }
+}
+
 
 
 
