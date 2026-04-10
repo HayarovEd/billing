@@ -3,21 +3,26 @@ package com.impuls.billing.ui.uikit
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.theme.Typography
 
@@ -96,6 +101,87 @@ fun UiTextField(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UiTextField2(
+    modifier: Modifier = Modifier,
+    content: String,
+    label: String,
+    leadingText: String? = null,
+    trailingIcon: ImageVector? = null,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    isOnlyDigit: Boolean = false,
+    maxLines: Int = 1,
+    isError: Boolean = false,
+    onClickContent: (String) -> Unit,
+    onClickTrailingIcon: () -> Unit = {},
+) {
+    OutlinedTextField(
+        value = content,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.Transparent,
+                shape = MaterialTheme.shapes.medium
+            ),
+        onValueChange = { text ->
+            if (isOnlyDigit) {
+                if (text.all { it.isDigit() }) {
+                    onClickContent(text)
+                }
+            } else {
+                onClickContent(text)
+            }
+        },
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+        isError = isError,
+        placeholder = {
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        visualTransformation = visualTransformation,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
+        keyboardActions = keyboardActions,
+        maxLines = maxLines,
+        trailingIcon = {
+            if (trailingIcon != null) {
+                UiIconButton(
+                    icon = trailingIcon,
+                    onClick = onClickTrailingIcon,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        leadingIcon = {
+            if (leadingText != null)
+                Text(
+                    text = leadingText,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+        },
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            errorBorderColor = MaterialTheme.colorScheme.error,
+        )
+    )
+}
+
 @Preview(
     showBackground = true
 )
@@ -103,6 +189,20 @@ fun UiTextField(
 private fun UiTextFieldView() {
     BillingTheme {
         UiTextField(
+            content = "",
+            label = "hallo",
+            onClickContent = {}
+        )
+    }
+}
+
+@Preview(
+    showBackground = true
+)
+@Composable
+private fun UiTextFieldView10() {
+    BillingTheme {
+        UiTextField2(
             content = "",
             label = "hallo",
             onClickContent = {}

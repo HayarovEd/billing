@@ -10,8 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,6 +26,7 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.PhoneVisualTransformation
 import com.impuls.billing.ui.uikit.UiIconButton
+import com.impuls.billing.ui.uikit.UiTextField2
 
 private const val mask = "+0(000)000-00-00"
 private  const val maskNumber = '0'
@@ -83,30 +82,15 @@ fun PhoneTypeUi(
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = modifier.height(10.dp))
-        OutlinedTextField(
-            value = phone,
-            onValueChange = { newValue ->
-                if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
-                    updatePhone(newValue.take(mask.count { it == maskNumber }))
-                }
+        UiTextField2(
+            content = phone,
+            onClickContent = {
+                updatePhone(it)
             },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = "",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                keyboardType = KeyboardType.Phone,
-            ),
+            label = "",
+            keyboardType = KeyboardType.Phone,
+            isOnlyDigit = true,
             visualTransformation  = PhoneVisualTransformation(mask, maskNumber),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                errorBorderColor = MaterialTheme.colorScheme.error,
-            )
         )
         Spacer(modifier = Modifier.weight(1f))
         Button(

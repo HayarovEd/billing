@@ -38,7 +38,7 @@ fun NavController(
         composable<NavigationRoute.Profile> {
             ProfileScreenRoot(
                 onNavigateToPayment = {
-                    navController.navigate(NavigationRoute.Payment(it))
+                    navController.navigate(NavigationRoute.Payment("595142026"))
                 },
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.Login)

@@ -13,8 +13,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +28,7 @@ import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ProfileRow
+import com.impuls.billing.ui.uikit.UiTextField2
 
 @Composable
 fun AmountTypeUi(
@@ -102,39 +101,15 @@ fun AmountTypeUi(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-
-                OutlinedTextField(
-                    value = amountString,
-                    onValueChange = { newValue ->
-                        if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
-                            updateAmount(newValue)
-                        }
+                UiTextField2(
+                    content = amountString,
+                    onClickContent = {
+                        updateAmount(it)
                     },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = {
-                        Text(
-                            text = "0.00",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    leadingIcon = {
-                        Text(
-                            text = "₽",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                    ),
+                    label = "0.00",
+                    leadingText = "₽",
+                    keyboardType = KeyboardType.Decimal,
                     isError = typeErrorAmount != TypeErrorAmount.NO_ERROR,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        errorBorderColor = MaterialTheme.colorScheme.error,
-                    )
                 )
 
                 // Сообщение об ошибке
