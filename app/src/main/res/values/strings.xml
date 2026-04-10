@@ -112,7 +112,7 @@
     <string name="id">ID: %1$d</string>
     <string name="code_agreement">Код договора</string>
     <string name="credit_limit">Кредитный лимит</string>
-    <string name="promise_credit">Обещанный кредит</string>
+    <string name="promise_credit">Обещанный платёж</string>
     <string name="overdue_dept">⚠️ Просроченная задолженность</string>
     <string name="high_credit_utilization">⚠️ Высокое использование кредита</string>
     <string name="normal_credit">✓</string>

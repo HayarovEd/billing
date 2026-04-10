@@ -6,7 +6,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +38,7 @@ fun AgreementCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -45,7 +47,6 @@ fun AgreementCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
-        onClick = onClick,
     ) {
         Column(
             modifier = Modifier
@@ -180,23 +181,62 @@ fun AgreementCard(
                 agreement.balance > agreement.credit * 0.8 -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.tertiary
             }
-
-            Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = statusColor.copy(alpha = 0.1f),
-                modifier = Modifier.fillMaxWidth()
+            if (agreement.balance <0) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = statusColor.copy(alpha = 0.1f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.overdue_dept),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(8.dp),
+                        textAlign = TextAlign.Center,
+                        color = statusColor
+                    )
+                }
+            } else if (agreement.balance * 0.8 < agreement.credit) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = statusColor.copy(alpha = 0.1f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.high_credit_utilization),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(8.dp),
+                        textAlign = TextAlign.Center,
+                        color = statusColor
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    text = when {
-                        agreement.balance < 0 -> stringResource(R.string.overdue_dept)
-                        agreement.balance * 0.8 < agreement.credit -> stringResource(R.string.high_credit_utilization)
-                        else -> stringResource(R.string.normal_credit)
-                    },
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(8.dp),
-                    textAlign = TextAlign.Center,
-                    color = statusColor
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.add_balance),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

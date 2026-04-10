@@ -120,6 +120,7 @@ private fun ProfileScreenScreen(
                             onAction(ProfileScreenAction.ConfirmPhone(it))
                         }
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = stringResource(R.string.my_accounts),
                         style = MaterialTheme.typography.titleLarge
