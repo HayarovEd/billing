@@ -4,7 +4,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -42,12 +42,16 @@ fun PaymentCardUi(
     ) {
         Text(
             text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = modifier.height(10.dp))
         UiIconButton(
@@ -61,7 +65,7 @@ fun PaymentCardUi(
         Spacer(modifier = modifier.height(10.dp))
         url?.let {
             AndroidView(
-                factory = { context ->
+                factory = { _ ->
                    webView.apply {
                        loadUrl(url)
                    }

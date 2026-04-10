@@ -73,7 +73,7 @@ fun ItemPaymentMethod(
                         .padding(3.dp),
                     text = "${stringResource(R.string.comission)} $comission%",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.background
+                    color = if (isChosenMethod) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
@@ -108,6 +108,31 @@ private fun Preview() {
 @Composable
 private fun Preview2() {
     BillingTheme {
+        ItemPaymentMethod(
+            comission = 0,
+            isChosenMethod = true,
+            titleContent = {
+                TitleMethodContentCard(
+                    name = stringResource(R.string.bank_card),
+                    icons = listOf(
+                        R.drawable.visaa,
+                        R.drawable.master,
+                        R.drawable.mir_logo,
+                        R.drawable.pay_union_pay
+                    )
+                )
+            },
+            updateSelect = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview3() {
+    BillingTheme(
+        darkTheme = true
+    ) {
         ItemPaymentMethod(
             comission = 0,
             isChosenMethod = true,

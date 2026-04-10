@@ -1,6 +1,6 @@
 package com.impuls.billing.ui.payment_screen
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,20 +9,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ProfileRow
-import com.impuls.billing.ui.uikit.UiTextField
 
 @Composable
 fun AmountTypeUi(
@@ -35,67 +42,141 @@ fun AmountTypeUi(
     updateAmount: (String) -> Unit,
     updateScreen: () -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(15.dp)
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Text(
-            text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
-        )
-        Spacer(modifier = modifier.height(10.dp))
-        Text(
-            text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
-        )
-        companyPayment?.let { company ->
-            imageData?.let {
-                TitleCompany(
-                    name = company.name,
-                    image = it.image,
-                    colorString = it.color
-                )
-            }
-        }
-        Spacer(modifier = modifier.height(10.dp))
-        ProfileRow(
-            title = stringResource(R.string.ladger_account),
-            content = number ?: ""
-        )
-        Spacer(modifier = modifier.height(10.dp))
-        UiTextField(
-            content = amountString,
-            label = stringResource(R.string.amount_to_pay),
-            isOnlyDigit = true,
-            keyboardType = KeyboardType.Number,
-            error = when (typeErrorAmount) {
-                TypeErrorAmount.NO_ERROR -> ""
-                TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
-                TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
-                TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
-                TypeErrorAmount.BLANK -> stringResource(R.string.text_not_blank)
-            },
-            isError = typeErrorAmount != TypeErrorAmount.NO_ERROR,
-            onClickContent = {
-                updateAmount(it)
-            }
-        )
-        Spacer(modifier = modifier.height(10.dp))
-        Button(
-            modifier = modifier.fillMaxWidth(),
-            onClick = updateScreen,
-            shape = RoundedCornerShape(5.dp),
-            enabled = typeErrorAmount == TypeErrorAmount.NO_ERROR,
-            border = BorderStroke(
-                width = 1.dp,
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Заголовок
+            Text(
+                text = stringResource(R.string.add_balance),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
-        ) {
+
+            // Описание
             Text(
-                text = stringResource(R.string.next),
-                style = MaterialTheme.typography.labelSmall
+                text = stringResource(R.string.add_balance_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            // Карточка компании
+            if (companyPayment != null && imageData != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    TitleCompany(
+                        name = companyPayment.name,
+                        image = imageData.image,
+                        colorString = imageData.color,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // Лицевой счет
+            ProfileRow(
+                title = stringResource(R.string.ladger_account),
+                content = number ?: "—",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Поле ввода суммы
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.amount_to_pay),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                OutlinedTextField(
+                    value = amountString,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            updateAmount(newValue)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "0.00",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    leadingIcon = {
+                        Text(
+                            text = "₽",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                    ),
+                    isError = typeErrorAmount != TypeErrorAmount.NO_ERROR,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        errorBorderColor = MaterialTheme.colorScheme.error,
+                    )
+                )
+
+                // Сообщение об ошибке
+                if (typeErrorAmount != TypeErrorAmount.NO_ERROR) {
+                    Text(
+                        text = when (typeErrorAmount) {
+                            TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
+                            TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
+                            TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
+                            TypeErrorAmount.BLANK -> stringResource(R.string.text_not_blank)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Кнопка "Далее"
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                onClick = updateScreen,
+                enabled = typeErrorAmount == TypeErrorAmount.NO_ERROR && amountString.isNotBlank(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.next),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+            }
         }
     }
 }

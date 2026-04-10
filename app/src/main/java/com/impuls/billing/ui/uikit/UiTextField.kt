@@ -60,7 +60,7 @@ fun UiTextField(
         },
         enabled = enabled,
         readOnly = readOnly,
-        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
+        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
         isError = isError,
         supportingText = {
             if (isError) {
@@ -82,7 +82,7 @@ fun UiTextField(
                 UiIconButton(
                     icon = trailingIcon,
                     onClick = onClickTrailingIcon,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         },
