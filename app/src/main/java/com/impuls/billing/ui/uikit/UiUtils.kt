@@ -2,10 +2,14 @@ package com.impuls.billing.ui.uikit
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -56,5 +60,22 @@ fun openSbpUrl(context: Context, url: String) {
             "Не удалось открыть ссылку",
             android.widget.Toast.LENGTH_SHORT
         ).show()
+    }
+}
+
+@Composable
+fun PortraitOnly() {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+    DisposableEffect(configuration) {
+        val activity = context as? android.app.Activity
+        val originalOrientation = activity?.requestedOrientation
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onDispose {
+            originalOrientation?.let { activity?.requestedOrientation = it }
+        }
     }
 }

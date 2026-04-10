@@ -263,8 +263,8 @@ fun BillingTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> highContrastDarkColorScheme
-        else -> highContrastLightColorScheme
+        darkTheme -> mediumContrastDarkColorScheme
+        else -> mediumContrastLightColorScheme
     }
 
     MaterialTheme(

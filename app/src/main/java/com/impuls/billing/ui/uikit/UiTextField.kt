@@ -165,13 +165,14 @@ fun UiTextField2(
             }
         },
         leadingIcon = {
-            if (leadingText != null)
+            leadingText?.let {
                 Text(
-                    text = leadingText,
+                    text = it,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
         },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(

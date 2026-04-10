@@ -8,6 +8,7 @@ import com.impuls.billing.ui.login_screen.LoginScreenRoot
 import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
 import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
 import com.impuls.billing.ui.splash_screen.SplashScreenRoot
+import com.impuls.billing.ui.uikit.PortraitOnly
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 
@@ -16,6 +17,7 @@ fun NavController(
     startDestination: NavigationRoute = NavigationRoute.Splash/*Payment("595142026")*/,
 ) {
     val navController = rememberNavController()
+    PortraitOnly()
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable<NavigationRoute.Splash> {

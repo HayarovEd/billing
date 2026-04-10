@@ -38,6 +38,7 @@ import com.impuls.billing.R
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiTextField
+import com.impuls.billing.ui.uikit.UiTextField2
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -188,7 +189,7 @@ private fun LoginScreen(
                     .padding(15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                UiTextField(
+                UiTextField2(
                     content = state.login,
                     label = stringResource(id = R.string.email_required),
                     onClickContent = {
@@ -198,7 +199,7 @@ private fun LoginScreen(
                 Spacer(
                     modifier = modifier.height(15.dp)
                 )
-                UiTextField(
+                UiTextField2(
                     content = state.password,
                     label = stringResource(id = R.string.password_required),
                     trailingIcon = if (isShowPassword) ImageVector.vectorResource(R.drawable.baseline_visibility_off_24) else ImageVector.vectorResource(
