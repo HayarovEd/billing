@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.home_screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,8 +25,9 @@ import com.impuls.billing.ui.theme.BillingTheme
 fun TariffCard(
     data: ClientVroup,
     width: Dp,
+    isSelected: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -36,6 +39,10 @@ fun TariffCard(
                 MaterialTheme.colorScheme.surfaceVariant
             else
                 MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 0.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Unspecified
         ),
         onClick = onClick
     ) {
@@ -141,11 +148,8 @@ fun TariffListScreen() {
         TariffCard(
             data = sampleData,
             width = 600.dp,
-            onClick = {
-                // Обработка нажатия на карточку
-                println("Нажата карточка с ID: ${sampleData.agrmId}")
-            }
+            isSelected = true,
+            onClick = {}
         )
     }
-
 }

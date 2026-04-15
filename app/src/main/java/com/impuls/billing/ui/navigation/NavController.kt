@@ -66,6 +66,9 @@ fun NavController(
                     navController.navigate(NavigationRoute.Login)
                     // navController.popBackStack(NavigationRoute.Login, false)
                 },
+                onNavigateToBack = {
+                    navController.navigateUp()
+                }
             )
         }
     }

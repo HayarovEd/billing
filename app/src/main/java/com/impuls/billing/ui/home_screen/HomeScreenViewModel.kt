@@ -53,8 +53,11 @@ class HomeScreenViewModel(
 
     fun onAction(action: HomeScreenAction) {
         when (action) {
-            else -> {
-
+            is HomeScreenAction.SelectVgroup -> {
+                _state.value.copy(
+                    selectedVGroupId = action.vgId,
+                )
+                    .updateState()
             }
         }
     }
@@ -80,9 +83,15 @@ class HomeScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         isLoading = false,
-                        vGroups = result.data
+                        vGroups = result.data,
                     )
                         .updateState()
+                    if (result.data.isNotEmpty()) {
+                        _state.value.copy(
+                            selectedVGroupId = result.data.first().vgId
+                        )
+                            .updateState()
+                    }
                 }
             }
         }
