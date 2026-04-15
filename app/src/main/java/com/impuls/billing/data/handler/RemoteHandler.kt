@@ -13,6 +13,7 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.JsonConvertException
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ClosedByteChannelException
+import java.net.ConnectException
 
 suspend fun <D> handleResponse(
     response: HttpResponse,
@@ -37,7 +38,10 @@ suspend fun <D> handleResponse(
             401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(DataError.Network.UNKNOWN)
         }
-    } catch (e: ServerResponseException) {
+    } catch (e: ConnectException) {
+        e.printStackTrace()
+        ResultWork.Error(DataError.Network.SERVER_ERROR)
+    }catch (e: ServerResponseException) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.SERVER_ERROR)
     } catch (e: HttpRequestTimeoutException) {

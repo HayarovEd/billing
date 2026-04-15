@@ -3,7 +3,6 @@ package com.impuls.billing.ui.profile_screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.impuls.billing.domain.repository.AccountRepository
-import com.impuls.billing.domain.repository.AuthRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
@@ -20,7 +19,6 @@ import kotlinx.coroutines.delay
 import kotlin.time.Clock
 
 class ProfileScreenViewModel(
-    private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
     private val dataStoreRepository: DataStoreRepository,
     private val jwtRepository: JwtRepository,

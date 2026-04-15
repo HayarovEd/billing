@@ -1,6 +1,7 @@
 package com.impuls.billing.di
 
 
+import com.impuls.billing.ui.home_screen.HomeScreenViewModel
 import com.impuls.billing.ui.login_screen.LoginScreenViewModel
 import com.impuls.billing.ui.payment_screen.PaymentScreenViewModel
 import com.impuls.billing.ui.profile_screen.ProfileScreenViewModel
@@ -13,7 +14,5 @@ val viewModelModule = module {
     viewModelOf(::ProfileScreenViewModel)
     viewModelOf(::PaymentScreenViewModel)
     viewModelOf(::SplashScreenViewModel)
-    /*
-    viewModelOf(::ChannelsScreenViewModel)
-    */
+    viewModelOf(::HomeScreenViewModel)
 }

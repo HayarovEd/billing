@@ -1,6 +1,7 @@
 package com.impuls.billing.domain.repository
 
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 
@@ -35,4 +36,10 @@ interface AccountRepository {
         id: Long,
         code: String
     ): ResultWork<Boolean, DataError>
+
+    suspend fun getVGroups(
+        token: String,
+        agrmId: Long?,
+        vgId: Long? = null
+    ): ResultWork<List<ClientVroup>, DataError>
 }

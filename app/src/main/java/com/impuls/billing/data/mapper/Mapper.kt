@@ -2,10 +2,13 @@ package com.impuls.billing.data.mapper
 
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
+import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.utils.convertBillDeliveryType
@@ -103,6 +106,22 @@ fun RecoverPasswordDto.convertToRecoverPassword(): RecoverPassword {
     return RecoverPassword(
         recordId = recordId,
         destination = destination
+    )
+}
+
+fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
+    return ClientVroup(
+        agrmId = vGroup.agrmId,
+        vgId = vGroup.vgId,
+        blocked = vGroup.blocked!=0L,
+        tarifId = vGroup.tarifId,
+        tarifDescr = vGroup.tarifDescr,
+        login = vGroup.login,
+        serviceVolume = vGroup.serviceVolume,
+        serviceRent = vGroup.serviceRent,
+        currentModifier = ModifierData(
+            type = vGroup.currentModifier.type,
+            value = vGroup.currentModifier.value)
     )
 }
 

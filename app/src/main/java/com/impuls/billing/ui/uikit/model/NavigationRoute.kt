@@ -10,9 +10,6 @@ sealed class NavigationRoute {
     data object Splash : NavigationRoute()
 
     @Serializable
-    data object Accounts : NavigationRoute()
-
-    @Serializable
     data object Profile : NavigationRoute()
 
     @Serializable
@@ -24,7 +21,9 @@ sealed class NavigationRoute {
     data object Bill : NavigationRoute()
 
     @Serializable
-    data object HomeInternet : NavigationRoute()
+    data class Home(
+        val agrmId: Long
+    ) : NavigationRoute()
 
     @Serializable
     data object Blockings : NavigationRoute()

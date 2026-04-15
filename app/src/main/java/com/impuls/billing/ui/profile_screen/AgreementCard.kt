@@ -27,7 +27,8 @@ import java.util.Locale
 fun AgreementCard(
     agreement: Agreement,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClickPayment: () -> Unit,
+    onClickInfo: () -> Unit,
 ) {
     // Форматирование чисел
     val balanceFormat = DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US).apply {
@@ -211,30 +212,46 @@ fun AgreementCard(
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            Button(
-                onClick = onClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            Row( modifier = Modifier
+                .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically) {
+                Button(
+                    onClick = onClickPayment,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.add_balance),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                OutlinedButton(
+                    modifier = Modifier
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = onClickInfo
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.add_balance),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        imageVector = ImageVector.vectorResource(R.drawable.info_24dp),
+                        contentDescription = null
                     )
                 }
             }
@@ -279,7 +296,8 @@ private fun Preview() {
                 initialBalance = 0.0,
                 code = "222"
             ),
-            onClick = {}
+            onClickPayment = {},
+            onClickInfo = {}
         )
     }
 }

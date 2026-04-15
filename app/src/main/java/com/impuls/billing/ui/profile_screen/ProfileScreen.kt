@@ -42,6 +42,7 @@ fun ProfileScreenRoot(
     viewModel: ProfileScreenViewModel = koinViewModel(),
     onNavigateToPayment: (String) -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToMore: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -64,7 +65,8 @@ fun ProfileScreenRoot(
         state = state,
         snakeBarHostState = snakeBarHostState,
         onAction = viewModel::onAction,
-        onNavigateToPayment = onNavigateToPayment
+        onNavigateToPayment = onNavigateToPayment,
+        onNavigateToMore = onNavigateToMore
     )
 }
 
@@ -75,6 +77,7 @@ private fun ProfileScreenScreen(
     snakeBarHostState: SnackbarHostState,
     onAction: (ProfileScreenAction) -> Unit,
     onNavigateToPayment: (String) -> Unit,
+    onNavigateToMore: (Long) -> Unit,
 ) {
 
     Scaffold(
@@ -134,8 +137,11 @@ private fun ProfileScreenScreen(
                         items(acc.agreements) {
                             AgreementCard(
                                 agreement = it,
-                                onClick = {
+                                onClickPayment = {
                                     onNavigateToPayment(it.code)
+                                },
+                                onClickInfo = {
+                                    onNavigateToMore(it.agrmId)
                                 }
                             )
                         }
@@ -238,6 +244,7 @@ private fun Preview() {
             snakeBarHostState = snackBarState,
             onAction = {},
             onNavigateToPayment = {},
+            onNavigateToMore = {},
         )
     }
 }
@@ -334,6 +341,7 @@ private fun Preview1() {
             snakeBarHostState = snackBarState,
             onAction = {},
             onNavigateToPayment = {},
+            onNavigateToMore = {},
         )
     }
 }
@@ -354,6 +362,7 @@ private fun Preview2() {
             snakeBarHostState = snackBarState,
             onAction = {},
             onNavigateToPayment = {},
+            onNavigateToMore = {},
         )
     }
 }

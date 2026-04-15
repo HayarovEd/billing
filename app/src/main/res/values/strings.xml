@@ -116,4 +116,8 @@
     <string name="overdue_dept">⚠️ Просроченная задолженность</string>
     <string name="high_credit_utilization">⚠️ Высокое использование кредита</string>
     <string name="normal_credit">✓</string>
+    <string name="is_blocked">Заблокирован</string>
+    <string name="is_active">Активен</string>
+    <string name="tarif">Тариф</string>
+    <string name="abonent_price">Абонентская плата: %1$s руб.</string>
 </resources>
