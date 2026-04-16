@@ -7,10 +7,12 @@ data class ClientVroup(
     val blocked: Boolean,
     val tarifId: Long,
     val tarifDescr: String,
+    val agentDescr: String,
     val login: String,
     val serviceVolume: Long,
     val serviceRent: Double,
-    val currentModifier: ModifierData
+    val currentModifier: ModifierData,
+    val addresses: List<String>,
 )
 
 data class ModifierData(

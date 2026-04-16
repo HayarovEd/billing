@@ -36,6 +36,7 @@ import com.impuls.billing.R.string
 @Composable
 fun UserCard(
     account: Account,
+    address: String,
     modifier: Modifier = Modifier,
     count: Int,
     onUpdatePhone: (String) -> Unit,
@@ -106,14 +107,18 @@ fun UserCard(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = address,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Email с верификацией
             InfoRowWithStatus(
@@ -382,6 +387,7 @@ fun PreviewUserCard() {
         UserCard(
             account = clientAccount.account,
             count = 5,
+            address = "Россия,край Пермский,р-н Пермский,,д Заборье,ул Зелёная,дом 7,,,,",
             onConfirmCodeEmail = {},
             onConfirmCodePhone = {},
             onUpdateEmail = {},

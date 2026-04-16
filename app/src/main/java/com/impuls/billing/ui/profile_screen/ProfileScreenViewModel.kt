@@ -169,10 +169,15 @@ class ProfileScreenViewModel(
 
                 is ResultWork.Success -> {
                     _state.value.copy(
-                        isLoading = false,
                         account = result.data
                     )
                         .updateState()
+                    if (result.data.agreements.isNotEmpty()) {
+                        loadVGroups(
+                            token = token,
+                            agrmId = result.data.agreements.first().agrmId
+                        )
+                    }
                 }
             }
         }
@@ -349,6 +354,35 @@ class ProfileScreenViewModel(
                     viewModelScope.launch {
                         navigate()
                     }
+                }
+            }
+        }
+    }
+
+
+    private fun loadVGroups(
+        token: String,
+        agrmId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getVGroups(
+                token=token,
+                agrmId = agrmId
+            )) {
+                is ResultWork.Error -> {
+                    _state.value.copy(
+                        isLoading = false,
+                    )
+                        .updateState()
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        isLoading = false,
+                        vGroups = result.data,
+                    )
+                        .updateState()
                 }
             }
         }

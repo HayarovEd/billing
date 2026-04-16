@@ -22,7 +22,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 
 
 @Composable
-fun TariffCard(
+fun TariffCardUL(
     data: ClientVroup,
     width: Dp,
     isSelected: Boolean,
@@ -129,7 +129,7 @@ fun TariffCard(
 
 @Preview(showBackground = true)
 @Composable
-fun TariffListScreen() {
+fun TariffListScreenUL() {
     val sampleData = ClientVroup(
         agrmId = 8220,
         vgId = 9022,
@@ -139,13 +139,15 @@ fun TariffListScreen() {
         login = "tb02376k93",
         serviceRent = 1000.0,
         serviceVolume = 2000,
+        addresses = emptyList(),
+        agentDescr = "Netflow ООО НПО ИМПУЛЬС",
         currentModifier = ModifierData(
             type = "rate",
             value = 0.95
         )
     )
     BillingTheme() {
-        TariffCard(
+        TariffCardUL(
             data = sampleData,
             width = 600.dp,
             isSelected = true,

@@ -121,7 +121,7 @@ private fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(state.vGroups) { vg ->
-                        TariffCard(
+                        TariffCardUL(
                             data = vg,
                             isSelected = vg.vgId == state.selectedVGroupId,
                             width = if (state.vGroups.size == 1) (windowWidth * 0.9f) else windowWidth * 0.8f,
@@ -150,6 +150,8 @@ private fun Preview() {
             login = "login $it",
             serviceVolume = 1000L,
             serviceRent = Random.nextDouble(100.0, 500.0),
+            addresses = emptyList(),
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
             currentModifier = ModifierData(
                 type = "ddds",
                 value = Random.nextDouble(0.8, 1.0),
@@ -182,7 +184,9 @@ private fun Preview1() {
             tarifDescr = "$it",
             login = "login $it",
             serviceVolume = 1000L,
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
             serviceRent = Random.nextDouble(100.0, 500.0),
+            addresses = emptyList(),
             currentModifier = ModifierData(
                 type = "ddds",
                 value = Random.nextDouble(0.8, 1.0),

@@ -104,6 +104,7 @@ private fun ProfileScreenScreen(
                     UserCard(
                         account = acc.account,
                         count = state.count,
+                        address = state.clientVGroups?.addresses?.firstOrNull()?:"",
                         onUpdatePhone = {
                             onAction(ProfileScreenAction.UpdatePhone(it))
                         },
@@ -158,6 +159,13 @@ private fun ProfileScreenScreen(
                                     },
                                 )
                             }
+                            state.clientVGroups?.let {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                TarifCardFL(
+                                    clientVroup = it
+                                )
+                            }
+
                         }
                     }
                 }
@@ -253,7 +261,7 @@ private fun Preview() {
     BillingTheme {
         ProfileScreenScreen(
             state = ProfileScreenState(
-                account = clientAccount
+                account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
             onAction = {},
@@ -350,7 +358,7 @@ private fun Preview1() {
     BillingTheme {
         ProfileScreenScreen(
             state = ProfileScreenState(
-                account = clientAccount
+                account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
             onAction = {},
@@ -371,7 +379,7 @@ private fun Preview2() {
     BillingTheme {
         ProfileScreenScreen(
             state = ProfileScreenState(
-                isLoading = true
+                isLoading = true,
             ),
             snakeBarHostState = snackBarState,
             onAction = {},

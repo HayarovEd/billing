@@ -121,10 +121,12 @@ fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
         login = vGroup.login,
         serviceVolume = vGroup.serviceVolume,
         serviceRent = vGroup.serviceRent,
+        agentDescr = vGroup.agentDescr,
         currentModifier = ModifierData(
             type = vGroup.currentModifier.type,
             value = vGroup.currentModifier.value
-        )
+        ),
+        addresses = addresses.map { it.address }
     )
 }
 
