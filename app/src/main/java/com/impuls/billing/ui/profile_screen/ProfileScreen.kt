@@ -35,6 +35,7 @@ import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.UiBottomNavigation
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -82,6 +83,17 @@ private fun ProfileScreenScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
+        bottomBar = {
+            UiBottomNavigation(
+                onClickToPayment = {
+                    state.account?.agreements?.firstOrNull()?.let { agrm ->
+                        onNavigateToPayment(agrm.code)
+                    }
+                },
+                onClickOpenHelp = {},
+                onClickOpenInfo = {}
+            )
+        }
     ) { contentPadding ->
         if (state.isLoading) {
             Box(
@@ -104,7 +116,7 @@ private fun ProfileScreenScreen(
                     UserCard(
                         account = acc.account,
                         count = state.count,
-                        address = state.clientVGroups?.addresses?.firstOrNull()?:"",
+                        address = state.clientVGroups?.addresses?.firstOrNull() ?: "",
                         onUpdatePhone = {
                             onAction(ProfileScreenAction.UpdatePhone(it))
                         },
@@ -132,7 +144,7 @@ private fun ProfileScreenScreen(
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Spacer(modifier = modifier.height(10.dp))
-                            LazyColumn (
+                            LazyColumn(
                                 modifier = modifier
                                     .fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -150,8 +162,9 @@ private fun ProfileScreenScreen(
                                 }
                             }
                         }
+
                         UserType.FL -> {
-                            acc.agreements.firstOrNull()?.let { agrm->
+                            acc.agreements.firstOrNull()?.let { agrm ->
                                 AgreementCardFL(
                                     agreement = agrm,
                                     onClickPayment = {
