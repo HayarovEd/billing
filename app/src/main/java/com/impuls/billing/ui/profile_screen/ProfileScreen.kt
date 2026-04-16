@@ -124,26 +124,40 @@ private fun ProfileScreenScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = stringResource(R.string.my_accounts),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Spacer(modifier = modifier.height(10.dp))
-                    LazyColumn (
-                        modifier = modifier
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        items(acc.agreements) {
-                            AgreementCard(
-                                agreement = it,
-                                onClickPayment = {
-                                    onNavigateToPayment(it.code)
-                                },
-                                onClickInfo = {
-                                    onNavigateToMore(it.agrmId)
-                                }
+                    when (acc.account.type) {
+                        UserType.UL -> {
+                            Text(
+                                text = stringResource(R.string.my_accounts),
+                                style = MaterialTheme.typography.titleLarge
                             )
+                            Spacer(modifier = modifier.height(10.dp))
+                            LazyColumn (
+                                modifier = modifier
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                items(acc.agreements) {
+                                    AgreementCard(
+                                        agreement = it,
+                                        onClickPayment = {
+                                            onNavigateToPayment(it.code)
+                                        },
+                                        onClickInfo = {
+                                            onNavigateToMore(it.agrmId)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        UserType.FL -> {
+                            acc.agreements.firstOrNull()?.let { agrm->
+                                AgreementCardFL(
+                                    agreement = agrm,
+                                    onClickPayment = {
+                                        onNavigateToPayment(agrm.code)
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -275,7 +289,7 @@ private fun Preview1() {
             login = "pycutbvk45",
             password = "342py23854",
             description = "Не использовать.",
-            name = "Ivanov II",
+            name = "Ivanov Ivan Ivanovich",
             phone = "",
             fax = "",
             email = "",
@@ -306,7 +320,7 @@ private fun Preview1() {
                 vGroups = 20,
                 penaltyMethod = 0,
                 monthBlockDay = 0,
-                balance = -56977.602534999998,
+                balance = 1000.0,
                 credit = 900000.0,
                 promiseCredit = 0.0,
                 installments = 0.0,
@@ -327,7 +341,7 @@ private fun Preview1() {
                 symbol = "руб",
                 username = "ЯЯ_Биллинг(Т_СТ)",
                 initialBalance = 0.0,
-                code = ""
+                code = "5665665"
             )
         )
     )

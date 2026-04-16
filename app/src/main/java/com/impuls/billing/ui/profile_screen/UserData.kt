@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -103,29 +102,8 @@ fun UserCard(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = "@${account.login}",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-
-                // UID бейдж
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                ) {
-                    Text(
-                        text = stringResource(string.id, account.uid),
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontFamily = FontFamily.Monospace
-                    )
                 }
             }
 
@@ -142,7 +120,7 @@ fun UserCard(
                 icon = ImageVector.vectorResource(
                     drawable.mobile_check_24dp),
                 label = stringResource(string.phone),
-                value = formatPhoneNumber(account.phone),
+                value = formatPhoneNumber(account.mobile),
                 isConfirmed = account.mobileIsConfirmed,
                 description = stringResource(string.desc_phone),
                 subTitle = stringResource(string.phone_number),

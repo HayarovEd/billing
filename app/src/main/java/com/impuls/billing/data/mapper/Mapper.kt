@@ -1,5 +1,6 @@
 package com.impuls.billing.data.mapper
 
+import com.impuls.billing.data.remote.ClientShortStatDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
@@ -10,6 +11,7 @@ import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.RecoverPassword
+import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
@@ -58,7 +60,7 @@ fun ClientAccountResponse.toClientAccount(): ClientAccount {
             abonentSurname = account.abonentsurname,
             abonentPatronymic = account.abonentpatronymic
         ),
-        agreements = agreements.map { 
+        agreements = agreements.map {
             Agreement(
                 agrmId = it.agrmid,
                 uid = it.uid,
@@ -113,7 +115,7 @@ fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
     return ClientVroup(
         agrmId = vGroup.agrmId,
         vgId = vGroup.vgId,
-        blocked = vGroup.blocked!=0L,
+        blocked = vGroup.blocked != 0L,
         tarifId = vGroup.tarifId,
         tarifDescr = vGroup.tarifDescr,
         login = vGroup.login,
@@ -121,7 +123,18 @@ fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
         serviceRent = vGroup.serviceRent,
         currentModifier = ModifierData(
             type = vGroup.currentModifier.type,
-            value = vGroup.currentModifier.value)
+            value = vGroup.currentModifier.value
+        )
+    )
+}
+
+fun ClientShortStatDto.toShortStat(): ShortStat {
+    return ShortStat(
+        agrmId = agrmId ?: 0L,
+        vgId = vgId ?: 0L,
+        amount = amount ?: 0.0,
+        agentDescr = agentDescr ?: "",
+        currSymbol = currSymbol ?: ""
     )
 }
 

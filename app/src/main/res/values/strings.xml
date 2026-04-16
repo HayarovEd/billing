@@ -110,7 +110,7 @@
     <string name="success_update_password">Пароль успешно изменен</string>
     <string name="enter_new_password">Введите новый\nпароль</string>
     <string name="id">ID: %1$d</string>
-    <string name="code_agreement">Код договора</string>
+    <string name="code_agreement">Оплата по номеру</string>
     <string name="credit_limit">Кредитный лимит</string>
     <string name="promise_credit">Обещанный платёж</string>
     <string name="overdue_dept">⚠️ Просроченная задолженность</string>
@@ -121,4 +121,5 @@
     <string name="tarif">Тариф</string>
     <string name="abonent_price">Абонентская плата: %1$s руб.</string>
     <string name="internet">Интернет</string>
+    <string name="agreement_number">Номер договора</string>
 </resources>
