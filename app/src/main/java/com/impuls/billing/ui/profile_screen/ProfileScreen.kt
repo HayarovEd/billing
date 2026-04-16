@@ -1,5 +1,7 @@
 package com.impuls.billing.ui.profile_screen
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -18,13 +21,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.Account
@@ -35,7 +43,7 @@ import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
-import com.impuls.billing.ui.uikit.UiBottomNavigation
+import com.impuls.billing.ui.uikit.UiIconButton
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -48,6 +56,7 @@ fun ProfileScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val activity = context as Activity
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ProfileScreenEvent.OnMessage -> snakeBarHostState.showSnackbar(
@@ -67,10 +76,14 @@ fun ProfileScreenRoot(
         snakeBarHostState = snakeBarHostState,
         onAction = viewModel::onAction,
         onNavigateToPayment = onNavigateToPayment,
-        onNavigateToMore = onNavigateToMore
+        onNavigateToMore = onNavigateToMore,
+        onExitFromApp = {
+            activity.finish()
+        }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileScreenScreen(
     modifier: Modifier = Modifier,
@@ -79,19 +92,44 @@ private fun ProfileScreenScreen(
     onAction: (ProfileScreenAction) -> Unit,
     onNavigateToPayment: (String) -> Unit,
     onNavigateToMore: (Long) -> Unit,
+    onExitFromApp: () -> Unit,
 ) {
+
+    var openCloseDialog by remember { mutableStateOf(false) }
+
+
+    BackHandler() {
+        openCloseDialog = true
+    }
+
+    if (openCloseDialog) {
+        Dialog(
+            onDismissRequest =  {
+                openCloseDialog = false
+            }
+        ) {
+            ContentExitDialog(
+                title = stringResource(R.string.sure_exit),
+                onCancel = {
+                    openCloseDialog = false
+                },
+                onConfirm = {
+                    openCloseDialog = false
+                    onExitFromApp()
+                }
+            )
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
-        bottomBar = {
-            UiBottomNavigation(
-                onClickToPayment = {
-                    state.account?.agreements?.firstOrNull()?.let { agrm ->
-                        onNavigateToPayment(agrm.code)
-                    }
-                },
-                onClickOpenHelp = {},
-                onClickOpenInfo = {}
+        floatingActionButton = {
+            UiIconButton(
+                icon = ImageVector.vectorResource(R.drawable.chat_24dp),
+                buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                onClick = {
+                    //TODO
+                }
             )
         }
     ) { contentPadding ->
@@ -280,6 +318,7 @@ private fun Preview() {
             onAction = {},
             onNavigateToPayment = {},
             onNavigateToMore = {},
+            onExitFromApp = {},
         )
     }
 }
@@ -377,6 +416,7 @@ private fun Preview1() {
             onAction = {},
             onNavigateToPayment = {},
             onNavigateToMore = {},
+            onExitFromApp = {},
         )
     }
 }
@@ -398,6 +438,7 @@ private fun Preview2() {
             onAction = {},
             onNavigateToPayment = {},
             onNavigateToMore = {},
+            onExitFromApp = {},
         )
     }
 }

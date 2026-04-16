@@ -162,6 +162,73 @@ private fun RowWithTextField(
     }
 }
 
+@Composable
+fun ContentExitDialog(
+    modifier: Modifier = Modifier,
+    title: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onBackground
+        ),
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = modifier.height(5.dp))
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OutlinedButton(
+                    modifier = modifier.weight(1f),
+                    onClick = onCancel,
+                    shape = RoundedCornerShape(5.dp),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.cancel),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                Spacer(modifier = modifier.width(3.dp))
+
+                OutlinedButton(
+                    modifier = modifier.weight(1f),
+                    onClick = onConfirm,
+                    shape = RoundedCornerShape(5.dp),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.exit
+                        ),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -221,6 +288,18 @@ private fun Preview3() {
             onConfirmCode = {},
             onConfirmContent = {},
             onRecentCode = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview4() {
+    BillingTheme {
+        ContentExitDialog(
+            title = "Номер телефона",
+            onCancel = {},
+            onConfirm = {}
         )
     }
 }
