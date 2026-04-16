@@ -9,6 +9,7 @@ data class ClientVroup(
     val tarifDescr: String,
     val agentDescr: String,
     val login: String,
+    val speed: Long,
     val serviceVolume: Long,
     val serviceRent: Double,
     val currentModifier: ModifierData,

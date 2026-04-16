@@ -122,6 +122,7 @@ fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
         serviceVolume = vGroup.serviceVolume,
         serviceRent = vGroup.serviceRent,
         agentDescr = vGroup.agentDescr,
+        speed = vGroup.curShape/1000,
         currentModifier = ModifierData(
             type = vGroup.currentModifier.type,
             value = vGroup.currentModifier.value

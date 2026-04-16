@@ -122,4 +122,5 @@
     <string name="abonent_price">Абонентская плата: %1$s руб.</string>
     <string name="internet">Интернет</string>
     <string name="agreement_number">Номер договора</string>
+    <string name="unit_m_s">мбит/с</string>
 </resources>

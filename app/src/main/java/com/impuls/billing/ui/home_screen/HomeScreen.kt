@@ -151,6 +151,7 @@ private fun Preview() {
             serviceVolume = 1000L,
             serviceRent = Random.nextDouble(100.0, 500.0),
             addresses = emptyList(),
+            speed = 100,
             agentDescr = "Netflow ООО НПО ИМПУЛЬС",
             currentModifier = ModifierData(
                 type = "ddds",
@@ -187,6 +188,7 @@ private fun Preview1() {
             agentDescr = "Netflow ООО НПО ИМПУЛЬС",
             serviceRent = Random.nextDouble(100.0, 500.0),
             addresses = emptyList(),
+            speed = 100,
             currentModifier = ModifierData(
                 type = "ddds",
                 value = Random.nextDouble(0.8, 1.0),

@@ -51,7 +51,7 @@ fun UiBottomNavigation(
         UiIconButton(
             modifier = modifier,
             icon = ImageVector.vectorResource(R.drawable.info_24dp),
-            buttonColor = MaterialTheme.colorScheme.onPrimary,
+            buttonColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
             onClick = onClickOpenInfo
         )
         Spacer(modifier = modifier.width(10.dp))
@@ -85,7 +85,7 @@ fun UiBottomNavigation(
         Spacer(modifier = modifier.width(10.dp))
         UiIconButton(
             icon = ImageVector.vectorResource(R.drawable.chat_24dp),
-            buttonColor =  MaterialTheme.colorScheme.onPrimary,
+            buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
             onClick = onClickOpenHelp
         )
     }

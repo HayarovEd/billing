@@ -141,6 +141,7 @@ fun TariffListScreenUL() {
         serviceVolume = 2000,
         addresses = emptyList(),
         agentDescr = "Netflow ООО НПО ИМПУЛЬС",
+        speed = 100,
         currentModifier = ModifierData(
             type = "rate",
             value = 0.95
