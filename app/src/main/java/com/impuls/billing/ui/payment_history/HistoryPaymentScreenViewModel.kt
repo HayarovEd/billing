@@ -98,7 +98,7 @@ class HistoryPaymentScreenViewModel(
         dateFrom: LocalDateTime,
         dateTo: LocalDateTime
     ) {
-        _state.value.copy(
+        /*_state.value.copy(
             isLoading = true,
         )
             .updateState()
@@ -125,7 +125,7 @@ class HistoryPaymentScreenViewModel(
                         .updateState()
                 }
             }
-        }
+        }*/
     }
 
 

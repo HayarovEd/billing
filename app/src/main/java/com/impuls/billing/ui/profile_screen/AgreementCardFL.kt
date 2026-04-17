@@ -29,6 +29,7 @@ fun AgreementCardFL(
     agreement: Agreement,
     modifier: Modifier = Modifier,
     onClickPayment: () -> Unit,
+    onClickPaymentHistory: () -> Unit,
 ) {
     // Форматирование чисел
     val balanceFormat = DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US).apply {
@@ -178,9 +179,7 @@ fun AgreementCardFL(
                     modifier = Modifier
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    onClick = {
-                        //TODO
-                    }
+                    onClick = onClickPaymentHistory
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.credit_card_clock_24dp),
@@ -258,6 +257,7 @@ private fun Preview() {
                 code = "222"
             ),
             onClickPayment = {},
+            onClickPaymentHistory = {}
         )
     }
 }

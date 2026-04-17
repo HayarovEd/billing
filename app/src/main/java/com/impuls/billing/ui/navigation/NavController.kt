@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.impuls.billing.ui.home_screen.HomeScreenRoot
 import com.impuls.billing.ui.login_screen.LoginScreenRoot
+import com.impuls.billing.ui.payment_history.HistoryPaymentScreenRoot
 import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
 import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
 import com.impuls.billing.ui.splash_screen.SplashScreenRoot
@@ -78,6 +79,9 @@ fun NavController(
                 },
                 onNavigateToMore = {
                     navController.navigate(NavigationRoute.Home(it))
+                },
+                onClickPaymentHistory = {
+                    navController.navigate(NavigationRoute.HistoryPaymentRoute(it))
                 }
             )
         }
@@ -97,6 +101,14 @@ fun NavController(
                 },
                 onNavigateToBack = {
                     navController.navigateUp()
+                }
+            )
+        }
+
+        composable<NavigationRoute.HistoryPaymentRoute> {
+            HistoryPaymentScreenRoot(
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.Login)
                 }
             )
         }

@@ -52,6 +52,7 @@ fun ProfileScreenRoot(
     onNavigateToPayment: (String) -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToMore: (Long) -> Unit,
+    onClickPaymentHistory: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -79,7 +80,8 @@ fun ProfileScreenRoot(
         onNavigateToMore = onNavigateToMore,
         onExitFromApp = {
             activity.finish()
-        }
+        },
+        onClickPaymentHistory = onClickPaymentHistory
     )
 }
 
@@ -93,6 +95,7 @@ private fun ProfileScreenScreen(
     onNavigateToPayment: (String) -> Unit,
     onNavigateToMore: (Long) -> Unit,
     onExitFromApp: () -> Unit,
+    onClickPaymentHistory: (Long) -> Unit,
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -128,7 +131,7 @@ private fun ProfileScreenScreen(
                 icon = ImageVector.vectorResource(R.drawable.chat_24dp),
                 buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
                 onClick = {
-                    //TODO
+
                 }
             )
         }
@@ -208,6 +211,9 @@ private fun ProfileScreenScreen(
                                     onClickPayment = {
                                         onNavigateToPayment(agrm.code)
                                     },
+                                    onClickPaymentHistory = {
+                                        onClickPaymentHistory(agrm.agrmId)
+                                    }
                                 )
                             }
                             state.clientVGroups?.let {
@@ -319,6 +325,7 @@ private fun Preview() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
+            onClickPaymentHistory = {}
         )
     }
 }
@@ -417,6 +424,7 @@ private fun Preview1() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
+            onClickPaymentHistory = {}
         )
     }
 }
@@ -439,6 +447,7 @@ private fun Preview2() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
+            onClickPaymentHistory = {}
         )
     }
 }
