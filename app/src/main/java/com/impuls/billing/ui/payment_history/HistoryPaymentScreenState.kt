@@ -26,3 +26,8 @@ enum class TypeScreen(
         titleRes = R.string.deposits
     )
 }
+
+enum class TypeBottomSheet{
+    PERIODS,
+    CALENDAR
+}

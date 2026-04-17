@@ -7,6 +7,7 @@ import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.domain.model.payment.StatusPayment
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -91,11 +92,11 @@ fun convertToHistoryStatusPayment(number: Long): HistoryStatusPayment {
     }
 }
 
-fun LocalDateTime.toBillingFormat(): String {
+fun LocalDate.toBillingFormat(): String {
     return "${this.year}-${this.month.number}-${day}"
 }
 
-fun PeriodHistory.convertToPairDate(): Pair<LocalDateTime, LocalDateTime> {
+fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
     val today = Clock.System.now()
     return when (this) {
         PeriodHistory.LastMonth -> Pair(
@@ -117,6 +118,6 @@ fun PeriodHistory.convertToPairDate(): Pair<LocalDateTime, LocalDateTime> {
 }
 
 
-fun Instant.toCurrentLocalDateTime(): LocalDateTime {
-    return this.toLocalDateTime(TimeZone.currentSystemDefault())
+fun Instant.toCurrentLocalDateTime(): LocalDate {
+    return this.toLocalDateTime(TimeZone.currentSystemDefault()).date
 }

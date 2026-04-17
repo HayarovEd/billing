@@ -54,6 +54,7 @@ fun HistoryPaymentScreenRoot(
     val context = LocalContext.current
 
     var showBottomSheet by remember { mutableStateOf(false) }
+    var typeBottomSheet by remember { mutableStateOf(TypeBottomSheet.PERIODS) }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -69,10 +70,14 @@ fun HistoryPaymentScreenRoot(
     HistoryPaymentScreen(
         state = state,
         showBottomSheet = showBottomSheet,
+        typeBottomSheet = typeBottomSheet,
         snakeBarHostState = snakeBarHostState,
         onAction = viewModel::onAction,
         updateShowBottomSheet = {
             showBottomSheet = it
+        },
+        updateTypeBottomSheet = {
+            typeBottomSheet = it
         }
     )
 }
@@ -82,15 +87,19 @@ fun HistoryPaymentScreenRoot(
 private fun HistoryPaymentScreen(
     modifier: Modifier = Modifier,
     state: HistoryPaymentScreenState,
+    typeBottomSheet: TypeBottomSheet,
     snakeBarHostState: SnackbarHostState,
     showBottomSheet: Boolean,
     onAction: (HistoryPaymentScreenAction) -> Unit,
     updateShowBottomSheet: (Boolean) -> Unit,
+    updateTypeBottomSheet: (TypeBottomSheet) -> Unit,
 ) {
-  //  val scope = rememberCoroutineScope()
+    //  val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
     ) { contentPadding ->
@@ -162,22 +171,45 @@ private fun HistoryPaymentScreen(
                 sheetState = sheetState,
                 onDismissRequest = {
                     updateShowBottomSheet(false)
+                    updateTypeBottomSheet(TypeBottomSheet.PERIODS)
                 },
             ) {
-                ContentHistoryBottomSheet(
-                    onClickPeriodWeek = {
-                        onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastWeek))
-                    },
-                    onClickPeriodMonth = {
-                        onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastMonth))
-                    },
-                    onClickPeriodToday = {
-                        onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.Today))
-                    },
-                    onClickPeriodCustom = {
-                        //TODO
+                when (typeBottomSheet) {
+                    TypeBottomSheet.PERIODS -> {
+                        ContentHistoryBottomSheet(
+                            onClickPeriodWeek = {
+                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastWeek))
+                            },
+                            onClickPeriodMonth = {
+                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastMonth))
+                            },
+                            onClickPeriodToday = {
+                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.Today))
+                            },
+                            onClickPeriodCustom = {
+                                updateTypeBottomSheet(TypeBottomSheet.CALENDAR)
+                            }
+                        )
                     }
-                )
+
+                    TypeBottomSheet.CALENDAR -> {
+                        ContentCalendarBottomSheet(
+                            onClickCancel = {
+                                updateShowBottomSheet(false)
+                                updateTypeBottomSheet(TypeBottomSheet.PERIODS)
+                            },
+                            onClickPeriod = { start, end->
+                                updateShowBottomSheet(false)
+                                updateTypeBottomSheet(TypeBottomSheet.PERIODS)
+                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.SelectedPeriod(
+                                    dateFrom = start,
+                                    dateTo = end
+                                )))
+                            }
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -192,10 +224,12 @@ private fun Preview() {
             state = HistoryPaymentScreenState(
                 agrmId = 0
             ),
+            typeBottomSheet = TypeBottomSheet.PERIODS,
             showBottomSheet = false,
             snakeBarHostState = snackBarState,
             onAction = {},
             updateShowBottomSheet = {},
+            updateTypeBottomSheet = {}
         )
     }
 }
@@ -209,10 +243,31 @@ private fun Preview2() {
             state = HistoryPaymentScreenState(
                 agrmId = 0
             ),
+            typeBottomSheet = TypeBottomSheet.PERIODS,
             showBottomSheet = true,
             snakeBarHostState = snackBarState,
             onAction = {},
             updateShowBottomSheet = {},
+            updateTypeBottomSheet = {}
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun Preview3() {
+    val snackBarState = remember { SnackbarHostState() }
+    BillingTheme {
+        HistoryPaymentScreen(
+            state = HistoryPaymentScreenState(
+                agrmId = 0
+            ),
+            typeBottomSheet = TypeBottomSheet.CALENDAR,
+            showBottomSheet = true,
+            snakeBarHostState = snackBarState,
+            onAction = {},
+            updateShowBottomSheet = {},
+            updateTypeBottomSheet = {}
         )
     }
 }

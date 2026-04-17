@@ -18,7 +18,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 
 class BillingPaymentRepositoryImpl(
     private val client: HttpClient,
@@ -27,12 +27,12 @@ class BillingPaymentRepositoryImpl(
     override suspend fun getHistoryOfPayment(
         token: String,
         agrmId: Long,
-        dateFrom: LocalDateTime,
-        dateTo: LocalDateTime,
+        dateFrom: LocalDate,
+        dateTo: LocalDate,
     ): ResultWork<List<HistoryPayment>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("payment/paymen") {
+                client.get("payment/payment") {
                     bearerAuth(token)
                     contentType(ContentType.Application.Json)
                     parameter("agrmnum", agrmId)

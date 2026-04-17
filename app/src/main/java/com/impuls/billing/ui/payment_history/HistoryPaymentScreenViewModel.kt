@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 class HistoryPaymentScreenViewModel(
@@ -95,10 +95,10 @@ class HistoryPaymentScreenViewModel(
 
     private fun loadPaymentHistory(
         token: String,
-        dateFrom: LocalDateTime,
-        dateTo: LocalDateTime
+        dateFrom: LocalDate,
+        dateTo: LocalDate
     ) {
-        /*_state.value.copy(
+        _state.value.copy(
             isLoading = true,
         )
             .updateState()
@@ -125,7 +125,7 @@ class HistoryPaymentScreenViewModel(
                         .updateState()
                 }
             }
-        }*/
+        }
     }
 
 

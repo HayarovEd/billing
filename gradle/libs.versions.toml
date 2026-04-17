@@ -1,5 +1,6 @@
 [versions]
 agp = "9.1.0"
+compose = "2.10.1"
 coreKtx = "1.18.0"
 jsoup = "1.22.1"
 junit = "4.13.2"
@@ -8,17 +9,18 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
 kotlin = "2.3.20"
-composeBom = "2026.03.00"
+composeBom = "2026.03.01"
 kotlinxCoroutinesAndroid = "1.10.2"
 datastorePreferences = "1.2.1"
-ktorVersion = "3.4.1"
+ktorVersion = "3.4.2"
 navigationCompose = "2.9.7"
 kotlinxDatetime = "0.7.1"
-koinVersion = "4.2.0"
+koinVersion = "4.2.1"
 coil-compose = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
