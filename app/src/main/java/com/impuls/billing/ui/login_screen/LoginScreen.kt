@@ -37,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
-import com.impuls.billing.ui.uikit.UiTextField
 import com.impuls.billing.ui.uikit.UiTextField2
 import org.koin.androidx.compose.koinViewModel
 

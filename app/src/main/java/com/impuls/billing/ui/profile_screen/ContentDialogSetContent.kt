@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,16 +9,26 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
@@ -41,96 +52,175 @@ fun ContentDialogSetContent(
     onCancel: () -> Unit,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp
+        ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-        shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Иконка и заголовок
+            if (title.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.info_24dp),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // Описание
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = modifier.height(5.dp))
-            if (isShowRepeatSendCode) {
-                RowWithTextField(
-                    title = stringResource(R.string.code_confirm),
-                    content = code,
-                    onUpdateContent = { onUpdateCode(it) }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Поле ввода
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                 )
-            } else {
-                RowWithTextField(
-                    title = title,
-                    content = content,
-                    onUpdateContent = { onUpdateContent(it) }
-                )
-            }
-            Spacer(modifier = modifier.height(5.dp))
-            Row(
-                modifier = modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (isShowRepeatSendCode) {
+                    RowWithTextField(
+                        title = stringResource(R.string.code_confirm),
+                        content = code,
+                        onUpdateContent = { onUpdateCode(it) }
+                    )
+                } else {
+                    RowWithTextField(
+                        title = title,
+                        content = content,
+                        onUpdateContent = { onUpdateContent(it) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Кнопки действий
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Кнопка Отмена
                 OutlinedButton(
-                    modifier = modifier.weight(1f),
                     onClick = onCancel,
-                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.outline
                     )
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.close_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.cancel),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
-                Spacer(modifier = modifier.width(3.dp))
 
-                OutlinedButton(
-                    modifier = modifier.weight(1f),
-                    onClick = if (isShowRepeatSendCode)
-                        onConfirmCode
-                    else onConfirmContent,
-                    shape = RoundedCornerShape(5.dp),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
+                // Кнопка Подтвердить/Сохранить
+                Button(
+                    onClick = if (isShowRepeatSendCode) onConfirmCode else onConfirmContent,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 4.dp
                     )
                 ) {
+                    Icon(
+                        imageVector = if (isShowRepeatSendCode) ImageVector.vectorResource(R.drawable.check_circle_24dp) else ImageVector.vectorResource(R.drawable.save_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = if (isShowRepeatSendCode) stringResource(R.string.confirm) else stringResource(
-                            R.string.save
-                        ),
-                        style = MaterialTheme.typography.labelSmall
+                        text = if (isShowRepeatSendCode) stringResource(R.string.confirm)
+                        else stringResource(R.string.save),
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             }
-            Spacer(modifier = modifier.height(5.dp))
+
+            // Кнопка повторной отправки
             if (isShowRepeatSendCode) {
-                OutlinedButton(
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextButton(
                     onClick = onRecentCode,
                     enabled = count == 0,
-                    shape = RoundedCornerShape(5.dp),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    val buttonText =
-                        if (count == 0) stringResource(R.string.send_repeate_code) else "${
-                            stringResource(R.string.send_repeate_code)
-                        }($count)"
-                    Text(
-                        text = buttonText,
-                        style = MaterialTheme.typography.labelSmall
-                    )
+                    if (count == 0) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.autorenew_48dp),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.send_repeate_code),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    } else {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${stringResource(R.string.send_repeate_code)} ($count)",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -170,58 +260,102 @@ fun ContentExitDialog(
     onCancel: () -> Unit,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp
+        ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-        shape = RoundedCornerShape(10.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Иконка предупреждения
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.warning_24dp),
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Заголовок
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = modifier.height(5.dp))
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Кнопки действий
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Кнопка Отмена
                 OutlinedButton(
-                    modifier = modifier.weight(1f),
                     onClick = onCancel,
-                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.outline
                     )
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.close_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.cancel),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
-                Spacer(modifier = modifier.width(3.dp))
 
-                OutlinedButton(
-                    modifier = modifier.weight(1f),
+                // Кнопка Выход/Подтверждение
+                Button(
                     onClick = onConfirm,
-                    shape = RoundedCornerShape(5.dp),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 4.dp
                     )
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.exit_to_app_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = stringResource(
-                            R.string.exit
-                        ),
-                        style = MaterialTheme.typography.labelSmall
+                        text = stringResource(R.string.exit),
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             }
@@ -291,6 +425,9 @@ private fun Preview3() {
         )
     }
 }
+
+
+
 
 @Preview
 @Composable

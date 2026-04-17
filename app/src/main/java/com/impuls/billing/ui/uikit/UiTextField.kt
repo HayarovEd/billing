@@ -75,6 +75,7 @@ fun UiTextField(
                 )
             }
         },
+        shape = RoundedCornerShape(30.dp),
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
@@ -174,7 +175,7 @@ fun UiTextField2(
                 )
             }
         },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(30.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
