@@ -5,10 +5,12 @@ import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
+import com.impuls.billing.data.remote.payment_history.PaymentHistoryDto
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
@@ -16,7 +18,11 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
+import com.impuls.billing.domain.utils.convertToHistoryStatusPayment
 import com.impuls.billing.domain.utils.convertUserType
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 
 fun ClientAccountResponse.toClientAccount(): ClientAccount {
@@ -138,6 +144,15 @@ fun ClientShortStatDto.toShortStat(): ShortStat {
         amount = amount ?: 0.0,
         agentDescr = agentDescr ?: "",
         currSymbol = currSymbol ?: ""
+    )
+}
+
+fun PaymentHistoryDto.toHistoryPayment(): HistoryPayment {
+    return HistoryPayment(
+        timestamp = Instant.fromEpochMilliseconds(timestamp).toLocalDateTime(TimeZone.currentSystemDefault()),
+        amount = amountCurr,
+        agrmId = uid,
+        status = convertToHistoryStatusPayment(payDto.status)
     )
 }
 

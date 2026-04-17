@@ -26,6 +26,11 @@ sealed class NavigationRoute {
     ) : NavigationRoute()
 
     @Serializable
+    data class HistoryPaymentRoute(
+        val agrmId: Long
+    ) : NavigationRoute()
+
+    @Serializable
     data object Blockings : NavigationRoute()
 
     @Serializable

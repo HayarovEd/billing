@@ -1,10 +1,19 @@
 package com.impuls.billing.domain.utils
 
 import com.impuls.billing.domain.model.BillDeliveryType
+import com.impuls.billing.domain.model.HistoryStatusPayment
 import com.impuls.billing.domain.model.PaymentMethodType
+import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.domain.model.payment.StatusPayment
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 
 fun findInXmlString(
@@ -71,4 +80,43 @@ fun convertToStatusPayment(string: String): StatusPayment {
         "error" -> StatusPayment.ERROR
         else -> StatusPayment.ERROR
     }
+}
+
+fun convertToHistoryStatusPayment(number: Long): HistoryStatusPayment {
+    return when (number) {
+        0L -> HistoryStatusPayment.APPROVED
+        1L -> HistoryStatusPayment.APPROVED_ON_FILE
+        2L -> HistoryStatusPayment.CANCELLED
+        else -> HistoryStatusPayment.CANCELLED
+    }
+}
+
+fun LocalDateTime.toBillingFormat(): String {
+    return "${this.year}-${this.month.number}-${day}"
+}
+
+fun PeriodHistory.convertToPairDate(): Pair<LocalDateTime, LocalDateTime> {
+    val today = Clock.System.now()
+    return when (this) {
+        PeriodHistory.LastMonth -> Pair(
+            today.minus(1, DateTimeUnit.MONTH, TimeZone.UTC).toCurrentLocalDateTime(),
+            today.toCurrentLocalDateTime()
+        )
+
+        PeriodHistory.LastWeek -> Pair(
+            today.minus(1, DateTimeUnit.WEEK, TimeZone.UTC).toCurrentLocalDateTime(),
+            today.toCurrentLocalDateTime()
+        )
+
+        is PeriodHistory.SelectedPeriod -> Pair(this.dateFrom, this.dateTo)
+        PeriodHistory.Today -> Pair(
+            today.minus(1, DateTimeUnit.DAY, TimeZone.UTC).toCurrentLocalDateTime(),
+            today.toCurrentLocalDateTime()
+        )
+    }
+}
+
+
+fun Instant.toCurrentLocalDateTime(): LocalDateTime {
+    return this.toLocalDateTime(TimeZone.currentSystemDefault())
 }
