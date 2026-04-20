@@ -96,6 +96,10 @@ fun LocalDate.toBillingFormat(): String {
     return "${this.year}-${this.month.number}-${day}"
 }
 
+fun LocalDateTime.toUiFormat(): String {
+    return "${this.year}-${this.month.number}-${day} ${time.hour}:${time.minute}"
+}
+
 fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
     val today = Clock.System.now()
     return when (this) {

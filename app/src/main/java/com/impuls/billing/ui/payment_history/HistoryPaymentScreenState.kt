@@ -10,7 +10,9 @@ data class HistoryPaymentScreenState(
     val isLoading: Boolean = false,
     val periodHistory: PeriodHistory = PeriodHistory.Today,
     val typeScreen: TypeScreen = TypeScreen.PAYMENT
-)
+) {
+    val paymentsSum = historyPayments.sumOf { it.amount }
+}
 
 
 enum class TypeScreen(

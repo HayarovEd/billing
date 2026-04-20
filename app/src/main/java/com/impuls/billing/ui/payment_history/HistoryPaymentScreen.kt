@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -156,12 +158,31 @@ private fun HistoryPaymentScreen(
                         TypeScreenTab(
                             modifier = modifier.weight(1f),
                             icon = ImageVector.vectorResource(it.iconRes),
+                            stringValue = "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}", //TODO not sum of debits
                             title = stringResource(it.titleRes),
                             isChecked = state.typeScreen == it,
                             onClick = {
                                 onAction(HistoryPaymentScreenAction.SwitchTypeScreen(it))
                             }
                         )
+                    }
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                when (state.typeScreen) {
+                    TypeScreen.WRITEOFF -> {
+
+                    }
+                    TypeScreen.PAYMENT -> {
+                        LazyColumn(
+                            modifier = modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(state.historyPayments) {
+                                ItemHistoryPayment(
+                                    historyPayment = it
+                                )
+                            }
+                        }
                     }
                 }
             }

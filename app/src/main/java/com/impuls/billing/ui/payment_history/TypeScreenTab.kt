@@ -1,6 +1,7 @@
 package com.impuls.billing.ui.payment_history
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 @Composable
 fun TypeScreenTab(
     modifier: Modifier = Modifier,
+    stringValue: String,
     icon: ImageVector,
     title: String,
     isChecked: Boolean,
@@ -40,8 +42,8 @@ fun TypeScreenTab(
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isChecked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-            contentColor = if (isChecked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            containerColor = if (isChecked) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface,
+            contentColor = if (isChecked) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (isChecked) 0.dp else 4.dp
@@ -54,16 +56,23 @@ fun TypeScreenTab(
                 .height(windowHeight/5)
                 .padding(16.dp)
         ) {
-            Text(
-                modifier = Modifier.align(alignment = Alignment.TopEnd),
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            Column {
+                Text(
+                    text = stringValue,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = title,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
             Icon(
                 modifier = Modifier
                     .align(alignment = Alignment.BottomStart)
-                    .size(windowHeight/7),
+                    .size(windowHeight/10),
                 imageVector = icon,
                 contentDescription = null
             )
@@ -78,6 +87,7 @@ private fun Preview() {
         TypeScreenTab(
             icon = ImageVector.vectorResource(R.drawable.add_card_24dp),
             title = stringResource(R.string.deposits),
+            stringValue = "1000",
             isChecked = true,
             onClick = {}
         )
@@ -92,6 +102,7 @@ private fun Preview1() {
             icon = ImageVector.vectorResource(R.drawable.payment_arrow_down_24dp),
             title = stringResource(R.string.debits),
             isChecked = false,
+            stringValue = "-1000",
             onClick = {}
         )
     }

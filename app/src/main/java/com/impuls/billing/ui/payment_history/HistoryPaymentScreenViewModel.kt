@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.repository.BillingPaymentRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
@@ -36,12 +35,7 @@ class HistoryPaymentScreenViewModel(
         .onStart {
             loadData(
                 action = {
-                    val period = PeriodHistory.Today.convertToPairDate()
-                    loadPaymentHistory(
-                        token = it,
-                        dateFrom = period.first,
-                        dateTo = period.second
-                    )
+                    loadInitialData(it)
                 },
                 navigate = {
                     viewModelScope.launch {
@@ -90,6 +84,15 @@ class HistoryPaymentScreenViewModel(
                 )
             }
         }
+    }
+
+    private fun loadInitialData(token: String) {
+        val period = state.value.periodHistory.convertToPairDate()
+        loadPaymentHistory(
+            token = token,
+            dateFrom = period.first,
+            dateTo = period.second
+        )
     }
 
 

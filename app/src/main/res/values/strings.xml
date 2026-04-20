@@ -132,4 +132,7 @@
     <string name="week">Неделя</string>
     <string name="today">Сегодня</string>
     <string name="choose_period">Выбрать период</string>
+    <string name="amount">Сумма</string>
+    <string name="success_payment">Успешно</string>
+    <string name="cancelled_payment">Отменен</string>
 </resources>

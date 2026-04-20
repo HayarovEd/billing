@@ -149,10 +149,12 @@ fun ClientShortStatDto.toShortStat(): ShortStat {
 
 fun PaymentHistoryDto.toHistoryPayment(): HistoryPayment {
     return HistoryPayment(
-        timestamp = Instant.fromEpochMilliseconds(timestamp).toLocalDateTime(TimeZone.currentSystemDefault()),
+        timestamp = Instant.fromEpochSeconds(timestamp).toLocalDateTime(TimeZone.currentSystemDefault()),
         amount = amountCurr,
-        agrmId = uid,
-        status = convertToHistoryStatusPayment(payDto.status)
+        uid = uid,
+        status = convertToHistoryStatusPayment(payDto.status),
+        currency = currSymb,
+        message = mgr
     )
 }
 
