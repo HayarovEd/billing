@@ -137,6 +137,7 @@
     <string name="success_payment">Успешно</string>
     <string name="cancelled_payment">Отменен</string>
     <string name="debet">Списание</string>
+    <string name="nothing_finded">А ничего нет!</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

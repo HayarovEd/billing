@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.NothingFind
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.asPeriodText
 import org.koin.androidx.compose.koinViewModel
@@ -162,6 +163,7 @@ private fun HistoryPaymentScreen(
                                 TypeScreen.WRITEOFF -> {
                                     "-${"%.2f".format(state.debitsSum)} ${stringResource(R.string.rub_symbol)}"
                                 }
+
                                 TypeScreen.PAYMENT -> {
                                     "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}"
                                 }
@@ -177,26 +179,35 @@ private fun HistoryPaymentScreen(
                 Spacer(modifier = Modifier.height(6.dp))
                 when (state.typeScreen) {
                     TypeScreen.WRITEOFF -> {
-                        LazyColumn(
-                            modifier = modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(state.historyDebits) {
-                                HistoryDebitCard(
-                                    history = it
-                                )
+                        if (state.historyDebits.isEmpty()) {
+                            NothingFind()
+                        } else {
+                            LazyColumn(
+                                modifier = modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(state.historyDebits) {
+                                    HistoryDebitCard(
+                                        history = it
+                                    )
+                                }
                             }
                         }
                     }
+
                     TypeScreen.PAYMENT -> {
-                        LazyColumn(
-                            modifier = modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(state.historyPayments) {
-                                ItemHistoryPayment(
-                                    historyPayment = it
-                                )
+                        if (state.historyPayments.isEmpty()) {
+                            NothingFind()
+                        } else {
+                            LazyColumn(
+                                modifier = modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(state.historyPayments) {
+                                    ItemHistoryPayment(
+                                        historyPayment = it
+                                    )
+                                }
                             }
                         }
                     }
@@ -235,13 +246,17 @@ private fun HistoryPaymentScreen(
                                 updateShowBottomSheet(false)
                                 updateTypeBottomSheet(TypeBottomSheet.PERIODS)
                             },
-                            onClickPeriod = { start, end->
+                            onClickPeriod = { start, end ->
                                 updateShowBottomSheet(false)
                                 updateTypeBottomSheet(TypeBottomSheet.PERIODS)
-                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.SelectedPeriod(
-                                    dateFrom = start,
-                                    dateTo = end
-                                )))
+                                onAction(
+                                    HistoryPaymentScreenAction.getHistoryByPeriod(
+                                        PeriodHistory.SelectedPeriod(
+                                            dateFrom = start,
+                                            dateTo = end
+                                        )
+                                    )
+                                )
                             }
                         )
                     }

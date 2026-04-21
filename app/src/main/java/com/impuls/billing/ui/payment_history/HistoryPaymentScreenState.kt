@@ -11,7 +11,7 @@ data class HistoryPaymentScreenState(
     val historyDebits: List<HistoryDebit> = emptyList(),
     val isLoading: Boolean = false,
     val periodHistory: PeriodHistory = PeriodHistory.Today,
-    val typeScreen: TypeScreen = TypeScreen.PAYMENT
+    val typeScreen: TypeScreen = TypeScreen.WRITEOFF
 ) {
     val paymentsSum = historyPayments.sumOf { it.amount }
     val debitsSum = historyDebits.sumOf { it.amount }
