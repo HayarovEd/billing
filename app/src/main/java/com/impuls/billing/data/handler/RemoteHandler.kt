@@ -37,7 +37,11 @@ suspend fun <D> handleResponse(
             400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
             401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(DataError.Network.UNKNOWN)
+
         }
+    }  catch (e: ClosedByteChannelException) {
+        e.printStackTrace()
+        ResultWork.Error(DataError.Network.SERVER_ERROR)
     } catch (e: ConnectException) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.SERVER_ERROR)

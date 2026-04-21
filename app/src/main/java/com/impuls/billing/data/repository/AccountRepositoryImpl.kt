@@ -40,6 +40,8 @@ class AccountRepositoryImpl(
                     bearerAuth(token)
                 }
             ) {
+                val a = it.bodyAsText()
+                println(a)
                 it.body<ClientAccountResponse>().toClientAccount()
             }
         }

@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.uikit
 
+import android.annotation.SuppressLint
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.model.payment.StatusPayment
@@ -139,6 +140,7 @@ fun StatusPayment.asTextMessage(): UiText {
     }
 }
 
+@SuppressLint("DefaultLocale")
 fun PeriodHistory.asPeriodText(): UiText {
     return when (this) {
         PeriodHistory.LastMonth -> {
@@ -152,7 +154,19 @@ fun PeriodHistory.asPeriodText(): UiText {
         )
 
         is PeriodHistory.SelectedPeriod -> {
-            DynamicString("${this.dateFrom.day}.${this.dateFrom.month.number}-${this.dateTo.day}.${this.dateTo.month.number}")
+            DynamicString(
+                "${String.format("%02d", this.dateFrom.day)}.${
+                    String.format(
+                        "%02d",
+                        this.dateFrom.month.number
+                    )
+                }-${String.format("%02d", this.dateTo.day)}.${
+                    String.format(
+                        "%02d",
+                        this.dateTo.month.number
+                    )
+                }"
+            )
         }
 
         PeriodHistory.Today -> StringResource(

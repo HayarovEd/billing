@@ -1,5 +1,6 @@
 package com.impuls.billing.domain.utils
 
+import android.annotation.SuppressLint
 import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.HistoryStatusPayment
 import com.impuls.billing.domain.model.PaymentMethodType
@@ -13,17 +14,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Instant
 
 
-fun findInXmlString(
-    tag: String,
-    xml: String
-): String? {
-    val pattern = "<$tag>(.*?)</$tag>".toRegex(RegexOption.DOT_MATCHES_ALL)
-    return pattern.find(xml)?.groupValues?.get(1)
-}
 
 fun convertBillDeliveryType(number: Long): BillDeliveryType {
     return when (number) {
@@ -92,12 +88,20 @@ fun convertToHistoryStatusPayment(number: Long): HistoryStatusPayment {
     }
 }
 
+@SuppressLint("DefaultLocale")
 fun LocalDate.toBillingFormat(): String {
-    return "${this.year}-${this.month.number}-${day}"
+    return "${this.year}-${String.format("%02d",this.month.number)}-${String.format("%02d",day)}"
 }
 
+@SuppressLint("DefaultLocale")
+fun LocalDate.toBillingFormat2(): String {
+    return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)}"
+}
+
+
+@SuppressLint("DefaultLocale")
 fun LocalDateTime.toUiFormat(): String {
-    return "${this.year}-${this.month.number}-${day} ${time.hour}:${time.minute}"
+    return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)} ${time.hour}:${time.minute}"
 }
 
 fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
@@ -124,4 +128,9 @@ fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
 
 fun Instant.toCurrentLocalDateTime(): LocalDate {
     return this.toLocalDateTime(TimeZone.currentSystemDefault()).date
+}
+
+fun Double.roundTo(decimals: Int): Double {
+    val factor = 10.0.pow(decimals)
+    return (this * factor).roundToInt() / factor
 }

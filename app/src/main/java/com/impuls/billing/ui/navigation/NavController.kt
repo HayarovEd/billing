@@ -18,7 +18,7 @@ import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 @Composable
 fun NavController(
-    startDestination: NavigationRoute = NavigationRoute.Splash/*Payment("595142026")*/,
+    startDestination: NavigationRoute = NavigationRoute.Splash,/*Payment("595142026")*/
 ) {
     val navController = rememberNavController()
     PortraitOnly()
@@ -75,13 +75,19 @@ fun NavController(
                 },
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.Login)
-                   // navController.popBackStack(NavigationRoute.Login, false)
+                    // navController.popBackStack(NavigationRoute.Login, false)
                 },
                 onNavigateToMore = {
                     navController.navigate(NavigationRoute.Home(it))
                 },
-                onClickPaymentHistory = {
-                    navController.navigate(NavigationRoute.HistoryPaymentRoute(it))
+                onClickPaymentHistory = { agrmId, vgId, tarifId ->
+                    navController.navigate(
+                        NavigationRoute.HistoryPaymentRoute(
+                            agrmId = agrmId,
+                            vgId = vgId,
+                            tariffId = tarifId
+                        )
+                    )
                 }
             )
         }
@@ -94,7 +100,7 @@ fun NavController(
             )
         }
         composable<NavigationRoute.Home> {
-            HomeScreenRoot (
+            HomeScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.Login)
                     // navController.popBackStack(NavigationRoute.Login, false)

@@ -27,7 +27,9 @@ sealed class NavigationRoute {
 
     @Serializable
     data class HistoryPaymentRoute(
-        val agrmId: Long
+        val agrmId: Long,
+        val vgId: Long,
+        val tariffId: Long,
     ) : NavigationRoute()
 
     @Serializable

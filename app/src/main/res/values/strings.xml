@@ -75,6 +75,7 @@
     <string name="text_not_blank">Поле не может быть пустым</string>
     <string name="next">Продолжить</string>
     <string name="rub_symbol">₽</string>
+    <string name="rub_unit">Руб.</string>
     <string name="choose_payment">Выберите способ оплаты</string>
     <string name="bank_card">Банковской картой</string>
     <string name="comission">Комиссия</string>
@@ -135,4 +136,20 @@
     <string name="amount">Сумма</string>
     <string name="success_payment">Успешно</string>
     <string name="cancelled_payment">Отменен</string>
+    <string name="debet">Списание</string>
+
+    <string-array name="months_nominative">
+        <item>январь</item>
+        <item>февраль</item>
+        <item>март</item>
+        <item>апрель</item>
+        <item>май</item>
+        <item>июнь</item>
+        <item>июль</item>
+        <item>август</item>
+        <item>сентябрь</item>
+        <item>октябрь</item>
+        <item>ноябрь</item>
+        <item>декабрь</item>
+    </string-array>
 </resources>

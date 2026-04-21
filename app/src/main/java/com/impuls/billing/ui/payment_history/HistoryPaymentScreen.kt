@@ -158,7 +158,14 @@ private fun HistoryPaymentScreen(
                         TypeScreenTab(
                             modifier = modifier.weight(1f),
                             icon = ImageVector.vectorResource(it.iconRes),
-                            stringValue = "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}", //TODO not sum of debits
+                            stringValue = when (it) {
+                                TypeScreen.WRITEOFF -> {
+                                    "-${"%.2f".format(state.debitsSum)} ${stringResource(R.string.rub_symbol)}"
+                                }
+                                TypeScreen.PAYMENT -> {
+                                    "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}"
+                                }
+                            },
                             title = stringResource(it.titleRes),
                             isChecked = state.typeScreen == it,
                             onClick = {
@@ -170,7 +177,16 @@ private fun HistoryPaymentScreen(
                 Spacer(modifier = Modifier.height(6.dp))
                 when (state.typeScreen) {
                     TypeScreen.WRITEOFF -> {
-
+                        LazyColumn(
+                            modifier = modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(state.historyDebits) {
+                                HistoryDebitCard(
+                                    history = it
+                                )
+                            }
+                        }
                     }
                     TypeScreen.PAYMENT -> {
                         LazyColumn(

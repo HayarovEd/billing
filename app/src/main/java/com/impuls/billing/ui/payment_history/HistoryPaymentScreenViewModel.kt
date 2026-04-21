@@ -29,6 +29,8 @@ class HistoryPaymentScreenViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val agrmId = savedStateHandle.toRoute<NavigationRoute.HistoryPaymentRoute>().agrmId
+    private val vgId = savedStateHandle.toRoute<NavigationRoute.HistoryPaymentRoute>().vgId
+    private val tariffId = savedStateHandle.toRoute<NavigationRoute.HistoryPaymentRoute>().tariffId
 
     private val _state = MutableStateFlow(HistoryPaymentScreenState(agrmId = agrmId))
     val state = _state
@@ -124,6 +126,31 @@ class HistoryPaymentScreenViewModel(
                     _state.value.copy(
                         isLoading = false,
                         historyPayments = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+        viewModelScope.launch {
+            when (val result = billingPaymentRepository.getHistoryOfDebet(
+                token = token,
+                agrmId = agrmId,
+                dateTo = dateTo,
+                dateFrom = dateFrom,
+                vgId = vgId,
+                tarifId = tariffId,
+            )) {
+                is ResultWork.Error -> {
+                    _state.value.copy(
+                    )
+                        .updateState()
+                    eventChannel.send(HistoryPaymentScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    println(result.data)
+                    _state.value.copy(
+                        historyDebits = result.data,
                     )
                         .updateState()
                 }

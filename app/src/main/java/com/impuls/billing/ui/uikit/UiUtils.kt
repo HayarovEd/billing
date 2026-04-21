@@ -3,7 +3,6 @@ package com.impuls.billing.ui.uikit
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
+import com.impuls.billing.R
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
 @Composable
 fun <T> ObserveAsEvents(
@@ -78,4 +80,10 @@ fun PortraitOnly() {
             originalOrientation?.let { activity?.requestedOrientation = it }
         }
     }
+}
+
+fun LocalDate.toDebitUi(context: Context): String {
+    val months = context.resources.getStringArray(R.array.months_nominative)
+    val monthName = months[month.number - 1]
+    return "$monthName ${this.year}"
 }

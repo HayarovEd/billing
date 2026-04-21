@@ -1,6 +1,7 @@
 package com.impuls.billing.data.mapper
 
 import com.impuls.billing.data.remote.ClientShortStatDto
+import com.impuls.billing.data.remote.DebitDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
@@ -10,6 +11,7 @@ import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.HistoryDebit
 import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.RecoverPassword
@@ -20,6 +22,8 @@ import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
 import com.impuls.billing.domain.utils.convertToHistoryStatusPayment
 import com.impuls.billing.domain.utils.convertUserType
+import com.impuls.billing.domain.utils.roundTo
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
@@ -128,7 +132,7 @@ fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
         serviceVolume = vGroup.serviceVolume,
         serviceRent = vGroup.serviceRent,
         agentDescr = vGroup.agentDescr,
-        speed = vGroup.curShape/1000,
+        speed = vGroup.curShape / 1000,
         currentModifier = ModifierData(
             type = vGroup.currentModifier.type,
             value = vGroup.currentModifier.value
@@ -149,12 +153,21 @@ fun ClientShortStatDto.toShortStat(): ShortStat {
 
 fun PaymentHistoryDto.toHistoryPayment(): HistoryPayment {
     return HistoryPayment(
-        timestamp = Instant.fromEpochSeconds(timestamp).toLocalDateTime(TimeZone.currentSystemDefault()),
+        timestamp = Instant.fromEpochSeconds(timestamp)
+            .toLocalDateTime(TimeZone.currentSystemDefault()),
         amount = amountCurr,
         uid = uid,
         status = convertToHistoryStatusPayment(payDto.status),
         currency = currSymb,
         message = mgr
+    )
+}
+
+
+fun DebitDto.toHistoryDebit(): HistoryDebit {
+    return HistoryDebit(
+        amount = amount.roundTo(2),
+        yearMonth = LocalDate.parse(yearMonth),
     )
 }
 

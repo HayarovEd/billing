@@ -52,7 +52,7 @@ fun ProfileScreenRoot(
     onNavigateToPayment: (String) -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToMore: (Long) -> Unit,
-    onClickPaymentHistory: (Long) -> Unit,
+    onClickPaymentHistory: (Long, Long, Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -95,7 +95,7 @@ private fun ProfileScreenScreen(
     onNavigateToPayment: (String) -> Unit,
     onNavigateToMore: (Long) -> Unit,
     onExitFromApp: () -> Unit,
-    onClickPaymentHistory: (Long) -> Unit,
+    onClickPaymentHistory: (Long, Long, Long) -> Unit,
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -212,7 +212,10 @@ private fun ProfileScreenScreen(
                                         onNavigateToPayment(agrm.code)
                                     },
                                     onClickPaymentHistory = {
-                                        onClickPaymentHistory(agrm.agrmId)
+                                        if (state.vGroups.isNotEmpty()) {
+                                            val vg = state.vGroups.first()
+                                            onClickPaymentHistory(agrm.agrmId, vg.vgId, vg.tarifId)
+                                        }
                                     }
                                 )
                             }
@@ -325,7 +328,7 @@ private fun Preview() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {}
+            onClickPaymentHistory = {_,_,_ ->}
         )
     }
 }
@@ -424,7 +427,7 @@ private fun Preview1() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {}
+            onClickPaymentHistory = {_,_,_ ->}
         )
     }
 }
@@ -447,7 +450,7 @@ private fun Preview2() {
             onNavigateToPayment = {},
             onNavigateToMore = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {}
+            onClickPaymentHistory = {_,_,_ ->}
         )
     }
 }
