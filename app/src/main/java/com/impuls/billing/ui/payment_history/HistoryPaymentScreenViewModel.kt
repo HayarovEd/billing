@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.repository.BillingPaymentRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
@@ -19,7 +20,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 class HistoryPaymentScreenViewModel(
@@ -132,11 +135,16 @@ class HistoryPaymentScreenViewModel(
             }
         }
         viewModelScope.launch {
+            val resultDateFrom = when (state.value.periodHistory) {
+                PeriodHistory.LastMonth, PeriodHistory.LastWeek, PeriodHistory.Today -> dateFrom
+                    .plus(1, DateTimeUnit.DAY)
+                is PeriodHistory.SelectedPeriod -> dateFrom
+            }
             when (val result = billingPaymentRepository.getHistoryOfDebet(
                 token = token,
                 agrmId = agrmId,
                 dateTo = dateTo,
-                dateFrom = dateFrom,
+                dateFrom = resultDateFrom,
                 vgId = vgId,
                 tarifId = tariffId,
             )) {

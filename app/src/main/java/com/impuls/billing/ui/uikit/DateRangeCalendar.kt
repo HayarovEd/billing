@@ -72,28 +72,30 @@ fun DateRangeCalendar(
 
     // Функция обработки выбора даты (реализация выбора диапазона)
     fun selectDate(date: LocalDate) {
-        when {
-            // Начальная дата не выбрана → выбираем начальную
-            selectedStartDate == null -> {
-                selectedStartDate = date
-                selectedEndDate = null
-            }
-            // Выбрана только начальная дата
-            selectedStartDate != null && selectedEndDate == null -> {
-                if (date.isBefore(selectedStartDate)) {
-                    // Если новая дата раньше начальной — меняем местами
-                    selectedEndDate = selectedStartDate
+        if (date<= LocalDate.now()) {
+            when {
+                // Начальная дата не выбрана → выбираем начальную
+                selectedStartDate == null -> {
                     selectedStartDate = date
-                } else {
-                    // Иначе завершаем диапазон
-                    selectedEndDate = date
+                    selectedEndDate = null
                 }
-                onRangeSelected(selectedStartDate, selectedEndDate)
-            }
-            // Диапазон уже выбран — начинаем новый
-            else -> {
-                selectedStartDate = date
-                selectedEndDate = null
+                // Выбрана только начальная дата
+                selectedStartDate != null && selectedEndDate == null -> {
+                    if (date.isBefore(selectedStartDate)) {
+                        // Если новая дата раньше начальной — меняем местами
+                        selectedEndDate = selectedStartDate
+                        selectedStartDate = date
+                    } else {
+                        // Иначе завершаем диапазон
+                        selectedEndDate = date
+                    }
+                    onRangeSelected(selectedStartDate, selectedEndDate)
+                }
+                // Диапазон уже выбран — начинаем новый
+                else -> {
+                    selectedStartDate = date
+                    selectedEndDate = null
+                }
             }
         }
     }

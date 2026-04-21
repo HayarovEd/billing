@@ -22,9 +22,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 
 class BillingPaymentRepositoryImpl(
     private val client: HttpClient,
@@ -72,7 +70,6 @@ class BillingPaymentRepositoryImpl(
                     parameter("dtto", dateTo
                         .toBillingFormat2())
                     parameter("dtfrom", dateFrom
-                        .plus(1, DateTimeUnit.DAY)
                         .toBillingFormat2())
                 }
             ) {
