@@ -29,14 +29,14 @@ import com.impuls.billing.ui.uikit.TitleMethodContentCard
 @Composable
 fun ItemPaymentMethod(
     modifier: Modifier = Modifier,
-    comission: Int,
+    commission: Int,
     isChosenMethod: Boolean,
     titleContent: @Composable () -> Unit,
     updateSelect: () -> Unit,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(5.dp),
+        shape = RoundedCornerShape(8.dp),
         border = BorderStroke(
             width = 2.dp,
             color = if (isChosenMethod) MaterialTheme.colorScheme.onSecondaryContainer
@@ -45,7 +45,7 @@ fun ItemPaymentMethod(
         onClick = updateSelect
     ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -61,24 +61,23 @@ fun ItemPaymentMethod(
                         selectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         unselectedColor = MaterialTheme.colorScheme.primary
                     ),
-                    onClick = updateSelect
+                    onClick = null // Click is handled by Card
                 )
                 Text(
-                    modifier = modifier
-                        .clip(shape = RoundedCornerShape(3.dp))
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(4.dp))
                         .background(
                             color = if (isChosenMethod) MaterialTheme.colorScheme.onSecondaryContainer
                             else MaterialTheme.colorScheme.primary
                         )
-                        .padding(3.dp),
-                    text = "${stringResource(R.string.comission)} $comission%",
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                    text = "${stringResource(R.string.commission)} $commission%",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = if (isChosenMethod) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
     }
-
 }
 
 @Preview
@@ -86,7 +85,7 @@ fun ItemPaymentMethod(
 private fun Preview() {
     BillingTheme {
         ItemPaymentMethod(
-            comission = 0,
+            commission = 0,
             isChosenMethod = false,
             titleContent = {
                 TitleMethodContent(
@@ -109,32 +108,7 @@ private fun Preview() {
 private fun Preview2() {
     BillingTheme {
         ItemPaymentMethod(
-            comission = 0,
-            isChosenMethod = true,
-            titleContent = {
-                TitleMethodContentCard(
-                    name = stringResource(R.string.bank_card),
-                    icons = listOf(
-                        R.drawable.visaa,
-                        R.drawable.master,
-                        R.drawable.mir_logo,
-                        R.drawable.pay_union_pay
-                    )
-                )
-            },
-            updateSelect = {}
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun Preview3() {
-    BillingTheme(
-        darkTheme = true
-    ) {
-        ItemPaymentMethod(
-            comission = 0,
+            commission = 0,
             isChosenMethod = true,
             titleContent = {
                 TitleMethodContentCard(

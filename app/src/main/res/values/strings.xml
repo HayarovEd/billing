@@ -78,7 +78,7 @@
     <string name="rub_unit">Руб.</string>
     <string name="choose_payment">Выберите способ оплаты</string>
     <string name="bank_card">Банковской картой</string>
-    <string name="comission">Комиссия</string>
+    <string name="commission">Комиссия</string>
     <string name="pay_to_card">Оплата картой</string>
     <string name="sberpay_payment">Оплата через SberPay</string>
     <string name="enter_number_phone">Введите номер телефона, к которому подключен СберБанк Онлайн в формате 7xxxxxxxxxx</string>

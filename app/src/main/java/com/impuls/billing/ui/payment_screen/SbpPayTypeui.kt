@@ -27,7 +27,7 @@ import com.impuls.billing.ui.uikit.UiIconButton
 
 
 @Composable
-fun SbpPayTypeui(
+fun SbpPayTypeUi(
     modifier: Modifier = Modifier,
     imageData: ImageData?,
     amount: String,
@@ -39,6 +39,13 @@ fun SbpPayTypeui(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
             style = MaterialTheme.typography.headlineSmall,
@@ -52,28 +59,32 @@ fun SbpPayTypeui(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
         Text(
-            text = stringResource(R.string.sberpay_payment),
+            text = "Оплата через СБП",
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
         Text(
             text = stringResource(R.string.sbprpay_desc),
             style = MaterialTheme.typography.bodyMedium
         )
+        
         Spacer(modifier = Modifier.weight(1f))
+        
         Button(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,7 +112,7 @@ fun SbpPayTypeui(
 @Composable
 private fun Preview() {
     BillingTheme {
-        SbpPayTypeui(
+        SbpPayTypeUi(
             imageData = ImageData(
                 color = "FEAD16",
                 image = ""

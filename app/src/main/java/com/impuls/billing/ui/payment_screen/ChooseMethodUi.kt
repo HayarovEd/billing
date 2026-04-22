@@ -45,6 +45,13 @@ fun ChooseMethodUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
             style = MaterialTheme.typography.headlineSmall,
@@ -58,30 +65,32 @@ fun ChooseMethodUi(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.choose_payment),
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
         LazyColumn(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            items(TypePayment.entries) { type->
+            items(TypePayment.entries) { type ->
                 ItemPaymentMethod(
-                    comission = type.comission,
+                    commission = type.comission,
                     isChosenMethod = chosenMethod == type,
                     titleContent = {
                         if (type == TypePayment.CARD) {
@@ -102,13 +111,15 @@ fun ChooseMethodUi(
                 )
             }
         }
+        
         Spacer(modifier = Modifier.weight(1f))
+        
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
             onClick = updateScreen,
-            enabled = chosenMethod!=null,
+            enabled = chosenMethod != null,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,

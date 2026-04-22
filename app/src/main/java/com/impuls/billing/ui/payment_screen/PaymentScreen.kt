@@ -45,13 +45,13 @@ fun PaymentScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val snakeBarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is PaymentScreenEvent.OnMessage -> snakeBarHostState.showSnackbar(
+            is PaymentScreenEvent.OnMessage -> snackbarHostState.showSnackbar(
                 event.message.asString(
                     context
                 )
@@ -65,7 +65,7 @@ fun PaymentScreenRoot(
 
     PaymentScreen(
         state = state,
-        snakeBarHostState = snakeBarHostState,
+        snackbarHostState = snackbarHostState,
         onAction = viewModel::onAction,
         navigateToBack = navigateToBack,
     )
@@ -75,7 +75,7 @@ fun PaymentScreenRoot(
 private fun PaymentScreen(
     modifier: Modifier = Modifier,
     state: PaymentScreenState,
-    snakeBarHostState: SnackbarHostState,
+    snackbarHostState: SnackbarHostState,
     onAction: (PaymentScreenAction) -> Unit,
     navigateToBack: () -> Unit,
 ) {
@@ -88,30 +88,22 @@ private fun PaymentScreen(
                 )
             )
         )
-
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snakeBarHostState) },
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { contentPadding ->
-        if (state.isLoading) {
-            Box(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-                    .padding(15.dp),
-                contentAlignment = Alignment.Center
-            ) {
+        Box(
+            modifier = Modifier
+                .padding(contentPadding)
+                .fillMaxSize()
+                .padding(15.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (state.isLoading) {
                 CircularProgressIndicator()
-            }
-        } else {
-            Box(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-                    .padding(15.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            } else {
                 state.resultCheck?.let { check ->
                     if (check.code == 0) {
                         when (state.paymentScreenType) {
@@ -210,7 +202,7 @@ private fun PaymentScreen(
                             }
 
                             PaymentScreenType.SBP -> {
-                                SbpPayTypeui(
+                                SbpPayTypeUi(
                                     imageData = state.imageData,
                                     amount = state.amountString,
                                     doPayment = {
@@ -227,44 +219,35 @@ private fun PaymentScreen(
                             }
                         }
                     } else {
-                        Box(
-                            modifier = modifier
-                                .padding(contentPadding)
-                                .fillMaxSize()
-                                .padding(15.dp),
-                            contentAlignment = Alignment.Center
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            Text(
+                                text = check.message ?: "",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                onClick = navigateToBack,
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             ) {
                                 Text(
-                                    text = check.message ?: "",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.error
+                                    text = stringResource(R.string.go_back),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 16.sp
                                 )
-                                Spacer(modifier = modifier.height(10.dp))
-                                Button(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(52.dp),
-                                    onClick = navigateToBack,
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.go_back),
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 16.sp
-                                    )
-                                }
                             }
-
                         }
                     }
                 }
@@ -276,7 +259,7 @@ private fun PaymentScreen(
 @Preview
 @Composable
 private fun Preview() {
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     BillingTheme {
         PaymentScreen(
             state = PaymentScreenState(
@@ -314,7 +297,7 @@ private fun Preview() {
                     tags = ""
                 )
             ),
-            snakeBarHostState = snackBarState,
+            snackbarHostState = snackbarHostState,
             onAction = {},
             navigateToBack = {},
         )
@@ -324,7 +307,7 @@ private fun Preview() {
 @Preview
 @Composable
 private fun Preview1() {
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     BillingTheme {
         PaymentScreen(
             state = PaymentScreenState(
@@ -334,7 +317,7 @@ private fun Preview1() {
                     message = "Неизвестный Лицевой счет 5951420261"
                 )
             ),
-            snakeBarHostState = snackBarState,
+            snackbarHostState = snackbarHostState,
             onAction = {},
             navigateToBack = {},
         )
