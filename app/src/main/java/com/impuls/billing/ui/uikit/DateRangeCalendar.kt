@@ -1,37 +1,47 @@
 package com.impuls.billing.ui.uikit
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.impuls.billing.R
 import com.impuls.billing.ui.theme.BillingTheme
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
-import kotlinx.datetime.DayOfWeek
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -39,26 +49,24 @@ import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview2() {
+private fun PreviewCalendar() {
     BillingTheme {
         DateRangeCalendar(
-            onRangeSelected = {_,_->}
+            onRangeSelected = { _, _ -> }
         )
     }
 }
-
 
 @Composable
 fun DateRangeCalendar(
     onRangeSelected: (startDate: LocalDate?, endDate: LocalDate?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Настройка диапазона отображаемых месяцев (например, 2 года назад до 2 лет вперёд)
-    val currentMonth = YearMonth.now()
-    val startMonth = currentMonth.minusMonths(24)
-    val endMonth = currentMonth.plusMonths(24)
+    val currentMonth = remember { YearMonth.now() }
+    val startMonth = remember { currentMonth.minusMonths(24) }
+    val endMonth = remember { currentMonth.plusMonths(24) }
+    val scope = rememberCoroutineScope()
 
-    // Состояние календаря с горизонтальной прокруткой [citation:3][citation:6]
     val state = rememberCalendarState(
         startMonth = startMonth,
         endMonth = endMonth,
@@ -66,32 +74,25 @@ fun DateRangeCalendar(
         outDateStyle = OutDateStyle.EndOfGrid
     )
 
-    // Состояние для выбранного диапазона дат
     var selectedStartDate by remember { mutableStateOf<LocalDate?>(null) }
     var selectedEndDate by remember { mutableStateOf<LocalDate?>(null) }
 
-    // Функция обработки выбора даты (реализация выбора диапазона)
     fun selectDate(date: LocalDate) {
-        if (date<= LocalDate.now()) {
+        if (date <= LocalDate.now()) {
             when {
-                // Начальная дата не выбрана → выбираем начальную
                 selectedStartDate == null -> {
                     selectedStartDate = date
                     selectedEndDate = null
                 }
-                // Выбрана только начальная дата
                 selectedStartDate != null && selectedEndDate == null -> {
                     if (date.isBefore(selectedStartDate)) {
-                        // Если новая дата раньше начальной — меняем местами
                         selectedEndDate = selectedStartDate
                         selectedStartDate = date
                     } else {
-                        // Иначе завершаем диапазон
                         selectedEndDate = date
                     }
                     onRangeSelected(selectedStartDate, selectedEndDate)
                 }
-                // Диапазон уже выбран — начинаем новый
                 else -> {
                     selectedStartDate = date
                     selectedEndDate = null
@@ -100,26 +101,35 @@ fun DateRangeCalendar(
         }
     }
 
-    // Дни недели для заголовка
     val daysOfWeek = remember { daysOfWeek() }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)) {
+        MonthHeader(
+            month = state.firstVisibleMonth,
+            onPreviousMonth = {
+                scope.launch {
+                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.minusMonths(1))
+                }
+            },
+            onNextMonth = {
+                scope.launch {
+                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.plusMonths(1))
+                }
+            }
+        )
 
-        // Заголовок с днями недели
         DaysOfWeekHeader(daysOfWeek = daysOfWeek)
 
-        // Горизонтальный календарь
         HorizontalCalendar(
             state = state,
-            monthHeader = { month ->
-                MonthHeader(month = month)
-            },
             dayContent = { day ->
+                val isInRange = isDateInRange(day.date, selectedStartDate, selectedEndDate)
+                
                 DayCell(
                     date = day.date,
                     isStartDate = day.date == selectedStartDate,
                     isEndDate = day.date == selectedEndDate,
-                    isInRange = isDateInRange(day.date, selectedStartDate, selectedEndDate),
+                    isInRange = isInRange,
                     isCurrentMonth = day.position == DayPosition.MonthDate,
                     onClick = { selectDate(day.date) }
                 )
@@ -133,38 +143,57 @@ private fun DaysOfWeekHeader(daysOfWeek: List<DayOfWeek>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(bottom = 8.dp)
     ) {
         daysOfWeek.forEach { dayOfWeek ->
             Text(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                text = when (dayOfWeek) {
-                    DayOfWeek.MONDAY -> "ПН"
-                    DayOfWeek.TUESDAY -> "ВТ"
-                    DayOfWeek.WEDNESDAY -> "СР"
-                    DayOfWeek.THURSDAY -> "ЧТ"
-                    DayOfWeek.FRIDAY -> "ПТ"
-                    DayOfWeek.SATURDAY -> "СБ"
-                    DayOfWeek.SUNDAY -> "ВС"
-                },
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase(),
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
         }
     }
 }
 
 @Composable
-private fun MonthHeader(month: CalendarMonth) {
-    Text(
+private fun MonthHeader(
+    month: CalendarMonth,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        textAlign = TextAlign.Center,
-        text = "${month.yearMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())} ${month.yearMonth.year}",
-        style = MaterialTheme.typography.titleMedium
-    )
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(onClick = onPreviousMonth) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_left_24dp),
+                contentDescription = "Previous Month",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        
+        Text(
+            text = "${month.yearMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).replaceFirstChar { it.uppercase() }} ${month.yearMonth.year}",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        IconButton(onClick = onNextMonth) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_right_24dp),
+                contentDescription = "Next Month",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
 }
 
 @Composable
@@ -176,42 +205,57 @@ private fun DayCell(
     isCurrentMonth: Boolean,
     onClick: () -> Unit
 ) {
+    val isToday = date == LocalDate.now()
+    
+    // Определяем форму для эффекта "ленты"
+    val shape = when {
+        isStartDate && isEndDate -> CircleShape
+        isStartDate -> RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp)
+        isEndDate -> RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp)
+        isInRange -> RoundedCornerShape(0.dp)
+        else -> RoundedCornerShape(8.dp)
+    }
+
     val backgroundColor = when {
-        isStartDate || isEndDate -> MaterialTheme.colorScheme.primaryContainer
-        isInRange -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        isStartDate || isEndDate -> MaterialTheme.colorScheme.primary
+        isInRange -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
         else -> Color.Transparent
     }
 
     val textColor = when {
-        isStartDate || isEndDate -> MaterialTheme.colorScheme.onPrimaryContainer
-        !isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant
+        isStartDate || isEndDate -> MaterialTheme.colorScheme.onPrimary
+        !isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+        isToday -> MaterialTheme.colorScheme.primary
         else -> MaterialTheme.colorScheme.onSurface
-    }
-
-    val shape = when {
-        isStartDate && isEndDate -> RoundedCornerShape(8.dp)
-        isStartDate -> RoundedCornerShape(8.dp)
-        isEndDate -> RoundedCornerShape(8.dp)
-        else -> RoundedCornerShape(0.dp)
     }
 
     Box(
         modifier = Modifier
             .aspectRatio(1f)
+            .padding(vertical = 2.dp)
+            .background(backgroundColor, shape)
             .clip(shape)
-            .background(backgroundColor)
-            .clickable { onClick() },
+            .clickable(enabled = date <= LocalDate.now()) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = date.dayOfMonth.toString(),
-            color = textColor,
-            fontSize = 14.sp
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = date.dayOfMonth.toString(),
+                color = textColor,
+                fontSize = 14.sp,
+                fontWeight = if (isStartDate || isEndDate || isToday) FontWeight.Bold else FontWeight.Normal
+            )
+            if (isToday && !isStartDate && !isEndDate) {
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                )
+            }
+        }
     }
 }
 
-// Вспомогательные функции
 private fun firstDayOfWeek(): DayOfWeek = DayOfWeek.MONDAY
 
 private fun daysOfWeek(): List<DayOfWeek> {
@@ -227,8 +271,6 @@ private fun isDateInRange(
 ): Boolean {
     return if (startDate != null && endDate != null) {
         date in startDate..endDate
-    } else if (startDate != null) {
-        date == startDate
     } else {
         false
     }

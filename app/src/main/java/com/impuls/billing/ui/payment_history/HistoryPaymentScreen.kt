@@ -36,7 +36,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
@@ -53,7 +52,7 @@ fun HistoryPaymentScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val snakeBarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -62,7 +61,7 @@ fun HistoryPaymentScreenRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             HistoryPaymentScreenEvent.NavigateEvent -> onNavigateToLogin()
-            is HistoryPaymentScreenEvent.OnMessage -> snakeBarHostState.showSnackbar(
+            is HistoryPaymentScreenEvent.OnMessage -> snackbarHostState.showSnackbar(
                 event.message.asString(
                     context
                 )
@@ -74,7 +73,7 @@ fun HistoryPaymentScreenRoot(
         state = state,
         showBottomSheet = showBottomSheet,
         typeBottomSheet = typeBottomSheet,
-        snakeBarHostState = snakeBarHostState,
+        snackbarHostState = snackbarHostState,
         onAction = viewModel::onAction,
         updateShowBottomSheet = {
             showBottomSheet = it
@@ -91,122 +90,112 @@ private fun HistoryPaymentScreen(
     modifier: Modifier = Modifier,
     state: HistoryPaymentScreenState,
     typeBottomSheet: TypeBottomSheet,
-    snakeBarHostState: SnackbarHostState,
+    snackbarHostState: SnackbarHostState,
     showBottomSheet: Boolean,
     onAction: (HistoryPaymentScreenAction) -> Unit,
     updateShowBottomSheet: (Boolean) -> Unit,
     updateTypeBottomSheet: (TypeBottomSheet) -> Unit,
 ) {
-    //  val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
-
     Scaffold(
-        snackbarHost = { SnackbarHost(snakeBarHostState) },
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { contentPadding ->
-        if (state.isLoading) {
-            Box(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-                    .padding(15.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            Column(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-                    .padding(15.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.history_operations),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    modifier = modifier.clickable(
-                        onClick = {
-                            updateShowBottomSheet(true)
-                        }
-                    ),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+        Box(
+            modifier = Modifier
+                .padding(contentPadding)
+                .fillMaxSize()
+                .padding(15.dp)
+        ) {
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                Column(modifier = Modifier.fillMaxSize()) {
                     Text(
-                        text = state.periodHistory.asPeriodText().asString(),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = stringResource(R.string.history_operations),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.arrow_drop_down_24dp),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    TypeScreen.entries.forEach {
-                        TypeScreenTab(
-                            modifier = modifier.weight(1f),
-                            icon = ImageVector.vectorResource(it.iconRes),
-                            stringValue = when (it) {
-                                TypeScreen.WRITEOFF -> {
-                                    "-${"%.2f".format(state.debitsSum)} ${stringResource(R.string.rub_symbol)}"
-                                }
-
-                                TypeScreen.PAYMENT -> {
-                                    "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}"
-                                }
-                            },
-                            title = stringResource(it.titleRes),
-                            isChecked = state.typeScreen == it,
-                            onClick = {
-                                onAction(HistoryPaymentScreenAction.SwitchTypeScreen(it))
-                            }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.clickable {
+                            updateShowBottomSheet(true)
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = state.periodHistory.asPeriodText().asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.arrow_drop_down_24dp),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                when (state.typeScreen) {
-                    TypeScreen.WRITEOFF -> {
-                        if (state.historyDebits.isEmpty()) {
-                            NothingFind()
-                        } else {
-                            LazyColumn(
-                                modifier = modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                items(state.historyDebits) {
-                                    HistoryDebitCard(
-                                        history = it
-                                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        TypeScreen.entries.forEach {
+                            TypeScreenTab(
+                                modifier = Modifier.weight(1f),
+                                icon = ImageVector.vectorResource(it.iconRes),
+                                stringValue = when (it) {
+                                    TypeScreen.WRITEOFF -> {
+                                        "-${"%.2f".format(state.debitsSum)} ${stringResource(R.string.rub_symbol)}"
+                                    }
+
+                                    TypeScreen.PAYMENT -> {
+                                        "${state.paymentsSum} ${stringResource(R.string.rub_symbol)}"
+                                    }
+                                },
+                                title = stringResource(it.titleRes),
+                                isChecked = state.typeScreen == it,
+                                onClick = {
+                                    onAction(HistoryPaymentScreenAction.SwitchTypeScreen(it))
+                                }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    when (state.typeScreen) {
+                        TypeScreen.WRITEOFF -> {
+                            if (state.historyDebits.isEmpty()) {
+                                NothingFind()
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    items(state.historyDebits) {
+                                        HistoryDebitCard(
+                                            history = it
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    TypeScreen.PAYMENT -> {
-                        if (state.historyPayments.isEmpty()) {
-                            NothingFind()
-                        } else {
-                            LazyColumn(
-                                modifier = modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                items(state.historyPayments) {
-                                    ItemHistoryPayment(
-                                        historyPayment = it
-                                    )
+                        TypeScreen.PAYMENT -> {
+                            if (state.historyPayments.isEmpty()) {
+                                NothingFind()
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    items(state.historyPayments) {
+                                        ItemHistoryPayment(
+                                            historyPayment = it
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -270,7 +259,7 @@ private fun HistoryPaymentScreen(
 @Preview(showSystemUi = true)
 @Composable
 private fun Preview() {
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     BillingTheme {
         HistoryPaymentScreen(
             state = HistoryPaymentScreenState(
@@ -278,7 +267,7 @@ private fun Preview() {
             ),
             typeBottomSheet = TypeBottomSheet.PERIODS,
             showBottomSheet = false,
-            snakeBarHostState = snackBarState,
+            snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
             updateTypeBottomSheet = {}
@@ -289,7 +278,7 @@ private fun Preview() {
 @Preview(showSystemUi = true)
 @Composable
 private fun Preview2() {
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     BillingTheme {
         HistoryPaymentScreen(
             state = HistoryPaymentScreenState(
@@ -297,7 +286,7 @@ private fun Preview2() {
             ),
             typeBottomSheet = TypeBottomSheet.PERIODS,
             showBottomSheet = true,
-            snakeBarHostState = snackBarState,
+            snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
             updateTypeBottomSheet = {}
@@ -308,7 +297,7 @@ private fun Preview2() {
 @Preview(showSystemUi = true)
 @Composable
 private fun Preview3() {
-    val snackBarState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     BillingTheme {
         HistoryPaymentScreen(
             state = HistoryPaymentScreenState(
@@ -316,7 +305,7 @@ private fun Preview3() {
             ),
             typeBottomSheet = TypeBottomSheet.CALENDAR,
             showBottomSheet = true,
-            snakeBarHostState = snackBarState,
+            snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
             updateTypeBottomSheet = {}

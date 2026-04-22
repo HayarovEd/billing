@@ -29,8 +29,7 @@ import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.UiTextField2
 
 private const val mask = "+0(000)000-00-00"
-private  const val maskNumber = '0'
-
+private const val maskNumber = '0'
 
 @Composable
 fun PhoneTypeUi(
@@ -47,6 +46,13 @@ fun PhoneTypeUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
             style = MaterialTheme.typography.headlineSmall,
@@ -60,39 +66,45 @@ fun PhoneTypeUi(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.sberpay_payment),
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.enter_number_phone),
             style = MaterialTheme.typography.bodyMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         UiTextField2(
             content = phone,
             onClickContent = {
                 updatePhone(it)
             },
-            label = "",
+            label = stringResource(R.string.phone_number),
             keyboardType = KeyboardType.Phone,
             isOnlyDigit = true,
-            visualTransformation  = PhoneVisualTransformation(mask, maskNumber),
+            visualTransformation = PhoneVisualTransformation(mask, maskNumber),
         )
+
         Spacer(modifier = Modifier.weight(1f))
+
         Button(
             modifier = Modifier
                 .fillMaxWidth()
