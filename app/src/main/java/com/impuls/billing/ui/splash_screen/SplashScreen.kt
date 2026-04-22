@@ -57,7 +57,7 @@ private fun SplashScreen(
             val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
             val scale by infiniteTransition.animateFloat(
                 initialValue = 1f,
-                targetValue = 3f,
+                targetValue = 2f,
                 animationSpec = infiniteRepeatable(tween(2000)),
                 label = ""
             )
@@ -80,6 +80,16 @@ private fun SplashScreen(
 @Composable
 private fun Preview() {
     BillingTheme {
+        SplashScreen()
+    }
+}
+
+@Preview
+@Composable
+private fun Preview1() {
+    BillingTheme(
+        darkTheme = true
+    ) {
         SplashScreen()
     }
 }

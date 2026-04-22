@@ -22,8 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.openSbpUrl
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,6 +96,14 @@ private fun PaymentScreen(
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            UiIconButton(
+                modifier = modifier
+                    .padding(15.dp),
+                icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+                onClick = navigateToBack,
+            )
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier

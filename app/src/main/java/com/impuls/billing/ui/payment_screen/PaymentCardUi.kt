@@ -40,6 +40,12 @@ fun PaymentCardUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = stringResource(R.string.add_balance),
             style = MaterialTheme.typography.headlineSmall,
@@ -52,11 +58,6 @@ fun PaymentCardUi(
             text = stringResource(R.string.add_balance_desc),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
         )
         Text(
             text = stringResource(R.string.pay_to_card),
