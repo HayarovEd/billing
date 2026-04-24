@@ -1,22 +1,30 @@
 package com.impuls.billing.data.mapper
 
+import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.ClientShortStatDto
 import com.impuls.billing.data.remote.DebitDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
+import com.impuls.billing.data.remote.connected_usb_box.VgroupUsbBoxDto
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
+import com.impuls.billing.data.remote.notices.ClientNoticesDto
 import com.impuls.billing.data.remote.payment_history.PaymentHistoryDto
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientInfo
+import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.model.HistoryDebit
 import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.ModifierData
+import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
+import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.utils.FromBillingToLocalDateTime
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
@@ -25,6 +33,7 @@ import com.impuls.billing.domain.utils.convertUserType
 import com.impuls.billing.domain.utils.roundTo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -170,4 +179,50 @@ fun DebitDto.toHistoryDebit(): HistoryDebit {
         yearMonth = LocalDate.parse(yearMonth),
     )
 }
+
+
+fun VgroupUsbBoxDto.toVgroupUsbBox(): VgroupUsbBox {
+    return VgroupUsbBox(
+        activated = FromBillingToLocalDateTime(service.activated),
+        state = service.state,
+        rate = service.rate,
+        price = catAbove,
+        vgLogin = vgLogin,
+        tarDescr = tarDescr,
+        symbol = symbol
+    )
+}
+
+fun ClientInfoDto.toClientInfo(): ClientInfo {
+    return ClientInfo(
+        email = email,
+        emailIsConfirmed = emailIsConfirmed,
+        kontPerson = kontPerson,
+        mobile = mobile,
+        mobileIsConfirmed = mobileIsConfirmed,
+        offerIsAccepted = offerIsAccepted,
+        passIsTemporary = passIsTemporary,
+        password = password,
+        phone = phone,
+        triggerContactDataReminder = triggerContactDataReminder
+    )
+}
+
+fun ClientNoticesDto.toClientNotices(): ClientNotices {
+    return ClientNotices(
+        uid = uid,
+        notices = notices.map {
+            Notice(
+                descr = it.descr,
+                email = it.email,
+                messenger = it.messenger,
+                name = it.name,
+                sms = it.sms,
+                type = it.type,
+                value = it.value
+            )
+        }
+    )
+}
+
 

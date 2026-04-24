@@ -26,7 +26,7 @@ class HomeScreenViewModel(
     private val jwtRepository: JwtRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val agrmId = savedStateHandle.toRoute<NavigationRoute.Home>().agrmId
+    private val agrmId = savedStateHandle.toRoute<NavigationRoute.HomeRoute>().agrmId
 
     private val _state = MutableStateFlow(HomeScreenState(agrmId = agrmId,))
     val state = _state

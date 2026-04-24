@@ -2,6 +2,7 @@ package com.impuls.billing.ui.profile_screen
 
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.VgroupUsbBox
 
 data class ProfileScreenState(
     val account: ClientAccount? = null,
@@ -10,6 +11,7 @@ data class ProfileScreenState(
     val phoneRet: Long? = null,
     val emailRet: Long? = null,
     val vGroups: List<ClientVroup> = emptyList(),
+    val vGroupUsbBoxes: List<VgroupUsbBox> = emptyList(),
 ) {
     val clientVGroups = vGroups.firstOrNull()
 }

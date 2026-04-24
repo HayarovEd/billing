@@ -1,6 +1,8 @@
 package com.impuls.billing.domain.repository
 
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientInfo
+import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
@@ -42,4 +44,7 @@ interface AccountRepository {
         agrmId: Long?,
         vgId: Long? = null
     ): ResultWork<List<ClientVroup>, DataError>
+
+    suspend fun getClientInfo(token: String): ResultWork<ClientInfo, DataError>
+    suspend fun getClientNotices(token: String, userid: Long): ResultWork<ClientNotices, DataError>
 }

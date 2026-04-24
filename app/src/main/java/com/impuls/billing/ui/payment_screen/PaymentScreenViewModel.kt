@@ -27,7 +27,7 @@ class PaymentScreenViewModel(
 
     private val _state = MutableStateFlow(
         PaymentScreenState(
-            number = savedStateHandle.toRoute<NavigationRoute.Payment>().number,
+            number = savedStateHandle.toRoute<NavigationRoute.PaymentRpute>().number,
         )
     )
     val state = _state

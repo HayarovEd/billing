@@ -1,7 +1,7 @@
 package com.impuls.billing.domain.utils
 
 const val APP_PREFERENCES = "auth_settings"
-const val BASE_URL = "http://10.222.222.174:9998/api/"
+const val BASE_URL = /*"http://10.222.222.174:9998/api/"*/ "http://77.236.64.205:9998/api/"
 const val BASE_PAYMENT_URL = "https://pfapi.ckassa.ru/api-shop/rs/payform/"
 const val NUMBER_NPO_CODIT = "111-16915-2"
 const val X_GWT_PERMUTATION_VALUE = "DA5774A738084094C8AC1B6AD1844285"

@@ -11,6 +11,9 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.DateTimeFormat
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
@@ -133,4 +136,14 @@ fun Instant.toCurrentLocalDateTime(): LocalDate {
 fun Double.roundTo(decimals: Int): Double {
     val factor = 10.0.pow(decimals)
     return (this * factor).roundToInt() / factor
+}
+
+@OptIn(FormatStringsInDatetimeFormats::class)
+fun FromBillingToLocalDateTime(dateTimeString: String): LocalDateTime {
+
+    val format: DateTimeFormat<LocalDateTime> = LocalDateTime.Format {
+        byUnicodePattern("yyyy-MM-dd HH:mm:ss")
+    }
+
+    return format.parse(dateTimeString)
 }

@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,7 @@ import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.R.drawable
 import com.impuls.billing.R.string
+import com.impuls.billing.ui.uikit.UiIconButton
 
 
 @Composable
@@ -99,12 +101,20 @@ fun UserCard(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
+                            modifier = Modifier.basicMarquee(),
                             text = account.name,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    UiIconButton(
+                        icon = ImageVector.vectorResource(drawable.settings_24dp),
+                        onClick = {
+
+                        }
+                    )
                 }
             }
             Text(

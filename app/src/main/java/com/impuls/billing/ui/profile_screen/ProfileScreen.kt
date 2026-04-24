@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -150,6 +153,7 @@ private fun ProfileScreenScreen(
             Column(
                 modifier = modifier
                     .padding(contentPadding)
+                    .verticalScroll(rememberScrollState())
                     .fillMaxSize()
                     .padding(15.dp)
             ) {
@@ -179,7 +183,7 @@ private fun ProfileScreenScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     when (acc.account.type) {
-                        UserType.UL -> {
+                        /*UserType.UL -> {
                             Text(
                                 text = stringResource(R.string.my_accounts),
                                 style = MaterialTheme.typography.titleLarge
@@ -202,9 +206,9 @@ private fun ProfileScreenScreen(
                                     )
                                 }
                             }
-                        }
+                        }*/
 
-                        UserType.FL -> {
+                        UserType.FL, UserType.UL -> {
                             acc.agreements.firstOrNull()?.let { agrm ->
                                 AgreementCardFL(
                                     agreement = agrm,
@@ -225,7 +229,11 @@ private fun ProfileScreenScreen(
                                     clientVroup = it
                                 )
                             }
-
+                            Spacer(modifier = Modifier.height(12.dp))
+                            UsbBoxCardFL(
+                                modifier = modifier.heightIn(max = 400.dp),
+                                vGroupUsbBoxes = state.vGroupUsbBoxes
+                            )
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
+import com.impuls.billing.domain.repository.HomeRepository
 import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
@@ -22,6 +23,7 @@ class ProfileScreenViewModel(
     private val accountRepository: AccountRepository,
     private val dataStoreRepository: DataStoreRepository,
     private val jwtRepository: JwtRepository,
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
 
 
@@ -366,7 +368,7 @@ class ProfileScreenViewModel(
     ) {
         viewModelScope.launch {
             when (val result = accountRepository.getVGroups(
-                token=token,
+                token = token,
                 agrmId = agrmId
             )) {
                 is ResultWork.Error -> {
@@ -381,6 +383,35 @@ class ProfileScreenViewModel(
                     _state.value.copy(
                         isLoading = false,
                         vGroups = result.data,
+                    )
+                        .updateState()
+                    if (result.data.isNotEmpty()) {
+                        loadUsbBoxes(
+                            token = token,
+                            vgId = result.data.first().vgId
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadUsbBoxes(
+        token: String,
+        vgId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = homeRepository.getUsbBoxByVgroup(
+                token = token,
+                vgId = vgId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        vGroupUsbBoxes = result.data,
                     )
                         .updateState()
                 }

@@ -138,6 +138,8 @@
     <string name="cancelled_payment">Отменен</string>
     <string name="debet">Списание</string>
     <string name="nothing_finded">А ничего нет!</string>
+    <string name="usb_boxes">Дополнительные услуги</string>
+    <string name="not_usb_boxes">Дополнительные услуги отсутствуют</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

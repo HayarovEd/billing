@@ -2,15 +2,21 @@ package com.impuls.billing.data.repository
 
 import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.toClientAccount
+import com.impuls.billing.data.mapper.toClientInfo
+import com.impuls.billing.data.mapper.toClientNotices
 import com.impuls.billing.data.mapper.toClientVroup
+import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.SuccessDto
 import com.impuls.billing.data.remote.SuccessRecordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
+import com.impuls.billing.data.remote.notices.ClientNoticesDto
 import com.impuls.billing.data.remote.requests.CodeRequest
 import com.impuls.billing.data.remote.requests.EmailRequest
 import com.impuls.billing.data.remote.requests.MobilePhoneRequest
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientInfo
+import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.utils.DataError
@@ -183,9 +189,39 @@ class AccountRepositoryImpl(
                     }
                 }
             ) {
-                val a = it.bodyAsText()
-                println(a)
                 it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
+            }
+        }
+    }
+
+    override suspend fun getClientInfo(
+        token: String
+    ): ResultWork<ClientInfo, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                client.get("account/info") {
+                    bearerAuth(token)
+                    contentType(ContentType.Application.Json)
+                }
+            ) {
+                it.body<ClientInfoDto>().toClientInfo()
+            }
+        }
+    }
+
+    override suspend fun getClientNotices(
+        token: String,
+        userid: Long,
+    ): ResultWork<ClientNotices, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                client.get("account/notices") {
+                    bearerAuth(token)
+                    contentType(ContentType.Application.Json)
+                    parameter("userid", userid)
+                }
+            ) {
+                it.body<ClientNoticesDto>().toClientNotices()
             }
         }
     }

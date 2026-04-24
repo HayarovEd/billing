@@ -18,7 +18,7 @@ import com.impuls.billing.ui.uikit.model.NavigationRoute
 
 @Composable
 fun NavController(
-    startDestination: NavigationRoute = NavigationRoute.Splash,/*Payment("595142026")*/
+    startDestination: NavigationRoute = NavigationRoute.SplashRoute,/*Payment("595142026")*/
 ) {
     val navController = rememberNavController()
     PortraitOnly()
@@ -51,34 +51,34 @@ fun NavController(
         }
     ) {
 
-        composable<NavigationRoute.Splash> {
+        composable<NavigationRoute.SplashRoute> {
             SplashScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.Login)
+                    navController.navigate(NavigationRoute.LoginRoute)
                 },
                 onNavigateToProfile = {
-                    navController.navigate(NavigationRoute.Profile)
+                    navController.navigate(NavigationRoute.ProfileRoute)
                 }
             )
         }
-        composable<NavigationRoute.Login> {
+        composable<NavigationRoute.LoginRoute> {
             LoginScreenRoot(
                 onNavigateToAccounts = {
-                    navController.navigate(NavigationRoute.Profile)
+                    navController.navigate(NavigationRoute.ProfileRoute)
                 }
             )
         }
-        composable<NavigationRoute.Profile> {
+        composable<NavigationRoute.ProfileRoute> {
             ProfileScreenRoot(
                 onNavigateToPayment = {
-                    navController.navigate(NavigationRoute.Payment(it))
+                    navController.navigate(NavigationRoute.PaymentRpute(it))
                 },
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.Login)
+                    navController.navigate(NavigationRoute.LoginRoute)
                     // navController.popBackStack(NavigationRoute.Login, false)
                 },
                 onNavigateToMore = {
-                    navController.navigate(NavigationRoute.Home(it))
+                    navController.navigate(NavigationRoute.HomeRoute(it))
                 },
                 onClickPaymentHistory = { agrmId, vgId, tarifId ->
                     navController.navigate(
@@ -92,17 +92,17 @@ fun NavController(
             )
         }
 
-        composable<NavigationRoute.Payment> {
+        composable<NavigationRoute.PaymentRpute> {
             PaymentScreenRoot(
                 navigateToBack = {
                     navController.navigateUp()
                 }
             )
         }
-        composable<NavigationRoute.Home> {
+        composable<NavigationRoute.HomeRoute> {
             HomeScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.Login)
+                    navController.navigate(NavigationRoute.LoginRoute)
                     // navController.popBackStack(NavigationRoute.Login, false)
                 },
                 onNavigateToBack = {
@@ -114,7 +114,7 @@ fun NavController(
         composable<NavigationRoute.HistoryPaymentRoute> {
             HistoryPaymentScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.Login)
+                    navController.navigate(NavigationRoute.LoginRoute)
                 }
             )
         }

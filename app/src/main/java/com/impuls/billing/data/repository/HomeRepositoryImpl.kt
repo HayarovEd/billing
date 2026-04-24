@@ -2,8 +2,11 @@ package com.impuls.billing.data.repository
 
 import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.toClientVroup
+import com.impuls.billing.data.mapper.toVgroupUsbBox
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
+import com.impuls.billing.data.remote.connected_usb_box.VgroupUsbBoxDto
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.repository.HomeRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
@@ -40,10 +43,28 @@ class HomeRepositoryImpl(
                     }
                 }
             ) {
-                val a = it.bodyAsText()
-                println(a)
                 it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
             }
         }
     }
+
+    override suspend fun getUsbBoxByVgroup(
+        token: String,
+        vgId: Long,
+    ): ResultWork<List<VgroupUsbBox>, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                client.get("home/service") {
+                    bearerAuth(token)
+                    contentType(ContentType.Application.Json)
+                    parameter("vgId", vgId)
+                }
+            ) {
+                val a = it.bodyAsText()
+                println(a)
+                it.body<List<VgroupUsbBoxDto>>().map { it.toVgroupUsbBox() }
+            }
+        }
+    }
+
 }

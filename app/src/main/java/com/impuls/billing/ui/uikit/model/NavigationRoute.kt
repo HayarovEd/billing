@@ -4,24 +4,21 @@ import kotlinx.serialization.Serializable
 
 sealed class NavigationRoute {
     @Serializable
-    data object Login : NavigationRoute()
+    data object LoginRoute : NavigationRoute()
 
     @Serializable
-    data object Splash : NavigationRoute()
+    data object SplashRoute : NavigationRoute()
 
     @Serializable
-    data object Profile : NavigationRoute()
+    data object ProfileRoute : NavigationRoute()
 
     @Serializable
-    data class Payment(
+    data class PaymentRpute(
         val number: String
     ) : NavigationRoute()
 
     @Serializable
-    data object Bill : NavigationRoute()
-
-    @Serializable
-    data class Home(
+    data class HomeRoute(
         val agrmId: Long
     ) : NavigationRoute()
 
@@ -33,10 +30,10 @@ sealed class NavigationRoute {
     ) : NavigationRoute()
 
     @Serializable
-    data object Blockings : NavigationRoute()
+    data class SettingsRoute(
+        val userId: Long
+    ) : NavigationRoute()
 
-    @Serializable
-    data object PasswordChanger : NavigationRoute()
 
 
 }
