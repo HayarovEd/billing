@@ -8,6 +8,7 @@ import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
+import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.NavigationRoute
@@ -114,7 +115,16 @@ class SettingsScreenViewModel(
             }
 
             SettingsScreenAction.UpdateNotices -> {
-
+                loadData(
+                    action = {
+                        updateNotices(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
             }
 
             is SettingsScreenAction.UpdateValue -> {
@@ -220,6 +230,27 @@ class SettingsScreenViewModel(
                     }
                 }
             }
+        }
+    }
+
+    private fun updateNotices(token: String) {
+        viewModelScope.launch {
+            _state.value.clientNotices?.let { cNotices ->
+                when (val result =
+                    accountRepository.updateClientNotices(
+                        token = token,
+                        clientNotices = cNotices
+                    )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(DataError.SuccessWork.SUCCESS_UPDATE_NOTICES.asUiText()))
+                    }
+                }
+            }
+
         }
     }
 

@@ -47,4 +47,8 @@ interface AccountRepository {
 
     suspend fun getClientInfo(token: String): ResultWork<ClientInfo, DataError>
     suspend fun getClientNotices(token: String, userid: Long): ResultWork<ClientNotices, DataError>
+    suspend fun updateClientNotices(
+        token: String,
+        clientNotices: ClientNotices
+    ): ResultWork<Long, DataError>
 }

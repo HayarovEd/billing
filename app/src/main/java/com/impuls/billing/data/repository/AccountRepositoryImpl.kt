@@ -11,9 +11,11 @@ import com.impuls.billing.data.remote.SuccessRecordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.notices.ClientNoticesDto
+import com.impuls.billing.data.remote.requests.ClientNoticesRequest
 import com.impuls.billing.data.remote.requests.CodeRequest
 import com.impuls.billing.data.remote.requests.EmailRequest
 import com.impuls.billing.data.remote.requests.MobilePhoneRequest
+import com.impuls.billing.data.remote.requests.NoticesRequest
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
@@ -222,6 +224,38 @@ class AccountRepositoryImpl(
                 }
             ) {
                 it.body<ClientNoticesDto>().toClientNotices()
+            }
+        }
+    }
+
+    override suspend fun updateClientNotices(
+        token: String,
+        clientNotices: ClientNotices,
+    ): ResultWork<Long, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                client.post ("account/notices") {
+                    bearerAuth(token)
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        ClientNoticesRequest(
+                            uid = clientNotices.uid,
+                            notices = clientNotices.notices.map {
+                                NoticesRequest(
+                                    descr = it.descr,
+                                    isEmail = it.email,
+                                    isMessenger = it.messenger,
+                                    name = it.name,
+                                    isSms = it.sms,
+                                    type = it.type,
+                                    value = it.value
+                                )
+                            }
+                        )
+                    )
+                }
+            ) {
+                it.body<Long>()
             }
         }
     }

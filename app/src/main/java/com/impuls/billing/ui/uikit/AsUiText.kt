@@ -98,6 +98,12 @@ fun DataError.asUiText(): UiText {
                 R.string.success_update_password
             )
         }
+
+        DataError.SuccessWork.SUCCESS_UPDATE_NOTICES -> {
+            StringResource(
+                R.string.success_update_notices
+            )
+        }
     }
 }
 
