@@ -41,6 +41,7 @@ import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
+import com.impuls.billing.domain.utils.formatPhoneNumber
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.UiIconButton
 
@@ -231,30 +232,6 @@ fun InfoRowWithStatus(
                 tint = if (isConfirmed) successColor else errorColor
             )
         }
-    }
-}
-
-fun formatPhoneNumber(phone: String): String {
-    return when {
-        phone.length == 11 && phone.startsWith("7") -> {
-            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
-                phone.substring(
-                    7,
-                    9
-                )
-            }-${phone.substring(9, 11)}"
-        }
-
-        phone.length == 11 && phone.startsWith("8") -> {
-            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
-                phone.substring(
-                    7,
-                    9
-                )
-            }-${phone.substring(9, 11)}"
-        }
-
-        else -> phone
     }
 }
 

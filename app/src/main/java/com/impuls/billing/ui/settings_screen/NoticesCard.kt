@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -72,14 +73,14 @@ fun NoticesCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Уведомление",
+                    text = stringResource(R.string.notice),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Сумма",
+                    text = stringResource(R.string.amount),
                     modifier = Modifier.width(68.dp), // VolumeFieldWidth (60) + VolumeFieldPadding (8)
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -87,7 +88,7 @@ fun NoticesCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "SMS",
+                    text = stringResource(R.string.sms),
                     modifier = Modifier.width(48.dp), // CheckboxColumnWidth
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -95,7 +96,7 @@ fun NoticesCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Email",
+                    text = stringResource(R.string.email),
                     modifier = Modifier.width(48.dp), // CheckboxColumnWidth
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -103,8 +104,8 @@ fun NoticesCard(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
-            androidx.compose.material3.HorizontalDivider(
+
+            HorizontalDivider(
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
@@ -131,6 +132,7 @@ fun NoticesCard(
                             }
                         )
                     }
+
                     TypeNotice.MONTHLY_REPORT -> {
                         RowNoticeOnlyEmail(
                             typeNotice = type,
@@ -158,9 +160,9 @@ fun NoticesCard(
                         )
                     }
                 }
-                
+
                 if (index < TypeNotice.entries.size - 1) {
-                    androidx.compose.material3.HorizontalDivider(
+                    HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
@@ -169,6 +171,7 @@ fun NoticesCard(
             Spacer(modifier = Modifier.width(12.dp))
             Button(
                 onClick = onClickSave,
+                enabled = clientInfo.emailIsConfirmed || clientInfo.mobileIsConfirmed,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

@@ -15,7 +15,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -32,19 +31,22 @@ class HomeRepositoryImpl(
     ): ResultWork<List<ClientVroup>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("account/vgroup") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    agrmId?.let {
-                        parameter("agrmid", it)
+                request = {
+                    client.get("account/vgroup") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        agrmId?.let {
+                            parameter("agrmid", it)
+                        }
+                        vgId?.let {
+                            parameter("vgid", vgId)
+                        }
                     }
-                    vgId?.let {
-                        parameter("vgid", vgId)
-                    }
+                },
+                data = {
+                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
                 }
-            ) {
-                it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
-            }
+            )
         }
     }
 
@@ -54,16 +56,17 @@ class HomeRepositoryImpl(
     ): ResultWork<List<VgroupUsbBox>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("home/service") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    parameter("vgId", vgId)
+                request = {
+                    client.get("home/service") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("vgId", vgId)
+                    }
+                },
+                data = {
+                    it.body<List<VgroupUsbBoxDto>>().map { it.toVgroupUsbBox() }
                 }
-            ) {
-                val a = it.bodyAsText()
-                println(a)
-                it.body<List<VgroupUsbBoxDto>>().map { it.toVgroupUsbBox() }
-            }
+            )
         }
     }
 

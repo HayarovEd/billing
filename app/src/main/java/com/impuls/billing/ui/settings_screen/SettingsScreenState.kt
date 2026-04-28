@@ -7,6 +7,9 @@ data class SettingsScreenState(
     val clientInfo: ClientInfo? = null,
     val clientNotices: ClientNotices? = null,
     val isLoading: Boolean = false,
+    val count: Int = 0,
+    val phoneRet: Long? = null,
+    val emailRet: Long? = null,
 )
 
 

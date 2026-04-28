@@ -1,6 +1,5 @@
 package com.impuls.billing.data.handler
 
-
 import com.impuls.billing.data.remote.ErrorDto
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
@@ -16,17 +15,22 @@ import io.ktor.utils.io.ClosedByteChannelException
 import java.net.ConnectException
 
 suspend fun <D> handleResponse(
-    response: HttpResponse,
+    request: suspend () -> HttpResponse,
     data: suspend (HttpResponse) -> D
 ): ResultWork<D, DataError> {
     return try {
+        val response = request()
         if (response.status.isSuccess()) {
             ResultWork.Success(data(response))
         } else {
             when (response.status.value) {
                 400 -> {
-                    val body = response.body<ErrorDto>()
-                    ResultWork.Error(DataError.CustomError(body.message))
+                    val body = try {
+                        response.body<ErrorDto>()
+                    } catch (e: Exception) {
+                        null
+                    }
+                    ResultWork.Error(DataError.Network.SERVER_ERROR)
                 }
                 401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(DataError.Network.UNKNOWN)
@@ -37,15 +41,14 @@ suspend fun <D> handleResponse(
             400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
             401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(DataError.Network.UNKNOWN)
-
         }
-    }  catch (e: ClosedByteChannelException) {
+    } catch (e: ClosedByteChannelException) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.SERVER_ERROR)
     } catch (e: ConnectException) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.SERVER_ERROR)
-    }catch (e: ServerResponseException) {
+    } catch (e: ServerResponseException) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.SERVER_ERROR)
     } catch (e: HttpRequestTimeoutException) {
@@ -57,9 +60,6 @@ suspend fun <D> handleResponse(
     } catch (e: JsonConvertException) {
         e.printStackTrace()
         ResultWork.Error(DataError.SerializationError.FORMAT_ERROR)
-    } catch (e: ClosedByteChannelException) {
-        e.printStackTrace()
-        ResultWork.Error(DataError.ValidationError.LOGIN_PASSWORD_INCORRECT)
     } catch (e: Exception) {
         e.printStackTrace()
         ResultWork.Error(DataError.Network.UNKNOWN)

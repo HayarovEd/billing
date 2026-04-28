@@ -2,7 +2,9 @@ package com.impuls.billing.ui.settings_screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -80,7 +82,41 @@ private fun SettingsScreen(
                     .padding(15.dp)
             ) {
                 state.clientInfo?.let {clientInfo->
+                    ContactsCard(
+                        mobile = clientInfo.mobile,
+                        mobileIsConfirmed = clientInfo.mobileIsConfirmed,
+                        emailIsConfirmed = clientInfo.emailIsConfirmed,
+                        email = clientInfo.email,
+                        count = state.count,
+                        onUpdatePhone = {
+                            onAction(SettingsScreenAction.UpdatePhone(
+                                phone = it
+                            ))
+                        },
+                        onUpdateEmail = {
+                            onAction(SettingsScreenAction.UpdateEmail(
+                                email = it
+                            ))
+                        },
+                        onConfirmCodePhone = {
+                            onAction(SettingsScreenAction.ConfirmPhone(
+                                code = it
+                            ))
+                        },
+                        onConfirmCodeEmail = {
+                            onAction(SettingsScreenAction.ConfirmEmail(
+                                code = it
+                            ))
+                        },
+                        onRecentCodePhone = {
+                            onAction(SettingsScreenAction.ResentCodeEmail)
+                        },
+                        onRecentCodeEmail = {
+                            onAction(SettingsScreenAction.ResentCodePhone)
+                        }
+                    )
                     state.clientNotices?.let { clientNotices->
+                        Spacer(modifier = Modifier.height(12.dp))
                         NoticesCard(
                             clientInfo = clientInfo,
                             clientNotices = clientNotices,

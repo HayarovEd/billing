@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.settings_screen
 
+
 sealed interface SettingsScreenAction {
     class UpdateValue(
         val value: String,
@@ -17,4 +18,11 @@ sealed interface SettingsScreenAction {
     ) : SettingsScreenAction
 
     data object UpdateNotices : SettingsScreenAction
+
+    class UpdatePhone(val phone: String): SettingsScreenAction
+    data object ResentCodePhone: SettingsScreenAction
+    class ConfirmPhone(val code: String): SettingsScreenAction
+    class UpdateEmail(val email: String): SettingsScreenAction
+    data object ResentCodeEmail: SettingsScreenAction
+    class ConfirmEmail(val code: String): SettingsScreenAction
 }

@@ -17,7 +17,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -36,18 +35,19 @@ class BillingPaymentRepositoryImpl(
     ): ResultWork<List<HistoryPayment>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("payment/payment") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    parameter("agrmnum", agrmId)
-                    parameter("dtto", dateTo.toBillingFormat())
-                    parameter("dtfrom", dateFrom.toBillingFormat())
+                request = {
+                    client.get("payment/payment") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("agrmnum", agrmId)
+                        parameter("dtto", dateTo.toBillingFormat())
+                        parameter("dtfrom", dateFrom.toBillingFormat())
+                    }
+                },
+                data = {
+                    it.body<List<PaymentHistoryDto>>().map { it.toHistoryPayment() }
                 }
-            ) {
-                val a = it.bodyAsText()
-                println(a)
-                it.body<List<PaymentHistoryDto>>().map { it.toHistoryPayment() }
-            }
+            )
         }
     }
 
@@ -61,22 +61,23 @@ class BillingPaymentRepositoryImpl(
     ): ResultWork<List<HistoryDebit>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("payment/debits") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    parameter("armgid", agrmId)
-                    parameter("tarifid", tarifId)
-                    parameter("vgid", vgId)
-                    parameter("dtto", dateTo
-                        .toBillingFormat2())
-                    parameter("dtfrom", dateFrom
-                        .toBillingFormat2())
+                request = {
+                    client.get("payment/debits") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("armgid", agrmId)
+                        parameter("tarifid", tarifId)
+                        parameter("vgid", vgId)
+                        parameter("dtto", dateTo
+                            .toBillingFormat2())
+                        parameter("dtfrom", dateFrom
+                            .toBillingFormat2())
+                    }
+                },
+                data = {
+                    it.body<List<DebitDto>>().map { it.toHistoryDebit() }
                 }
-            ) {
-                val a = it.bodyAsText()
-                println(a)
-                it.body<List<DebitDto>>().map { it.toHistoryDebit() }
-            }
+            )
         }
     }
 }

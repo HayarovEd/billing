@@ -14,6 +14,7 @@ import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -154,6 +155,98 @@ class SettingsScreenViewModel(
                     } ?: currentState
                 }
             }
+
+            is SettingsScreenAction.ConfirmEmail -> {
+                loadData(
+                    action = {
+                        confirmValidateClientEmail(
+                            token = it,
+                            code = action.code
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            is SettingsScreenAction.ConfirmPhone -> {
+                loadData(
+                    action = {
+                        confirmValidateClientMobileNumber(
+                            token = it,
+                            code = action.code
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            SettingsScreenAction.ResentCodeEmail -> {
+                loadData(
+                    action = {
+                        timer()
+                        validateEmail(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            SettingsScreenAction.ResentCodePhone -> {
+                loadData(
+                    action = {
+                        timer()
+                        validateMobilePhone(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            is SettingsScreenAction.UpdateEmail -> {
+                loadData(
+                    action = {
+                        updateEmail(
+                            token = it,
+                            email = action.email
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            is SettingsScreenAction.UpdatePhone -> {
+                loadData(
+                    action = {
+                        updatePhone(
+                            token = it,
+                            phone = action.phone
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -251,6 +344,151 @@ class SettingsScreenViewModel(
                 }
             }
 
+        }
+    }
+
+    private fun updatePhone(
+        token: String,
+        phone: String
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.setClientMobilePhone(
+                token = token,
+                uid = userId,
+                phone = phone
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    loadIntitalData(token)
+                    validateMobilePhone(token)
+                    timer()
+                }
+            }
+        }
+    }
+
+    private fun validateMobilePhone(token: String) {
+        viewModelScope.launch {
+            when (val result = accountRepository.validateClientMobileNumber(token)) {
+                is ResultWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        phoneRet = result.data
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun confirmValidateClientMobileNumber(
+        token: String,
+        code: String
+    ) {
+        state.value.phoneRet?.let {
+            viewModelScope.launch {
+                when (val result = accountRepository.confirmValidateClientMobileNumber(
+                    token = token,
+                    id = it,
+                    code = code
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadIntitalData(token)
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    private fun updateEmail(
+        token: String,
+        email: String
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.setClientEmail(
+                token = token,
+                uid = userId,
+                email = email
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    loadIntitalData(token)
+                    validateEmail(token)
+                    timer()
+                }
+            }
+        }
+    }
+
+    private fun validateEmail(token: String) {
+        viewModelScope.launch {
+            when (val result = accountRepository.validateClientEmail(token)) {
+                is ResultWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        emailRet = result.data
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun confirmValidateClientEmail(
+        token: String,
+        code: String
+    ) {
+        state.value.phoneRet?.let {
+            viewModelScope.launch {
+                when (val result = accountRepository.confirmValidateClientEmail(
+                    token = token,
+                    id = it,
+                    code = code
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadIntitalData(token)
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun timer(count: Int = 10) {
+        viewModelScope.launch {
+            _state.value.copy(
+                count = count
+            )
+                .updateState()
+            for (i in count downTo 0) {
+                _state.value.copy(
+                    count = i
+                )
+                    .updateState()
+                delay(1000)
+            }
         }
     }
 

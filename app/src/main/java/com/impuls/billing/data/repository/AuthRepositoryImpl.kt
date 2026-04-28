@@ -31,14 +31,16 @@ class AuthRepositoryImpl(
         password: String
     ): ResultWork<ResultLogin, DataError> {
         return handleResponse(
-            response = client.post("auth/login") {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    LoginRequest(
-                        name = username,
-                        password = password
+            request = {
+                client.post("auth/login") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        LoginRequest(
+                            name = username,
+                            password = password
+                        )
                     )
-                )
+                }
             },
             data = {
                 ResultLogin(it.body<TokenDto>().token)
@@ -51,17 +53,19 @@ class AuthRepositoryImpl(
         transport: Int
     ): ResultWork<RecoverPassword, DataError> {
         return handleResponse(
-            response = client.post("auth/recoverPassword") {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    RecoverPasswordRequest(
-                        login = login,
-                        transport = transport,
-                        simpleRecover = true,
-                        sync = true,
-                        operId = 0
+            request = {
+                client.post("auth/recoverPassword") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        RecoverPasswordRequest(
+                            login = login,
+                            transport = transport,
+                            simpleRecover = true,
+                            sync = true,
+                            operId = 0
+                        )
                     )
-                )
+                }
             },
             data = {
                 it.body<RecoverPasswordDto>().convertToRecoverPassword()
@@ -75,15 +79,17 @@ class AuthRepositoryImpl(
         code: String,
     ): ResultWork<Boolean, DataError> {
         return handleResponse(
-            response = client.post("auth/updatePasswordByCode") {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    UpdatePasswordByCodeRequest(
-                        login = login,
-                        password = password,
-                        code = code
+            request = {
+                client.post("auth/updatePasswordByCode") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        UpdatePasswordByCodeRequest(
+                            login = login,
+                            password = password,
+                            code = code
+                        )
                     )
-                )
+                }
             },
             data = {
                 it.body<SuccessDto>().success

@@ -147,3 +147,25 @@ fun FromBillingToLocalDateTime(dateTimeString: String): LocalDateTime {
 
     return format.parse(dateTimeString)
 }
+
+fun formatPhoneNumber(phone: String): String {
+    return when (phone.length) {
+        11 if phone.startsWith("7") -> {
+            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
+                phone.substring(
+                    7,
+                    9
+                )
+            }-${phone.substring(9, 11)}"
+        }
+        11 if phone.startsWith("8") -> {
+            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
+                phone.substring(
+                    7,
+                    9
+                )
+            }-${phone.substring(9, 11)}"
+        }
+        else -> phone
+    }
+}

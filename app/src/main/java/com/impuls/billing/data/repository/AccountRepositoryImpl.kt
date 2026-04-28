@@ -30,7 +30,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -44,14 +43,15 @@ class AccountRepositoryImpl(
     ): ResultWork<ClientAccount, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("account/") {
-                    bearerAuth(token)
+                request = {
+                    client.get("account/") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<ClientAccountResponse>().toClientAccount()
                 }
-            ) {
-                val a = it.bodyAsText()
-                println(a)
-                it.body<ClientAccountResponse>().toClientAccount()
-            }
+            )
         }
     }
 
@@ -62,19 +62,22 @@ class AccountRepositoryImpl(
     ): ResultWork<Boolean, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/clientMobilePhone") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(
-                        MobilePhoneRequest(
-                            phone = phone,
-                            uid = uid
+                request = {
+                    client.post("account/clientMobilePhone") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            MobilePhoneRequest(
+                                phone = phone,
+                                uid = uid
+                            )
                         )
-                    )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
-            ) {
-                it.body<SuccessDto>().success
-            }
+            )
         }
     }
 
@@ -82,12 +85,15 @@ class AccountRepositoryImpl(
     override suspend fun validateClientMobileNumber(token: String): ResultWork<Long, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/validationClientMobileNumber") {
-                    bearerAuth(token)
+                request = {
+                    client.post("account/validationClientMobileNumber") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<SuccessRecordDto>().recordNumber
                 }
-            ) {
-                it.body<SuccessRecordDto>().recordNumber
-            }
+            )
         }
     }
 
@@ -98,19 +104,22 @@ class AccountRepositoryImpl(
     ): ResultWork<Boolean, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/confirmationClientMobileNumber") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(
-                        CodeRequest(
-                            id = id,
-                            code = code
+                request = {
+                    client.post("account/confirmationClientMobileNumber") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            CodeRequest(
+                                id = id,
+                                code = code
+                            )
                         )
-                    )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
-            ) {
-                it.body<SuccessDto>().success
-            }
+            )
         }
     }
 
@@ -121,19 +130,22 @@ class AccountRepositoryImpl(
     ): ResultWork<Boolean, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/clientEmail") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(
-                        EmailRequest(
-                            uid = uid,
-                            email = email
+                request = {
+                    client.post("account/clientEmail") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            EmailRequest(
+                                uid = uid,
+                                email = email
+                            )
                         )
-                    )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
-            ) {
-                it.body<SuccessDto>().success
-            }
+            )
         }
     }
 
@@ -141,12 +153,15 @@ class AccountRepositoryImpl(
     override suspend fun validateClientEmail(token: String): ResultWork<Long, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/validationClientEmail") {
-                    bearerAuth(token)
+                request = {
+                    client.post("account/validationClientEmail") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<SuccessRecordDto>().recordNumber
                 }
-            ) {
-                it.body<SuccessRecordDto>().recordNumber
-            }
+            )
         }
     }
 
@@ -157,19 +172,22 @@ class AccountRepositoryImpl(
     ): ResultWork<Boolean, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post("account/confirmationClientEmail") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(
-                        CodeRequest(
-                            id = id,
-                            code = code
+                request = {
+                    client.post("account/confirmationClientEmail") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            CodeRequest(
+                                id = id,
+                                code = code
+                            )
                         )
-                    )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
-            ) {
-                it.body<SuccessDto>().success
-            }
+            )
         }
     }
 
@@ -180,19 +198,22 @@ class AccountRepositoryImpl(
     ): ResultWork<List<ClientVroup>, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("account/vgroup") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    agrmId?.let {
-                        parameter("agrmid", it)
+                request = {
+                    client.get("account/vgroup") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        agrmId?.let {
+                            parameter("agrmid", it)
+                        }
+                        vgId?.let {
+                            parameter("vgid", vgId)
+                        }
                     }
-                    vgId?.let {
-                        parameter("vgid", vgId)
-                    }
+                },
+                data = {
+                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
                 }
-            ) {
-                it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
-            }
+            )
         }
     }
 
@@ -201,13 +222,16 @@ class AccountRepositoryImpl(
     ): ResultWork<ClientInfo, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("account/info") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
+                request = {
+                    client.get("account/info") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                    }
+                },
+                data = {
+                    it.body<ClientInfoDto>().toClientInfo()
                 }
-            ) {
-                it.body<ClientInfoDto>().toClientInfo()
-            }
+            )
         }
     }
 
@@ -217,14 +241,17 @@ class AccountRepositoryImpl(
     ): ResultWork<ClientNotices, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.get("account/notices") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    parameter("userid", userid)
+                request = {
+                    client.get("account/notices") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("userid", userid)
+                    }
+                },
+                data = {
+                    it.body<ClientNoticesDto>().toClientNotices()
                 }
-            ) {
-                it.body<ClientNoticesDto>().toClientNotices()
-            }
+            )
         }
     }
 
@@ -234,29 +261,32 @@ class AccountRepositoryImpl(
     ): ResultWork<Long, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
-                client.post ("account/notices") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(
-                        ClientNoticesRequest(
-                            uid = clientNotices.uid,
-                            notices = clientNotices.notices.map {
-                                NoticesRequest(
-                                    descr = it.descr,
-                                    isEmail = it.email,
-                                    isMessenger = it.messenger,
-                                    name = it.name,
-                                    isSms = it.sms,
-                                    type = it.type,
-                                    value = it.value
-                                )
-                            }
+                request = {
+                    client.post ("account/notices") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            ClientNoticesRequest(
+                                uid = clientNotices.uid,
+                                notices = clientNotices.notices.map {
+                                    NoticesRequest(
+                                        descr = it.descr,
+                                        isEmail = it.email,
+                                        isMessenger = it.messenger,
+                                        name = it.name,
+                                        isSms = it.sms,
+                                        type = it.type,
+                                        value = it.value
+                                    )
+                                }
+                            )
                         )
-                    )
+                    }
+                },
+                data = {
+                    it.body<Long>()
                 }
-            ) {
-                it.body<Long>()
-            }
+            )
         }
     }
 }
