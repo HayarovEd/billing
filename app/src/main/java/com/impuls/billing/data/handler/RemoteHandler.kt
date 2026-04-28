@@ -24,14 +24,7 @@ suspend fun <D> handleResponse(
             ResultWork.Success(data(response))
         } else {
             when (response.status.value) {
-                400 -> {
-                    val body = try {
-                        response.body<ErrorDto>()
-                    } catch (e: Exception) {
-                        null
-                    }
-                    ResultWork.Error(DataError.Network.SERVER_ERROR)
-                }
+                400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
                 401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(DataError.Network.UNKNOWN)
             }
