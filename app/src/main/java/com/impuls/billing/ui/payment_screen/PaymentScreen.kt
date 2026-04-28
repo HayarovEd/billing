@@ -97,12 +97,12 @@ private fun PaymentScreen(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            UiIconButton(
+            /*UiIconButton(
                 modifier = modifier
                     .padding(15.dp),
                 icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
                 onClick = navigateToBack,
-            )
+            )*/
         }
     ) { contentPadding ->
         Box(
@@ -134,7 +134,8 @@ private fun PaymentScreen(
                                                 PaymentScreenType.CHOOSE_PAYMENT_METHOD
                                             )
                                         )
-                                    }
+                                    },
+                                    onBack = navigateToBack
                                 )
                             }
 
