@@ -2,15 +2,26 @@ package com.impuls.billing.ui.profile_screen
 
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import com.impuls.billing.R.drawable
+import com.impuls.billing.R.string
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.BillDeliveryType
@@ -30,8 +42,6 @@ import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
-import com.impuls.billing.R.drawable
-import com.impuls.billing.R.string
 import com.impuls.billing.ui.uikit.UiIconButton
 
 
@@ -40,17 +50,9 @@ fun UserCard(
     account: Account,
     address: String,
     modifier: Modifier = Modifier,
-    count: Int,
-    onUpdatePhone: (String) -> Unit,
-    onUpdateEmail: (String) -> Unit,
-    onConfirmCodePhone: (String) -> Unit,
-    onConfirmCodeEmail: (String) -> Unit,
-    onRecentCodePhone: () -> Unit,
-    onRecentCodeEmail: () -> Unit,
+    onNavigateToSettings: (Long) -> Unit,
 ) {
 
-    var visiblePhoneDialog by retain { mutableStateOf(false) }
-    var visibleEmailDialog by retain { mutableStateOf(false) }
     Card(
         modifier = modifier
             .fillMaxWidth(),
@@ -112,7 +114,7 @@ fun UserCard(
                     UiIconButton(
                         icon = ImageVector.vectorResource(drawable.settings_24dp),
                         onClick = {
-
+                            onNavigateToSettings(account.uid)
                         }
                     )
                 }
@@ -133,25 +135,13 @@ fun UserCard(
             // Email с верификацией
             InfoRowWithStatus(
                 icon = ImageVector.vectorResource(
-                    drawable.mobile_check_24dp),
+                    drawable.mobile_check_24dp
+                ),
                 label = stringResource(string.phone),
                 value = formatPhoneNumber(account.mobile),
                 isConfirmed = account.mobileIsConfirmed,
-                description = stringResource(string.desc_phone),
-                subTitle = stringResource(string.phone_number),
                 defaultContent = stringResource(string.set_phone),
-                isShowDialog = visiblePhoneDialog,
-                count = count,
-                onConfirmCode = {
-                    onConfirmCodePhone(it)
-                },
-                onRecentCode = onRecentCodePhone,
-                onConfirmContent = {
-                    onUpdatePhone(it)
-                },
-                updateVisibleDialog = {
-                    visiblePhoneDialog = it
-                },
+                onNavigateToSettings = { onNavigateToSettings(account.uid) },
                 onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant,
                 successColor = MaterialTheme.colorScheme.primary,
                 errorColor = MaterialTheme.colorScheme.error
@@ -162,25 +152,13 @@ fun UserCard(
             // Телефон с верификацией
             InfoRowWithStatus(
                 icon = ImageVector.vectorResource(
-                    drawable.alternate_email_24dp),
+                    drawable.alternate_email_24dp
+                ),
                 label = stringResource(string.email),
                 value = account.email,
                 isConfirmed = account.emailIsConfirmed,
-                description = stringResource(string.desc_email),
-                subTitle = stringResource(string.email_adrress),
                 defaultContent = stringResource(string.set_email),
-                isShowDialog = visibleEmailDialog,
-                count = count,
-                onConfirmCode = {
-                    onConfirmCodeEmail(it)
-                },
-                onRecentCode = onRecentCodeEmail,
-                onConfirmContent = {
-                    onUpdateEmail(it)
-                },
-                updateVisibleDialog = {
-                    visibleEmailDialog = it
-                },
+                onNavigateToSettings = { onNavigateToSettings(account.uid) },
                 onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant,
                 successColor = MaterialTheme.colorScheme.primary,
                 errorColor = MaterialTheme.colorScheme.error
@@ -195,67 +173,18 @@ fun InfoRowWithStatus(
     label: String,
     value: String,
     isConfirmed: Boolean,
-    count: Int,
-    description: String,
-    subTitle: String,
     defaultContent: String,
-    isShowDialog: Boolean,
-    onConfirmContent: (String) -> Unit,
-    onConfirmCode: (String) -> Unit,
-    onRecentCode: () -> Unit,
-    updateVisibleDialog: (Boolean) -> Unit,
     onSurfaceVariant: Color,
     successColor: Color,
-    errorColor: Color
+    errorColor: Color,
+    onNavigateToSettings: () -> Unit,
 ) {
-    var currentContent by retain { mutableStateOf(value) }
-    var currentCode by retain { mutableStateOf("") }
-    var isShowRepeatSendCode by remember { mutableStateOf(false) }
-
-    if (isShowDialog) {
-        Dialog(
-            onDismissRequest = {
-                updateVisibleDialog(false)
-                isShowRepeatSendCode = false
-            }
-        ) {
-            ContentDialogSetContent(
-                description = description,
-                title = subTitle,
-                content = currentContent,
-                code = currentCode,
-                count = count,
-                isShowRepeatSendCode = isShowRepeatSendCode,
-                onUpdateContent = {
-                    currentContent = it
-                },
-                onUpdateCode = {
-                    currentCode = it
-                },
-                onCancel = {
-                    updateVisibleDialog(false)
-                    isShowRepeatSendCode = false
-                },
-                onRecentCode = onRecentCode,
-                onConfirmContent = {
-                    onConfirmContent(currentContent)
-                    isShowRepeatSendCode = true
-                },
-                onConfirmCode = {
-                    onConfirmCode(currentCode)
-                }
-            )
-        }
-    }
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                onClick = {
-                    updateVisibleDialog(true)
-                }
+                enabled = value.isBlank(),
+                onClick = onNavigateToSettings
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -282,7 +211,7 @@ fun InfoRowWithStatus(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text =  value.ifBlank { defaultContent },
+                text = value.ifBlank { defaultContent },
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -293,8 +222,10 @@ fun InfoRowWithStatus(
 
             Icon(
                 imageVector = if (isConfirmed) ImageVector.vectorResource(
-                    drawable.check_circle_24dp) else ImageVector.vectorResource(
-                    drawable.close_24dp),
+                    drawable.check_circle_24dp
+                ) else ImageVector.vectorResource(
+                    drawable.close_24dp
+                ),
                 contentDescription = "",
                 modifier = Modifier.size(18.dp),
                 tint = if (isConfirmed) successColor else errorColor
@@ -306,11 +237,23 @@ fun InfoRowWithStatus(
 fun formatPhoneNumber(phone: String): String {
     return when {
         phone.length == 11 && phone.startsWith("7") -> {
-            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${phone.substring(7, 9)}-${phone.substring(9, 11)}"
+            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
+                phone.substring(
+                    7,
+                    9
+                )
+            }-${phone.substring(9, 11)}"
         }
+
         phone.length == 11 && phone.startsWith("8") -> {
-            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${phone.substring(7, 9)}-${phone.substring(9, 11)}"
+            "+7 (${phone.substring(1, 4)}) ${phone.substring(4, 7)}-${
+                phone.substring(
+                    7,
+                    9
+                )
+            }-${phone.substring(9, 11)}"
         }
+
         else -> phone
     }
 }
@@ -396,14 +339,8 @@ fun PreviewUserCard() {
     BillingTheme {
         UserCard(
             account = clientAccount.account,
-            count = 5,
             address = "Россия,край Пермский,р-н Пермский,,д Заборье,ул Зелёная,дом 7,,,,",
-            onConfirmCodeEmail = {},
-            onConfirmCodePhone = {},
-            onUpdateEmail = {},
-            onUpdatePhone = {},
-            onRecentCodeEmail = {},
-            onRecentCodePhone = {}
+            onNavigateToSettings = {}
         )
     }
 }

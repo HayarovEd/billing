@@ -2,17 +2,13 @@ package com.impuls.billing.ui.profile_screen
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +51,7 @@ fun ProfileScreenRoot(
     onNavigateToLogin: () -> Unit,
     onNavigateToMore: (Long) -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
+    onNavigateToSettings: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -78,9 +74,8 @@ fun ProfileScreenRoot(
     ProfileScreenScreen(
         state = state,
         snakeBarHostState = snakeBarHostState,
-        onAction = viewModel::onAction,
         onNavigateToPayment = onNavigateToPayment,
-        onNavigateToMore = onNavigateToMore,
+        onNavigateToSettings = onNavigateToSettings,
         onExitFromApp = {
             activity.finish()
         },
@@ -94,11 +89,10 @@ private fun ProfileScreenScreen(
     modifier: Modifier = Modifier,
     state: ProfileScreenState,
     snakeBarHostState: SnackbarHostState,
-    onAction: (ProfileScreenAction) -> Unit,
     onNavigateToPayment: (String) -> Unit,
-    onNavigateToMore: (Long) -> Unit,
     onExitFromApp: () -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
+    onNavigateToSettings: (Long) -> Unit,
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -160,25 +154,9 @@ private fun ProfileScreenScreen(
                 state.account?.let { acc ->
                     UserCard(
                         account = acc.account,
-                        count = state.count,
                         address = state.clientVGroups?.addresses?.firstOrNull() ?: "",
-                        onUpdatePhone = {
-                            onAction(ProfileScreenAction.UpdatePhone(it))
-                        },
-                        onUpdateEmail = {
-                            onAction(ProfileScreenAction.UpdateEmail(it))
-                        },
-                        onRecentCodeEmail = {
-                            onAction(ProfileScreenAction.ResentCodeEmail)
-                        },
-                        onRecentCodePhone = {
-                            onAction(ProfileScreenAction.ResentCodePhone)
-                        },
-                        onConfirmCodeEmail = {
-                            onAction(ProfileScreenAction.ConfirmEmail(it))
-                        },
-                        onConfirmCodePhone = {
-                            onAction(ProfileScreenAction.ConfirmPhone(it))
+                        onNavigateToSettings = {
+                            onNavigateToSettings(it)
                         }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -332,9 +310,8 @@ private fun Preview() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onAction = {},
+            onNavigateToSettings = {},
             onNavigateToPayment = {},
-            onNavigateToMore = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->}
         )
@@ -431,9 +408,8 @@ private fun Preview1() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onAction = {},
+            onNavigateToSettings = {},
             onNavigateToPayment = {},
-            onNavigateToMore = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->}
         )
@@ -454,9 +430,8 @@ private fun Preview2() {
                 isLoading = true,
             ),
             snakeBarHostState = snackBarState,
-            onAction = {},
+            onNavigateToSettings = {},
             onNavigateToPayment = {},
-            onNavigateToMore = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->}
         )

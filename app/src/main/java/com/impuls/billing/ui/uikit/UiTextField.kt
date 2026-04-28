@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -210,7 +211,7 @@ fun UiTextField3(
     isOnlyDigit: Boolean = false,
     isOnlyLetter: Boolean = false,
     maxLines: Int = 1,
-    textSize: TextUnit = 11.sp,
+    textSize: TextUnit = 8.sp,
     onClickContent: (String) -> Unit,
     onClickTrailingIcon: () -> Unit = {},
 ) {
@@ -241,7 +242,7 @@ fun UiTextField3(
         ),
         keyboardActions = keyboardActions,
         readOnly = readOnly,
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
+       // textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorScheme.onPrimaryContainer),
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier
@@ -255,7 +256,9 @@ fun UiTextField3(
             ) {
                 if (content.isEmpty()) {
                     Text(
-                        modifier = Modifier.align(Alignment.CenterStart),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .align(Alignment.CenterStart),
                         text = label,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontSize = textSize,

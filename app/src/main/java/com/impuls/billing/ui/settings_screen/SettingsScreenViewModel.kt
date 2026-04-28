@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
@@ -56,8 +57,92 @@ class SettingsScreenViewModel(
 
     fun onAction(action: SettingsScreenAction) {
         when (action) {
-            else -> {
+            is SettingsScreenAction.UpdateCheckEmail -> {
+                _state.update { currentState ->
+                    currentState.clientNotices?.let { client ->
+                        val existingNotice = client.notices.find { it.type == action.typeId }
+                        val updatedNotices = if (existingNotice != null) {
+                            client.notices.map { notice ->
+                                if (notice.type == action.typeId) notice.copy(email = action.isCheckEmail) else notice
+                            }
+                        } else {
+                            client.notices + Notice(
+                                descr = "",
+                                email = action.isCheckEmail,
+                                messenger = false,
+                                name = "",
+                                sms = false,
+                                type = action.typeId,
+                                value = "0"
+                            )
+                        }
+                        currentState.copy(
+                            clientNotices = client.copy(
+                                notices = updatedNotices.filter { it.email || it.sms }
+                            )
+                        )
+                    } ?: currentState
+                }
+            }
 
+            is SettingsScreenAction.UpdateCheckSms -> {
+                _state.update { currentState ->
+                    currentState.clientNotices?.let { client ->
+                        val existingNotice = client.notices.find { it.type == action.typeId }
+                        val updatedNotices = if (existingNotice != null) {
+                            client.notices.map { notice ->
+                                if (notice.type == action.typeId) notice.copy(sms = action.isCheckSms) else notice
+                            }
+                        } else {
+                            client.notices + Notice(
+                                descr = "",
+                                email = false,
+                                messenger = false,
+                                name = "",
+                                sms = action.isCheckSms,
+                                type = action.typeId,
+                                value = "0"
+                            )
+                        }
+                        currentState.copy(
+                            clientNotices = client.copy(
+                                notices = updatedNotices.filter { it.email || it.sms }
+                            )
+                        )
+                    } ?: currentState
+                }
+            }
+
+            SettingsScreenAction.UpdateNotices -> {
+
+            }
+
+            is SettingsScreenAction.UpdateValue -> {
+                _state.update { currentState ->
+                    currentState.clientNotices?.let { client ->
+                        val existingNotice = client.notices.find { it.type == action.typeId }
+                        val updatedNotices = if (existingNotice != null) {
+                            client.notices.map { notice ->
+                                if (notice.type == action.typeId) notice.copy(value = action.value) else notice
+                            }
+                        } else {
+                            client.notices + Notice(
+                                descr = "",
+                                email = false,
+                                messenger = false,
+                                name = "",
+                                sms = false,
+                                type = action.typeId,
+                                value = action.value
+                            )
+                        }
+                        currentState.copy(
+                            clientNotices = client.copy(
+                                notices = updatedNotices.filter { it.email || it.sms }
+                            )
+                        )
+                    } ?: currentState
+                }
             }
         }
     }

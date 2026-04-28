@@ -11,6 +11,7 @@ import com.impuls.billing.ui.login_screen.LoginScreenRoot
 import com.impuls.billing.ui.payment_history.HistoryPaymentScreenRoot
 import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
 import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
+import com.impuls.billing.ui.settings_screen.SettingsScreenRoot
 import com.impuls.billing.ui.splash_screen.SplashScreenRoot
 import com.impuls.billing.ui.uikit.PortraitOnly
 import com.impuls.billing.ui.uikit.model.NavigationRoute
@@ -88,6 +89,9 @@ fun NavController(
                             tariffId = tarifId
                         )
                     )
+                },
+                onNavigateToSettings = {
+                    navController.navigate(NavigationRoute.SettingsRoute(it))
                 }
             )
         }
@@ -113,6 +117,14 @@ fun NavController(
 
         composable<NavigationRoute.HistoryPaymentRoute> {
             HistoryPaymentScreenRoot(
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.LoginRoute)
+                }
+            )
+        }
+
+        composable<NavigationRoute.SettingsRoute> {
+            SettingsScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.LoginRoute)
                 }
