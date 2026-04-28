@@ -10,12 +10,12 @@ data class SettingsScreenState(
 )
 
 
-enum class TypeNotice {
-    WARNING_BALANCE,
-    END_PROMISE_PAYMENT,
-    MONTHLY_REPORT,
-    PAYMENT,
-    MONTHLY_REPORT_ACCOUNT_BALANCE,
-    BLOCK_ON,
-    BLOCK_OFF
+enum class TypeNotice(val typeNumber: Int) {
+    WARNING_BALANCE(1),
+    END_PROMISE_PAYMENT(2),
+    MONTHLY_REPORT(3),
+    PAYMENT(4),
+    MONTHLY_REPORT_ACCOUNT_BALANCE(5), //or 6
+    BLOCK_ON(7),
+    BLOCK_OFF(8)
 }

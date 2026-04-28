@@ -6,6 +6,7 @@ import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.model.payment.StatusPayment
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.settings_screen.TypeNotice
 import com.impuls.billing.ui.uikit.UiText.*
 import kotlinx.datetime.number
 
@@ -172,5 +173,17 @@ fun PeriodHistory.asPeriodText(): UiText {
         PeriodHistory.Today -> StringResource(
             R.string.today
         )
+    }
+}
+
+fun TypeNotice.asTypeNoticeText(): UiText {
+    return when (this) {
+        TypeNotice.WARNING_BALANCE -> StringResource(R.string.warning_balance)
+        TypeNotice.END_PROMISE_PAYMENT -> StringResource(R.string.end_promise_payment)
+        TypeNotice.MONTHLY_REPORT -> StringResource(R.string.monthly_report)
+        TypeNotice.PAYMENT -> StringResource(R.string.go_payment)
+        TypeNotice.MONTHLY_REPORT_ACCOUNT_BALANCE -> StringResource(R.string.monthly_report_account)
+        TypeNotice.BLOCK_ON -> StringResource(R.string.user_block_on)
+        TypeNotice.BLOCK_OFF -> StringResource(R.string.user_block_off)
     }
 }

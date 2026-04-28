@@ -140,6 +140,14 @@
     <string name="nothing_finded">А ничего нет!</string>
     <string name="usb_boxes">Дополнительные услуги</string>
     <string name="not_usb_boxes">Дополнительные услуги отсутствуют</string>
+    <string name="warning_balance">Предупреждение о балансе менее</string>
+    <string name="end_promise_payment">Напоминание об окончании обещанного платежа</string>
+    <string name="monthly_report_account">Ежемесячный отчет о состоянии лицевого счета</string>
+    <string name="monthly_report">Ежемесячный счет</string>
+
+    <string name="go_payment">Поступление платежа</string>
+    <string name="user_block_on">Уведомление об установке пользовательской блокировки</string>
+    <string name="user_block_off">Уведомление о снятии пользовательской блокировки</string>
 
     <string-array name="months_nominative">
         <item>январь</item>
