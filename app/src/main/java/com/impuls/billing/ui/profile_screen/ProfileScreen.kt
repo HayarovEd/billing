@@ -433,6 +433,106 @@ private fun Preview1() {
     showSystemUi = true
 )
 @Composable
+private fun Preview1_1() {
+    val snackBarState = remember { SnackbarHostState() }
+
+    val clientAccount = ClientAccount(
+        billDeliveryName = "Email",
+        account = Account(
+            uid = 8273,
+            doctype = 0,
+            billDelivery = BillDeliveryType.MAIL,
+            category = 0,
+            type = UserType.FL,
+            oksm = 643,
+            wrongActive = 0,
+            archive = false,
+            ownerShip = 0,
+            mobileIsConfirmed = false,
+            emailIsConfirmed = false,
+            offerIsAccepted = false,
+            soleProprietor = false,
+            login = "pycutbvk45",
+            password = "342py23854",
+            description = "Не использовать.",
+            name = "Ivanov Ivan Ivanovich",
+            phone = "",
+            fax = "",
+            email = "",
+            mobile = "89026355319",
+            bankName = "",
+            branchBankName = "",
+            treasuryName = "",
+            treasuryAccount = "",
+            bik = "",
+            setti = "",
+            corr = "",
+            kpp = "",
+            inn = "",
+            ogrn = "",
+            okpo = "",
+            okved = "",
+            abonentName = "",
+            abonentSurname = "",
+            abonentPatronymic = ""
+        ),
+        agreements = listOf(
+            Agreement(
+                agrmId = 8220,
+                uid = 8273,
+                operId = 7357,
+                curId = 1,
+                bNotify = 0,
+                vGroups = 20,
+                penaltyMethod = 0,
+                monthBlockDay = 0,
+                balance = 1000.0,
+                credit = 900000.0,
+                promiseCredit = 0.0,
+                installments = 0.0,
+                balanceStatus = 1,
+                friendAgrmId = 0,
+                paymentMethod = PaymentMethodType.ADVANCE,
+                blockDays = 0,
+                blockMonths = 0,
+                orderPayDay = 0,
+                blockOrders = 0,
+                blockAmount = 0.0,
+                ownerId = 0,
+                isDefault = 0,
+                number = "Т_СТ",
+                date = "2017-03-14",
+                closeDon = null,
+                bCheck = "0000-00-00",
+                symbol = "руб",
+                username = "ЯЯ_Биллинг(Т_СТ)",
+                initialBalance = 0.0,
+                code = "5665665"
+            )
+        )
+    )
+
+
+    BillingTheme(darkTheme = true) {
+        ProfileScreenScreen(
+            state = ProfileScreenState(
+                account = clientAccount,
+            ),
+            snakeBarHostState = snackBarState,
+            onNavigateToSettings = {},
+            onNavigateToPayment = {},
+            onExitFromApp = {},
+            onClickPaymentHistory = {_,_,_ ->},
+            isVisibleDialog = false,
+            updateVisibilityDialog = {},
+        )
+    }
+}
+
+@Preview(
+    showSystemUi = true
+)
+@Composable
 private fun Preview2() {
     val snackBarState = remember { SnackbarHostState() }
 

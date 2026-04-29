@@ -126,7 +126,11 @@ fun NavController(
         composable<NavigationRoute.SettingsRoute> {
             SettingsScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.LoginRoute)
+                    navController.navigate(NavigationRoute.LoginRoute) {
+                        popUpTo<NavigationRoute.LoginRoute> {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
