@@ -113,7 +113,6 @@ fun AmountTypeUi(
                         TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
                         TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
                         TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
-                        else -> ""
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
