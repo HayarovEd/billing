@@ -2,11 +2,12 @@ package com.impuls.billing.ui.settings_screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -14,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +43,7 @@ fun ChangePasswordCard(
     isUpdatingPassword: Boolean,
     updateVisibilityDialog: (Boolean) -> Unit,
     onUpdatePassword: (old: String, new: String, confirm: String) -> Unit,
+    onClickLogoff: () -> Unit,
 ) {
     var currentPassword by retain { mutableStateOf("") }
     var newPassword by retain { mutableStateOf("") }
@@ -83,23 +86,47 @@ fun ChangePasswordCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
     ) {
-        Column(
+        Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            OutlinedButton(
+                onClick = onClickLogoff,
+                modifier = Modifier,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.exit_to_app_24dp),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             Button(
                 onClick = {
                    updateVisibilityDialog(true)
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -135,7 +162,8 @@ private fun Preview() {
             isVisibleDialog = false,
             isUpdatingPassword = false,
             updateVisibilityDialog = {},
-            onUpdatePassword = { _, _, _ -> }
+            onUpdatePassword = { _, _, _ -> },
+            onClickLogoff = {},
         )
     }
 }
@@ -148,7 +176,8 @@ private fun Preview1() {
             isVisibleDialog = true,
             isUpdatingPassword = false,
             updateVisibilityDialog = {},
-            onUpdatePassword = { _, _, _ -> }
+            onUpdatePassword = { _, _, _ -> },
+            onClickLogoff = {}
         )
     }
 }

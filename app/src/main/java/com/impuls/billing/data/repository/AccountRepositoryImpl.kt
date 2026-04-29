@@ -27,6 +27,7 @@ import com.impuls.billing.domain.utils.ResultWork
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
@@ -308,6 +309,24 @@ class AccountRepositoryImpl(
                                 oldPassword = oldPassword
                             )
                         )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+    override suspend fun logOut(
+        token: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.delete ("account/logout") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
                     }
                 },
                 data = {

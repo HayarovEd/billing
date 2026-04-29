@@ -21,10 +21,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.impuls.billing.R
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import org.koin.androidx.compose.koinViewModel
 
@@ -37,6 +41,7 @@ fun SettingsScreenRoot(
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     var isVisibleDialog by retain { mutableStateOf(false) }
+    var isVisibleLogOffDialog by retain { mutableStateOf(false) }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsScreenEvent.NavigateEvent -> onNavigateToLogin()
@@ -53,10 +58,14 @@ fun SettingsScreenRoot(
     SettingsScreen(
         state = state,
         isVisibleDialog = isVisibleDialog,
+        isVisibleLogOffDialog = isVisibleLogOffDialog,
         snakeBarHostState = snakeBarHostState,
         onAction = viewModel::onAction,
         updateVisibilityDialog = {
             isVisibleDialog = it
+        },
+        updateVisibilityLogoffDialog = {
+            isVisibleLogOffDialog = it
         }
     )
 }
@@ -66,11 +75,31 @@ private fun SettingsScreen(
     modifier: Modifier = Modifier,
     state: SettingsScreenState,
     isVisibleDialog: Boolean,
+    isVisibleLogOffDialog: Boolean,
     updateVisibilityDialog: (Boolean) -> Unit,
+    updateVisibilityLogoffDialog: (Boolean) -> Unit,
     snakeBarHostState: SnackbarHostState,
     onAction: (SettingsScreenAction) -> Unit,
 ) {
-
+    if (isVisibleLogOffDialog) {
+        Dialog(
+            onDismissRequest = {
+                updateVisibilityLogoffDialog(false)
+            },
+            content = {
+                ContentExitDialog(
+                    title = stringResource(R.string.logoff_profile),
+                    onConfirm = {
+                        updateVisibilityLogoffDialog(false)
+                        onAction(SettingsScreenAction.LogOff)
+                    },
+                    onCancel = {
+                        updateVisibilityLogoffDialog(false)
+                    }
+                )
+            }
+        )
+    }
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
     ) { contentPadding ->
@@ -181,6 +210,9 @@ private fun SettingsScreen(
                                     confirm = confirm
                                 )
                             )
+                        },
+                        onClickLogoff = {
+                            updateVisibilityLogoffDialog(true)
                         }
                     )
                 }
@@ -194,13 +226,55 @@ private fun SettingsScreen(
 @Composable
 private fun Preview() {
     val snackBarState = remember { SnackbarHostState() }
+    val mockClientInfo = com.impuls.billing.domain.model.ClientInfo(
+        email = "example@mail.ru",
+        emailIsConfirmed = true,
+        kontPerson = "Иванов Иван Иванович",
+        mobile = "79001234567",
+        mobileIsConfirmed = true,
+        offerIsAccepted = true,
+        passIsTemporary = false,
+        password = "password",
+        phone = "79001234567",
+        triggerContactDataReminder = false
+    )
+    val mockNotices = listOf(
+        com.impuls.billing.domain.model.Notice(
+            type = 1,
+            name = "Порог предупреждения о балансе",
+            descr = "Уведомление при достижении порога",
+            sms = true,
+            email = true,
+            messenger = false,
+            value = "100"
+        ),
+        com.impuls.billing.domain.model.Notice(
+            type = 3,
+            name = "Ежемесячный отчет",
+            descr = "Отчет за месяц",
+            sms = false,
+            email = true,
+            messenger = false,
+            value = "0"
+        )
+    )
+    val mockState = SettingsScreenState(
+        clientInfo = mockClientInfo,
+        clientNotices = com.impuls.billing.domain.model.ClientNotices(
+            notices = mockNotices,
+            uid = 123
+        ),
+        isLoading = false
+    )
     BillingTheme {
         SettingsScreen(
-            state = SettingsScreenState(),
+            state = mockState,
             snakeBarHostState = snackBarState,
+            isVisibleLogOffDialog = false,
             onAction = {},
             isVisibleDialog = false,
-            updateVisibilityDialog = {}
+            updateVisibilityDialog = {},
+            updateVisibilityLogoffDialog = {}
         )
     }
 }

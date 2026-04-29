@@ -95,7 +95,7 @@
     <string name="payment_error">Ошибка при проведении (платеж оплачен, но при проведении платежа возникла ошибка)</string>
     <string name="sbprpay_desc">1.\tНажмите «Оплатить»\n2.\tВыберите приложение вашего банка, с помощью которого хотите оплатить\n3.\tПодтвердите платеж</string>
     <string name="do_payment">Оплатить</string>
-    <string name="help_phone">Для восстановления логина обратитесь в контактный центр 8–800-000-00-00.</string>
+    <string name="help_phone">Для восстановления логина обратитесь в контактный центр 8–800–000–00–00.</string>
     <string name="need_passport_data">Необходимо назвать паспортные данные лица, на которое оформлен договор</string>
     <string name="ok_">Ок</string>
     <string name="recover_description">Данная форма служит для смены Вашего пароля на случайно сформированный.\n\nИнформация о новом пароле будет передана Вам в СМС-сообщении, отправленном на телефон, указанный в вашем профиле или отправлена на почту.</string>
@@ -160,6 +160,7 @@
     <string name="change_password">Сменить пароль</string>
     <string name="old_passord_incorrect">Неверный текущий пароль</string>
     <string name="passwords_not_equals">Новый пароль не совпал с подтвержденным</string>
+    <string name="logoff_profile">Выйти из профиля</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

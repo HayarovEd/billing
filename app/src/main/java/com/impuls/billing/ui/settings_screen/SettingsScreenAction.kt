@@ -31,4 +31,6 @@ sealed interface SettingsScreenAction {
         val new: String,
         val confirm: String,
     ) : SettingsScreenAction
+
+    data object LogOff: SettingsScreenAction
 }

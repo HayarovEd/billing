@@ -265,6 +265,19 @@ class SettingsScreenViewModel(
                     }
                 )
             }
+
+            SettingsScreenAction.LogOff -> {
+                loadData(
+                    action = {
+                        logOff(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -558,6 +571,30 @@ class SettingsScreenViewModel(
                     .updateState()
                 delay(1000)
             }
+        }
+    }
+
+    private fun logOff(token: String) {
+        _state.value.copy(
+            isLoading = true
+        )
+            .updateState()
+        viewModelScope.launch {
+            when (val result = accountRepository.logOut(token)) {
+                is ResultWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    if (result.data) {
+                        dataStoreRepository.removeBearer()
+                        eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                    } else {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(DataError.Network.UNKNOWN.asUiText()))
+                    }
+                }
+            }
+
         }
     }
 

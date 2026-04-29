@@ -57,4 +57,6 @@ interface AccountRepository {
         oldPassword: String,
         newPassword: String
     ): ResultWork<Boolean, DataError>
+
+    suspend fun logOut(token: String): ResultWork<Boolean, DataError>
 }
