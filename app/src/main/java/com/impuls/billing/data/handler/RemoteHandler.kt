@@ -1,9 +1,7 @@
 package com.impuls.billing.data.handler
 
-import com.impuls.billing.data.remote.ErrorDto
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
-import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException

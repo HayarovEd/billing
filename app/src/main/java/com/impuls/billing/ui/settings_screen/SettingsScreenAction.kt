@@ -25,4 +25,10 @@ sealed interface SettingsScreenAction {
     class UpdateEmail(val email: String): SettingsScreenAction
     data object ResentCodeEmail: SettingsScreenAction
     class ConfirmEmail(val code: String): SettingsScreenAction
+
+    class UpdatePassword(
+        val old: String,
+        val new: String,
+        val confirm: String,
+    ) : SettingsScreenAction
 }

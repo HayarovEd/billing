@@ -16,6 +16,7 @@ import com.impuls.billing.data.remote.requests.CodeRequest
 import com.impuls.billing.data.remote.requests.EmailRequest
 import com.impuls.billing.data.remote.requests.MobilePhoneRequest
 import com.impuls.billing.data.remote.requests.NoticesRequest
+import com.impuls.billing.data.remote.requests.UpdatePasswordRequest
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
@@ -285,6 +286,32 @@ class AccountRepositoryImpl(
                 },
                 data = {
                     it.body<Long>()
+                }
+            )
+        }
+    }
+
+    override suspend fun updatePassword(
+        token: String,
+        oldPassword: String,
+        newPassword: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post ("account/password") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            UpdatePasswordRequest(
+                                newPassword = newPassword,
+                                oldPassword = oldPassword
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
             )
         }

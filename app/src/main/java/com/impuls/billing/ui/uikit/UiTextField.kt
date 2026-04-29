@@ -76,7 +76,7 @@ fun UiTextField(
         },
         enabled = enabled,
         readOnly = readOnly,
-        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary, fontSize = 12.sp),
         isError = isError,
         supportingText = {
             if (isError) {
@@ -99,14 +99,14 @@ fun UiTextField(
                 UiIconButton(
                     icon = trailingIcon,
                     onClick = onClickTrailingIcon,
-                    color = MaterialTheme.colorScheme.primary
+                    color = colorScheme.primary
                 )
             }
         },
         label = {
             Text(
                 text = label,
-                style = Typography.labelSmall
+                style = Typography.labelSmall.copy(fontSize = 10.sp)
             )
         },
         colors = colors()
@@ -188,9 +188,9 @@ fun UiTextField2(
         },
         shape = RoundedCornerShape(30.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            errorBorderColor = MaterialTheme.colorScheme.error,
+            focusedBorderColor = colorScheme.primary,
+            unfocusedBorderColor = colorScheme.outline,
+            errorBorderColor = colorScheme.error,
         )
     )
 }

@@ -51,4 +51,10 @@ interface AccountRepository {
         token: String,
         clientNotices: ClientNotices
     ): ResultWork<Long, DataError>
+
+    suspend fun updatePassword(
+        token: String,
+        oldPassword: String,
+        newPassword: String
+    ): ResultWork<Boolean, DataError>
 }

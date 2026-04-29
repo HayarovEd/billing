@@ -14,7 +14,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +36,7 @@ fun SettingsScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    var isVisibleDialog by retain { mutableStateOf(false) }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsScreenEvent.NavigateEvent -> onNavigateToLogin()
@@ -48,8 +52,12 @@ fun SettingsScreenRoot(
 
     SettingsScreen(
         state = state,
+        isVisibleDialog = isVisibleDialog,
         snakeBarHostState = snakeBarHostState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        updateVisibilityDialog = {
+            isVisibleDialog = it
+        }
     )
 }
 
@@ -57,9 +65,12 @@ fun SettingsScreenRoot(
 private fun SettingsScreen(
     modifier: Modifier = Modifier,
     state: SettingsScreenState,
+    isVisibleDialog: Boolean,
+    updateVisibilityDialog: (Boolean) -> Unit,
     snakeBarHostState: SnackbarHostState,
     onAction: (SettingsScreenAction) -> Unit,
 ) {
+
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
     ) { contentPadding ->
@@ -81,7 +92,7 @@ private fun SettingsScreen(
                     .fillMaxSize()
                     .padding(15.dp)
             ) {
-                state.clientInfo?.let {clientInfo->
+                state.clientInfo?.let { clientInfo ->
                     ContactsCard(
                         mobile = clientInfo.mobile,
                         mobileIsConfirmed = clientInfo.mobileIsConfirmed,
@@ -89,24 +100,32 @@ private fun SettingsScreen(
                         email = clientInfo.email,
                         count = state.count,
                         onUpdatePhone = {
-                            onAction(SettingsScreenAction.UpdatePhone(
-                                phone = it
-                            ))
+                            onAction(
+                                SettingsScreenAction.UpdatePhone(
+                                    phone = it
+                                )
+                            )
                         },
                         onUpdateEmail = {
-                            onAction(SettingsScreenAction.UpdateEmail(
-                                email = it
-                            ))
+                            onAction(
+                                SettingsScreenAction.UpdateEmail(
+                                    email = it
+                                )
+                            )
                         },
                         onConfirmCodePhone = {
-                            onAction(SettingsScreenAction.ConfirmPhone(
-                                code = it
-                            ))
+                            onAction(
+                                SettingsScreenAction.ConfirmPhone(
+                                    code = it
+                                )
+                            )
                         },
                         onConfirmCodeEmail = {
-                            onAction(SettingsScreenAction.ConfirmEmail(
-                                code = it
-                            ))
+                            onAction(
+                                SettingsScreenAction.ConfirmEmail(
+                                    code = it
+                                )
+                            )
                         },
                         onRecentCodePhone = {
                             onAction(SettingsScreenAction.ResentCodeEmail)
@@ -115,34 +134,55 @@ private fun SettingsScreen(
                             onAction(SettingsScreenAction.ResentCodePhone)
                         }
                     )
-                    state.clientNotices?.let { clientNotices->
+                    state.clientNotices?.let { clientNotices ->
                         Spacer(modifier = Modifier.height(12.dp))
                         NoticesCard(
                             clientInfo = clientInfo,
                             clientNotices = clientNotices,
-                            updateCheckSms = { checkSms, type->
-                                onAction(SettingsScreenAction.UpdateCheckSms(
-                                    isCheckSms = checkSms,
-                                    typeId = type
-                                ))
+                            updateCheckSms = { checkSms, type ->
+                                onAction(
+                                    SettingsScreenAction.UpdateCheckSms(
+                                        isCheckSms = checkSms,
+                                        typeId = type
+                                    )
+                                )
                             },
-                            updateCheckEmail = { checkEmail, type->
-                                onAction(SettingsScreenAction.UpdateCheckEmail(
-                                    isCheckEmail = checkEmail,
-                                    typeId = type
-                                ))
+                            updateCheckEmail = { checkEmail, type ->
+                                onAction(
+                                    SettingsScreenAction.UpdateCheckEmail(
+                                        isCheckEmail = checkEmail,
+                                        typeId = type
+                                    )
+                                )
                             },
-                            updateVolume = { value, type->
-                                onAction(SettingsScreenAction.UpdateValue(
-                                    value = value,
-                                    typeId = type
-                                ))
+                            updateVolume = { value, type ->
+                                onAction(
+                                    SettingsScreenAction.UpdateValue(
+                                        value = value,
+                                        typeId = type
+                                    )
+                                )
                             },
                             onClickSave = {
                                 onAction(SettingsScreenAction.UpdateNotices)
                             }
                         )
                     }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    ChangePasswordCard(
+                        isVisibleDialog = isVisibleDialog,
+                        isUpdatingPassword = state.isUpdatingPassword,
+                        updateVisibilityDialog = updateVisibilityDialog,
+                        onUpdatePassword = { old, new, confirm ->
+                            onAction(
+                                SettingsScreenAction.UpdatePassword(
+                                    old = old,
+                                    new = new,
+                                    confirm = confirm
+                                )
+                            )
+                        }
+                    )
                 }
 
             }
@@ -158,7 +198,9 @@ private fun Preview() {
         SettingsScreen(
             state = SettingsScreenState(),
             snakeBarHostState = snackBarState,
-            onAction = {}
+            onAction = {},
+            isVisibleDialog = false,
+            updateVisibilityDialog = {}
         )
     }
 }

@@ -104,6 +104,17 @@ fun DataError.asUiText(): UiText {
                 R.string.success_update_notices
             )
         }
+
+        DataError.ValidationError.OLD_PASSWORD_INCORRECT -> {
+            StringResource(
+                R.string.old_passord_incorrect
+            )
+        }
+        DataError.ValidationError.PASSWORDS_NOT_EQUALS -> {
+            StringResource(
+                R.string.passwords_not_equals
+            )
+        }
     }
 }
 

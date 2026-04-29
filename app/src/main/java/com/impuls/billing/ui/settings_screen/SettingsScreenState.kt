@@ -10,6 +10,7 @@ data class SettingsScreenState(
     val count: Int = 0,
     val phoneRet: Long? = null,
     val emailRet: Long? = null,
+    val isUpdatingPassword: Boolean = false,
 )
 
 

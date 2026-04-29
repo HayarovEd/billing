@@ -247,6 +247,24 @@ class SettingsScreenViewModel(
                     }
                 )
             }
+
+            is SettingsScreenAction.UpdatePassword -> {
+                loadData(
+                    action = {
+                        updatePassword(
+                            token = it,
+                            new = action.new,
+                            old = action.old,
+                            confirm = action.confirm
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(SettingsScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -471,6 +489,57 @@ class SettingsScreenViewModel(
                         loadIntitalData(token)
                     }
                 }
+            }
+        }
+
+    }
+
+    private fun updatePassword(
+        token: String,
+        old: String,
+        new: String,
+        confirm: String
+    ) {
+        _state.value.clientInfo?.let { info ->
+            viewModelScope.launch {
+                _state.value.copy(
+                    isUpdatingPassword = true
+                )
+                    .updateState()
+                if (old != info.password) {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(DataError.ValidationError.OLD_PASSWORD_INCORRECT.asUiText()))
+                    _state.value.copy(
+                        isUpdatingPassword = false
+                    )
+                        .updateState()
+                    return@launch
+                }
+                if (new != confirm) {
+                    eventChannel.send(SettingsScreenEvent.OnMessage(DataError.ValidationError.PASSWORDS_NOT_EQUALS.asUiText()))
+                    _state.value.copy(
+                        isUpdatingPassword = false
+                    )
+                        .updateState()
+                    return@launch
+                }
+                when (val result = accountRepository.updatePassword(
+                    token = token,
+                    oldPassword = old,
+                    newPassword = new
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(SettingsScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        loadIntitalData(token)
+                        eventChannel.send(SettingsScreenEvent.OnMessage(DataError.SuccessWork.SUCCESS_UPDATE_PASSWORD.asUiText()))
+                    }
+                }
+                _state.value.copy(
+                    isUpdatingPassword = false
+                )
+                    .updateState()
             }
         }
 

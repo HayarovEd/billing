@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
 import org.koin.androidx.compose.koinViewModel
@@ -57,6 +59,7 @@ fun ProfileScreenRoot(
     val snakeBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val activity = context as Activity
+    var isVisibleDialog by retain { mutableStateOf(false) }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ProfileScreenEvent.OnMessage -> snakeBarHostState.showSnackbar(
@@ -74,12 +77,16 @@ fun ProfileScreenRoot(
     ProfileScreenScreen(
         state = state,
         snakeBarHostState = snakeBarHostState,
+        isVisibleDialog = isVisibleDialog,
         onNavigateToPayment = onNavigateToPayment,
         onNavigateToSettings = onNavigateToSettings,
         onExitFromApp = {
             activity.finish()
         },
-        onClickPaymentHistory = onClickPaymentHistory
+        onClickPaymentHistory = onClickPaymentHistory,
+        updateVisibilityDialog = {
+            isVisibleDialog = it
+        }
     )
 }
 
@@ -89,6 +96,8 @@ private fun ProfileScreenScreen(
     modifier: Modifier = Modifier,
     state: ProfileScreenState,
     snakeBarHostState: SnackbarHostState,
+    isVisibleDialog: Boolean,
+    updateVisibilityDialog: (Boolean) -> Unit,
     onNavigateToPayment: (String) -> Unit,
     onExitFromApp: () -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
@@ -313,7 +322,9 @@ private fun Preview() {
             onNavigateToSettings = {},
             onNavigateToPayment = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->}
+            onClickPaymentHistory = {_,_,_ ->},
+            isVisibleDialog = false,
+            updateVisibilityDialog = {},
         )
     }
 }
@@ -411,7 +422,9 @@ private fun Preview1() {
             onNavigateToSettings = {},
             onNavigateToPayment = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->}
+            onClickPaymentHistory = {_,_,_ ->},
+            isVisibleDialog = false,
+            updateVisibilityDialog = {},
         )
     }
 }
@@ -433,7 +446,9 @@ private fun Preview2() {
             onNavigateToSettings = {},
             onNavigateToPayment = {},
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->}
+            onClickPaymentHistory = {_,_,_ ->},
+            isVisibleDialog = true,
+            updateVisibilityDialog = {},
         )
     }
 }

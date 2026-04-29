@@ -39,7 +39,7 @@ import androidx.compose.ui.window.Dialog
 import com.impuls.billing.R.drawable
 import com.impuls.billing.R.string
 import com.impuls.billing.domain.utils.formatPhoneNumber
-import com.impuls.billing.ui.profile_screen.ContentDialogSetContent
+import com.impuls.billing.ui.uikit.ContentDialogSetContent
 import com.impuls.billing.ui.theme.BillingTheme
 
 @Composable

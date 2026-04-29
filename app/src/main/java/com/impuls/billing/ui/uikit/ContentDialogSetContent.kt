@@ -1,4 +1,4 @@
-package com.impuls.billing.ui.profile_screen
+package com.impuls.billing.ui.uikit
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
 import com.impuls.billing.ui.theme.BillingTheme
-import com.impuls.billing.ui.uikit.UiTextField
 
 @Composable
 fun ContentDialogSetContent(
@@ -174,7 +173,9 @@ fun ContentDialogSetContent(
                     )
                 ) {
                     Icon(
-                        imageVector = if (isShowRepeatSendCode) ImageVector.vectorResource(R.drawable.check_circle_24dp) else ImageVector.vectorResource(R.drawable.save_24dp),
+                        imageVector = if (isShowRepeatSendCode) ImageVector.vectorResource(R.drawable.check_circle_24dp) else ImageVector.vectorResource(
+                            R.drawable.save_24dp
+                        ),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )
@@ -237,14 +238,15 @@ private fun RowWithTextField(
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
     ) {
         Text(
+            modifier = Modifier.weight(1f),
             text = "${title}:",
             style = MaterialTheme.typography.labelMedium
         )
         Spacer(modifier = modifier.width(3.dp))
         UiTextField(
+            modifier = Modifier.weight(1.5f),
             content = content,
             label = "",
             onClickContent = { onUpdateContent(it) }
@@ -363,6 +365,156 @@ fun ContentExitDialog(
     }
 }
 
+@Composable
+fun ContentDialogUpdatePassword(
+    modifier: Modifier = Modifier,
+    isUpdatingPassword: Boolean,
+    currentPassword: String,
+    newPassword: String,
+    confirmPassword: String,
+    onUpdateCurrentPassword: (String) -> Unit,
+    onUpdateNewPassword: (String) -> Unit,
+    onUpdateConfirmPassword: (String) -> Unit,
+    onUpdatePassword: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp
+        ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                RowWithTextField(
+                    title = stringResource(R.string.current_password),
+                    content = currentPassword,
+                    onUpdateContent = { onUpdateCurrentPassword(it) }
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                RowWithTextField(
+                    title = stringResource(R.string.new_password),
+                    content = newPassword,
+                    onUpdateContent = { onUpdateNewPassword(it) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                RowWithTextField(
+                    title = stringResource(R.string.confirm_password),
+                    content = confirmPassword,
+                    onUpdateContent = { onUpdateConfirmPassword(it) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Кнопки действий
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Кнопка Отмена
+                OutlinedButton(
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.close_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.cancel),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
+                // Кнопка Подтвердить/Сохранить
+                Button(
+                    onClick = onUpdatePassword,
+                    modifier = Modifier.weight(1f),
+                    enabled = !isUpdatingPassword
+                            && currentPassword.isNotBlank()
+                            && newPassword.isNotBlank()
+                            && confirmPassword.isNotBlank(),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 4.dp
+                    )
+                ) {
+                    if (isUpdatingPassword) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.reload_121122),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.check_circle_24dp),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.replace),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -427,8 +579,6 @@ private fun Preview3() {
 }
 
 
-
-
 @Preview
 @Composable
 private fun Preview4() {
@@ -437,6 +587,42 @@ private fun Preview4() {
             title = "Номер телефона",
             onCancel = {},
             onConfirm = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview5() {
+    BillingTheme {
+        ContentDialogUpdatePassword(
+            isUpdatingPassword = false,
+            currentPassword = "1234",
+            newPassword = "234",
+            confirmPassword = "",
+            onCancel = {},
+            onUpdatePassword = {},
+            onUpdateNewPassword = {},
+            onUpdateConfirmPassword = {},
+            onUpdateCurrentPassword = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview6() {
+    BillingTheme {
+        ContentDialogUpdatePassword(
+            isUpdatingPassword = true,
+            currentPassword = "1234",
+            newPassword = "234",
+            confirmPassword = "",
+            onCancel = {},
+            onUpdatePassword = {},
+            onUpdateNewPassword = {},
+            onUpdateConfirmPassword = {},
+            onUpdateCurrentPassword = {}
         )
     }
 }
