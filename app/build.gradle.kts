@@ -91,4 +91,7 @@ dependencies {
 
 
     implementation(libs.compose)
+
+    //shimmer
+    implementation(libs.compose.shimmer)
 }

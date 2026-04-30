@@ -90,8 +90,19 @@ fun NavController(
                         )
                     )
                 },
-                onNavigateToSettings = {
-                    navController.navigate(NavigationRoute.SettingsRoute(it))
+                onNavigateToSettings = { uid ->
+                    navController.navigate(
+                        NavigationRoute.SettingsRoute(
+                            userId = uid,
+                        )
+                    )
+                },
+                onNavigateToBlocking = {
+                    navController.navigate(
+                        NavigationRoute.BlockingRoute(
+                            vgId = it
+                        )
+                    )
                 }
             )
         }
@@ -133,6 +144,10 @@ fun NavController(
                     }
                 }
             )
+        }
+
+        composable<NavigationRoute.BlockingRoute> {
+
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,17 +13,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,96 +48,200 @@ import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.model.ModifierData
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.asTypeBlockVGroupText
 import kotlin.random.Random
 
 @Composable
 fun TarifCardFL(
     modifier: Modifier = Modifier,
     clientVroup: ClientVroup,
+    onClickUnblock: () -> Unit,
 ) {
+    val containerColorColor = when (clientVroup.blocked) {
+        TypeBlockVGroup.UNBLOCKED -> MaterialTheme.colorScheme.surface
+        TypeBlockVGroup.USER_BLOCKED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+        TypeBlockVGroup.ADMIN_BLOCKED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+        TypeBlockVGroup.OFF_ACTIVE -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    }
+    var widthCard by remember { mutableIntStateOf(0) }
+    var heightCard by remember { mutableIntStateOf(0) }
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .onSizeChanged { size ->
+                widthCard = (size.width)
+                heightCard = (size.height)
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = containerColorColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Box( modifier = Modifier
+            .fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.size(64.dp)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Text(
-                                modifier = modifier.fillMaxWidth(),
-                                text = "${clientVroup.speed}\n${stringResource(R.string.unit_m_s)}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = clientVroup.tarifDescr,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = clientVroup.agentDescr,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(64.dp)
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Text(
+                                    modifier = modifier.fillMaxWidth(),
+                                    text = "${clientVroup.speed}\n${stringResource(R.string.unit_m_s)}",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = clientVroup.tarifDescr,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = clientVroup.agentDescr,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                if (clientVroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Button(
+                                        onClick = onClickUnblock,
+                                        modifier = Modifier
+                                            .height(48.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.unlocked_black),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                                if (clientVroup.blocked == TypeBlockVGroup.UNBLOCKED) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Button(
+                                        onClick = onClickUnblock,
+                                        modifier = Modifier
+                                            .height(48.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.lock_padlock),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+
+                           /* if (clientVroup.blocked!= TypeBlockVGroup.UNBLOCKED) {
+                                Text(
+                                    text = clientVroup.blocked.asTypeBlockVGroupText().asString(),
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }*/
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.abonent_price, clientVroup.serviceRent),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            if (clientVroup.blocked!= TypeBlockVGroup.UNBLOCKED) {
+                val color = MaterialTheme.colorScheme.errorContainer
+                val textColor = MaterialTheme.colorScheme.onErrorContainer
+                val textMeasurer = rememberTextMeasurer()
+                val measuredText =
+                    textMeasurer.measure(
+                        AnnotatedString(clientVroup.blocked.asTypeBlockVGroupText().asString()),
+                        style = TextStyle(fontSize = 10.sp, color = textColor),
+                    )
+
+                Canvas(modifier = Modifier
+                    .fillMaxWidth()
+                ) {
+                    val pathWidth = heightCard * 0.2f
+                    val path = Path().apply {
+                        moveTo(widthCard - pathWidth - heightCard * 0.4f, 0f)
+                        lineTo(widthCard - heightCard * 0.4f, 0f)
+                        lineTo(widthCard.toFloat(), heightCard * 0.40f)
+                        lineTo(widthCard.toFloat(), heightCard * 0.4f + pathWidth)
+                        lineTo(widthCard - pathWidth - heightCard * 0.4f, 0f)
+                    }
+                    drawPath(
+                        path = path,
+                        color = color
+                    )
+                    val xM = (widthCard - pathWidth*0.5f - heightCard * 0.4f + widthCard)/2 - measuredText.size.width/2
+                    val yM = (0f + heightCard * 0.4f)/2
+                    rotate(degrees = 45f, pivot =  Offset(xM+measuredText.size.width/2, yM)) {
+                        drawText(
+                            measuredText,
+                            topLeft = Offset(xM, yM)
                         )
                     }
                 }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.abonent_price, clientVroup.serviceRent),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
@@ -132,7 +254,7 @@ private fun Preview() {
         ClientVroup(
             agrmId = 45,
             vgId = it.toLong(),
-            blocked = it % 2 == 0,
+            blocked = TypeBlockVGroup.UNBLOCKED,
             tarifId = it * 10L,
             tarifDescr = "Просто - 100 (Импульс) 1000 руб",
             login = "login $it",
@@ -149,7 +271,98 @@ private fun Preview() {
     }
     BillingTheme {
         TarifCardFL(
-            clientVroup = vgroups.first()
+            clientVroup = vgroups.first(),
+            onClickUnblock = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview1() {
+    val vgroups = (1..1).map {
+        ClientVroup(
+            agrmId = 45,
+            vgId = it.toLong(),
+            blocked = TypeBlockVGroup.USER_BLOCKED,
+            tarifId = it * 10L,
+            tarifDescr = "Просто - 100 (Импульс) 1000 руб",
+            login = "login $it",
+            serviceVolume = 1000L,
+            serviceRent = 500.0,
+            addresses = emptyList(),
+            speed = 100,
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
+            currentModifier = ModifierData(
+                type = "ddds",
+                value = Random.nextDouble(0.8, 1.0),
+            )
+        )
+    }
+    BillingTheme {
+        TarifCardFL(
+            clientVroup = vgroups.first(),
+            onClickUnblock = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview2() {
+    val vgroups = (1..1).map {
+        ClientVroup(
+            agrmId = 45,
+            vgId = it.toLong(),
+            blocked = TypeBlockVGroup.ADMIN_BLOCKED,
+            tarifId = it * 10L,
+            tarifDescr = "Просто - 100 (Импульс) 1000 руб",
+            login = "login $it",
+            serviceVolume = 1000L,
+            serviceRent = 500.0,
+            addresses = emptyList(),
+            speed = 100,
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
+            currentModifier = ModifierData(
+                type = "ddds",
+                value = Random.nextDouble(0.8, 1.0),
+            )
+        )
+    }
+    BillingTheme {
+        TarifCardFL(
+            clientVroup = vgroups.first(),
+            onClickUnblock = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview3() {
+    val vgroups = (1..1).map {
+        ClientVroup(
+            agrmId = 45,
+            vgId = it.toLong(),
+            blocked = TypeBlockVGroup.OFF_ACTIVE,
+            tarifId = it * 10L,
+            tarifDescr = "Просто - 100 (Импульс) 1000 руб",
+            login = "login $it",
+            serviceVolume = 1000L,
+            serviceRent = 500.0,
+            addresses = emptyList(),
+            speed = 100,
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
+            currentModifier = ModifierData(
+                type = "ddds",
+                value = Random.nextDouble(0.8, 1.0),
+            )
+        )
+    }
+    BillingTheme {
+        TarifCardFL(
+            clientVroup = vgroups.first(),
+            onClickUnblock = {}
         )
     }
 }

@@ -5,6 +5,7 @@ import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.HistoryStatusPayment
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.domain.model.payment.StatusPayment
 import kotlinx.datetime.DateTimeUnit
@@ -91,6 +92,16 @@ fun convertToHistoryStatusPayment(number: Long): HistoryStatusPayment {
     }
 }
 
+fun convertToTypeBlockVGroup(number: Long): TypeBlockVGroup {
+    return when (number) {
+        0L -> TypeBlockVGroup.UNBLOCKED
+        2L -> TypeBlockVGroup.USER_BLOCKED
+        3L -> TypeBlockVGroup.ADMIN_BLOCKED
+        10L -> TypeBlockVGroup.OFF_ACTIVE
+        else -> TypeBlockVGroup.OFF_ACTIVE
+    }
+}
+
 @SuppressLint("DefaultLocale")
 fun LocalDate.toBillingFormat(): String {
     return "${this.year}-${String.format("%02d",this.month.number)}-${String.format("%02d",day)}"
@@ -139,7 +150,7 @@ fun Double.roundTo(decimals: Int): Double {
 }
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-fun FromBillingToLocalDateTime(dateTimeString: String): LocalDateTime {
+fun fromBillingToLocalDateTime(dateTimeString: String): LocalDateTime {
 
     val format: DateTimeFormat<LocalDateTime> = LocalDateTime.Format {
         byUnicodePattern("yyyy-MM-dd HH:mm:ss")

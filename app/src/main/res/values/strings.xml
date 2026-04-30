@@ -161,6 +161,9 @@
     <string name="old_passord_incorrect">Неверный текущий пароль</string>
     <string name="passwords_not_equals">Новый пароль не совпал с подтвержденным</string>
     <string name="logoff_profile">Выйти из профиля</string>
+    <string name="off_active">Отключена</string>
+    <string name="blocked_admin">Заблокирована</string>
+    <string name="blocked_user">Приостановлена</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

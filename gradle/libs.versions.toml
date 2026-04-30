@@ -1,6 +1,7 @@
 [versions]
 agp = "9.1.1"
 compose = "2.10.1"
+composeShimmer = "1.4.0"
 coreKtx = "1.18.0"
 jsoup = "1.22.2"
 junit = "4.13.2"
@@ -21,6 +22,7 @@ coil-compose = "2.7.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
+compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "composeShimmer" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

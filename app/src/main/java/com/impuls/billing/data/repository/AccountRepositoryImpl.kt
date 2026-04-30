@@ -4,13 +4,14 @@ import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.toClientAccount
 import com.impuls.billing.data.mapper.toClientInfo
 import com.impuls.billing.data.mapper.toClientNotices
-import com.impuls.billing.data.mapper.toClientVroup
+import com.impuls.billing.data.mapper.toClientVGroup
 import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.SuccessDto
 import com.impuls.billing.data.remote.SuccessRecordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.notices.ClientNoticesDto
+import com.impuls.billing.data.remote.requests.BlockingRequest
 import com.impuls.billing.data.remote.requests.ClientNoticesRequest
 import com.impuls.billing.data.remote.requests.CodeRequest
 import com.impuls.billing.data.remote.requests.EmailRequest
@@ -36,6 +37,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
 class AccountRepositoryImpl(
     private val client: HttpClient,
@@ -213,7 +216,7 @@ class AccountRepositoryImpl(
                     }
                 },
                 data = {
-                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
+                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVGroup() }
                 }
             )
         }
@@ -335,4 +338,35 @@ class AccountRepositoryImpl(
             )
         }
     }
+
+    override suspend fun blocking(
+        token: String,
+        vgId: Long,
+        agrmId: Long,
+        changeTime: LocalDate,
+        blkReq: Int,
+    ): ResultWork<Long, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post ("block/rasp") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            BlockingRequest(
+                                agrmId = agrmId,
+                                blkReq = blkReq,
+                                changeTime = "${changeTime.year}-${changeTime.month.number}-${changeTime.day}",
+                                vgId = vgId
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessRecordDto>().recordNumber
+                }
+            )
+        }
+    }
+
 }

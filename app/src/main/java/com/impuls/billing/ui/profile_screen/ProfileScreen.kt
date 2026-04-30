@@ -38,7 +38,10 @@ import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
 import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.PaymentMethodType
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ContentExitDialog
@@ -54,6 +57,7 @@ fun ProfileScreenRoot(
     onNavigateToMore: (Long) -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
     onNavigateToSettings: (Long) -> Unit,
+    onNavigateToBlocking: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -86,7 +90,8 @@ fun ProfileScreenRoot(
         onClickPaymentHistory = onClickPaymentHistory,
         updateVisibilityDialog = {
             isVisibleDialog = it
-        }
+        },
+        onNavigateToBlocking = onNavigateToBlocking
     )
 }
 
@@ -102,6 +107,7 @@ private fun ProfileScreenScreen(
     onExitFromApp: () -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
     onNavigateToSettings: (Long) -> Unit,
+    onNavigateToBlocking: (Long) -> Unit,
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -213,7 +219,10 @@ private fun ProfileScreenScreen(
                             state.clientVGroups?.let {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 TarifCardFL(
-                                    clientVroup = it
+                                    clientVroup = it,
+                                    onClickUnblock = {
+                                        onNavigateToBlocking(it.vgId)
+                                    }
                                 )
                             }
                             Spacer(modifier = Modifier.height(12.dp))
@@ -319,12 +328,13 @@ private fun Preview() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {},
+            onNavigateToSettings = {_ ->},
             onNavigateToPayment = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->},
             isVisibleDialog = false,
             updateVisibilityDialog = {},
+            onNavigateToBlocking = {}
         )
     }
 }
@@ -412,19 +422,39 @@ private fun Preview1() {
         )
     )
 
+    val vgroup = listOf(ClientVroup(
+        agrmId = 11,
+        vgId = 1000,
+        blocked = TypeBlockVGroup.UNBLOCKED,
+        tarifId = 107,
+        tarifDescr = "descr",
+        agentDescr = "",
+        login = "login",
+        speed = 5000,
+        serviceVolume = 0,
+        serviceRent = 700.0,
+        currentModifier = ModifierData(
+            type = "TODO()",
+            value = 1.0
+        ),
+        addresses = listOf()
+    ))
+
 
     BillingTheme {
         ProfileScreenScreen(
             state = ProfileScreenState(
                 account = clientAccount,
+                vGroups = vgroup
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {},
+            onNavigateToSettings = {_->},
             onNavigateToPayment = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->},
             isVisibleDialog = false,
             updateVisibilityDialog = {},
+            onNavigateToBlocking = {}
         )
     }
 }
@@ -519,12 +549,13 @@ private fun Preview1_1() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {},
+            onNavigateToSettings = {_->},
             onNavigateToPayment = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->},
             isVisibleDialog = false,
             updateVisibilityDialog = {},
+            onNavigateToBlocking = {}
         )
     }
 }
@@ -543,12 +574,13 @@ private fun Preview2() {
                 isLoading = true,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {},
+            onNavigateToSettings = {_ ->},
             onNavigateToPayment = {},
             onExitFromApp = {},
             onClickPaymentHistory = {_,_,_ ->},
             isVisibleDialog = true,
             updateVisibilityDialog = {},
+            onNavigateToBlocking = {},
         )
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.ui.theme.BillingTheme
 
 
@@ -35,10 +36,7 @@ fun TariffCardUL(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (data.blocked)
-                MaterialTheme.colorScheme.surfaceVariant
-            else
-                MaterialTheme.colorScheme.surface
+            containerColor =  MaterialTheme.colorScheme.surface
         ),
         border = BorderStroke(
             width = if (isSelected) 2.dp else 0.dp,
@@ -63,7 +61,7 @@ fun TariffCardUL(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                if (data.blocked) {
+                if (data.blocked!= TypeBlockVGroup.UNBLOCKED) {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
@@ -133,7 +131,7 @@ fun TariffListScreenUL() {
     val sampleData = ClientVroup(
         agrmId = 8220,
         vgId = 9022,
-        blocked = false,
+        blocked = TypeBlockVGroup.UNBLOCKED,
         tarifId = 108,
         tarifDescr = "Для подключения Телинт (просто 50)",
         login = "tb02376k93",

@@ -31,9 +31,13 @@ sealed class NavigationRoute {
 
     @Serializable
     data class SettingsRoute(
-        val userId: Long
+        val userId: Long,
     ) : NavigationRoute()
 
+    @Serializable
+    data class BlockingRoute(
+        val vgId: Long,
+    ) : NavigationRoute()
 
 
 }

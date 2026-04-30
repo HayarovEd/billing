@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.model.ModifierData
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
@@ -144,7 +145,7 @@ private fun Preview() {
         ClientVroup(
             agrmId = 45,
             vgId = it.toLong(),
-            blocked = it % 2 == 0,
+            blocked = TypeBlockVGroup.UNBLOCKED,
             tarifId = it * 10L,
             tarifDescr = "$it",
             login = "login $it",
@@ -180,7 +181,7 @@ private fun Preview1() {
         ClientVroup(
             agrmId = 45,
             vgId = it.toLong(),
-            blocked = it % 2 == 0,
+            blocked = TypeBlockVGroup.USER_BLOCKED,
             tarifId = it * 10L,
             tarifDescr = "$it",
             login = "login $it",

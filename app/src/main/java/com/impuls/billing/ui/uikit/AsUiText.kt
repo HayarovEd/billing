@@ -3,6 +3,7 @@ package com.impuls.billing.ui.uikit
 import android.annotation.SuppressLint
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.payment.StatusPayment
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
@@ -202,5 +203,14 @@ fun TypeNotice.asTypeNoticeText(): UiText {
         TypeNotice.MONTHLY_REPORT_ACCOUNT_BALANCE -> StringResource(R.string.monthly_report_account)
         TypeNotice.BLOCK_ON -> StringResource(R.string.user_block_on)
         TypeNotice.BLOCK_OFF -> StringResource(R.string.user_block_off)
+    }
+}
+
+fun TypeBlockVGroup.asTypeBlockVGroupText(): UiText {
+    return when (this) {
+        TypeBlockVGroup.UNBLOCKED -> DynamicString("")
+        TypeBlockVGroup.USER_BLOCKED -> StringResource(R.string.blocked_user)
+        TypeBlockVGroup.ADMIN_BLOCKED -> StringResource(R.string.blocked_admin)
+        TypeBlockVGroup.OFF_ACTIVE -> StringResource(R.string.off_active)
     }
 }

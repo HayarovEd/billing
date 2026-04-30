@@ -4,7 +4,7 @@ package com.impuls.billing.domain.model
 data class ClientVroup(
     val agrmId: Long,
     val vgId: Long,
-    val blocked: Boolean,
+    val blocked: TypeBlockVGroup,
     val tarifId: Long,
     val tarifDescr: String,
     val agentDescr: String,

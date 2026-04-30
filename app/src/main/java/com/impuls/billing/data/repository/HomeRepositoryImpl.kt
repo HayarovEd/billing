@@ -1,7 +1,7 @@
 package com.impuls.billing.data.repository
 
 import com.impuls.billing.data.handler.handleResponse
-import com.impuls.billing.data.mapper.toClientVroup
+import com.impuls.billing.data.mapper.toClientVGroup
 import com.impuls.billing.data.mapper.toVgroupUsbBox
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.connected_usb_box.VgroupUsbBoxDto
@@ -44,7 +44,7 @@ class HomeRepositoryImpl(
                     }
                 },
                 data = {
-                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVroup() }
+                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVGroup() }
                 }
             )
         }

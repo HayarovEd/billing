@@ -1,5 +1,4 @@
-package com.impuls.billing.ui.uikit.model
-
+package com.impuls.billing.domain.model
 
 data class ResultLogin (
     val token: String

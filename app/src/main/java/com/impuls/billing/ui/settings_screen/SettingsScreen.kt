@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.settings_screen
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,6 +43,7 @@ fun SettingsScreenRoot(
     val context = LocalContext.current
     var isVisibleDialog by retain { mutableStateOf(false) }
     var isVisibleLogOffDialog by retain { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsScreenEvent.NavigateEvent -> onNavigateToLogin()
@@ -57,6 +59,7 @@ fun SettingsScreenRoot(
 
     SettingsScreen(
         state = state,
+        scrollState = scrollState,
         isVisibleDialog = isVisibleDialog,
         isVisibleLogOffDialog = isVisibleLogOffDialog,
         snakeBarHostState = snakeBarHostState,
@@ -73,6 +76,7 @@ fun SettingsScreenRoot(
 @Composable
 private fun SettingsScreen(
     modifier: Modifier = Modifier,
+    scrollState: ScrollState,
     state: SettingsScreenState,
     isVisibleDialog: Boolean,
     isVisibleLogOffDialog: Boolean,
@@ -117,7 +121,7 @@ private fun SettingsScreen(
             Column(
                 modifier = modifier
                     .padding(contentPadding)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .fillMaxSize()
                     .padding(15.dp)
             ) {
@@ -197,7 +201,9 @@ private fun SettingsScreen(
                             }
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(
+                        modifier = Modifier
+                            .height(12.dp))
                     ChangePasswordCard(
                         isVisibleDialog = isVisibleDialog,
                         isUpdatingPassword = state.isUpdatingPassword,
@@ -266,9 +272,11 @@ private fun Preview() {
         ),
         isLoading = false
     )
+    val scrollState = rememberScrollState()
     BillingTheme {
         SettingsScreen(
             state = mockState,
+            scrollState = scrollState,
             snakeBarHostState = snackBarState,
             isVisibleLogOffDialog = false,
             onAction = {},

@@ -24,16 +24,16 @@ import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.model.payment.ImageData
-import com.impuls.billing.domain.utils.FromBillingToLocalDateTime
+import com.impuls.billing.domain.utils.fromBillingToLocalDateTime
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
 import com.impuls.billing.domain.utils.convertToHistoryStatusPayment
+import com.impuls.billing.domain.utils.convertToTypeBlockVGroup
 import com.impuls.billing.domain.utils.convertUserType
 import com.impuls.billing.domain.utils.roundTo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -130,11 +130,11 @@ fun RecoverPasswordDto.convertToRecoverPassword(): RecoverPassword {
     )
 }
 
-fun ClientVgroupFullResponse.toClientVroup(): ClientVroup {
+fun ClientVgroupFullResponse.toClientVGroup(): ClientVroup {
     return ClientVroup(
         agrmId = vGroup.agrmId,
         vgId = vGroup.vgId,
-        blocked = vGroup.blocked != 0L,
+        blocked = convertToTypeBlockVGroup(vGroup.blocked),
         tarifId = vGroup.tarifId,
         tarifDescr = vGroup.tarifDescr,
         login = vGroup.login,
@@ -183,7 +183,7 @@ fun DebitDto.toHistoryDebit(): HistoryDebit {
 
 fun VgroupUsbBoxDto.toVgroupUsbBox(): VgroupUsbBox {
     return VgroupUsbBox(
-        activated = FromBillingToLocalDateTime(service.activated),
+        activated = fromBillingToLocalDateTime(service.activated),
         state = service.state,
         rate = service.rate,
         price = catAbove,
