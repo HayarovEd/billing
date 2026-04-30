@@ -45,7 +45,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @Preview(showBackground = true)
 @Composable
@@ -53,6 +53,17 @@ private fun PreviewCalendar() {
     BillingTheme {
         DateRangeCalendar(
             onRangeSelected = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewSingleCalendar() {
+    BillingTheme {
+        DateCalendar(
+            currentDate = LocalDate.now(),
+            updateCurrentDate = {}
         )
     }
 }
@@ -84,6 +95,7 @@ fun DateRangeCalendar(
                     selectedStartDate = date
                     selectedEndDate = null
                 }
+
                 selectedStartDate != null && selectedEndDate == null -> {
                     if (date.isBefore(selectedStartDate)) {
                         selectedEndDate = selectedStartDate
@@ -93,6 +105,7 @@ fun DateRangeCalendar(
                     }
                     onRangeSelected(selectedStartDate, selectedEndDate)
                 }
+
                 else -> {
                     selectedStartDate = date
                     selectedEndDate = null
@@ -103,7 +116,9 @@ fun DateRangeCalendar(
 
     val daysOfWeek = remember { daysOfWeek() }
 
-    Column(modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .background(MaterialTheme.colorScheme.surface)) {
         MonthHeader(
             month = state.firstVisibleMonth,
             onPreviousMonth = {
@@ -124,12 +139,71 @@ fun DateRangeCalendar(
             state = state,
             dayContent = { day ->
                 val isInRange = isDateInRange(day.date, selectedStartDate, selectedEndDate)
-                
+
                 DayCell(
                     date = day.date,
                     isStartDate = day.date == selectedStartDate,
                     isEndDate = day.date == selectedEndDate,
                     isInRange = isInRange,
+                    isCurrentMonth = day.position == DayPosition.MonthDate,
+                    onClick = { selectDate(day.date) }
+                )
+            }
+        )
+    }
+}
+
+
+@Composable
+fun DateCalendar(
+    modifier: Modifier = Modifier,
+    currentDate: LocalDate,
+    updateCurrentDate: (LocalDate) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val currentMonth = YearMonth.of(currentDate.year, currentDate.month)
+    val state = rememberCalendarState(
+        startMonth = currentMonth.minusMonths(24),
+        endMonth = currentMonth.plusMonths(24),
+        firstVisibleMonth = currentMonth,
+        outDateStyle = OutDateStyle.EndOfGrid
+    )
+
+    var selectedDate by remember { mutableStateOf(currentDate) }
+    fun selectDate(date: LocalDate) {
+        if (date >= LocalDate.now()) {
+            selectedDate = date
+            updateCurrentDate(selectedDate)
+        }
+    }
+
+    val daysOfWeek = remember { daysOfWeek() }
+
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .background(MaterialTheme.colorScheme.surface)) {
+        MonthHeader(
+            month = state.firstVisibleMonth,
+            onPreviousMonth = {
+                scope.launch {
+                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.minusMonths(1))
+                }
+            },
+            onNextMonth = {
+                scope.launch {
+                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.plusMonths(1))
+                }
+            }
+        )
+
+        DaysOfWeekHeader(daysOfWeek = daysOfWeek)
+
+        HorizontalCalendar(
+            state = state,
+            dayContent = { day ->
+                DaySingleCell(
+                    date = day.date,
+                    isSelectedDate = day.date == selectedDate,
                     isCurrentMonth = day.position == DayPosition.MonthDate,
                     onClick = { selectDate(day.date) }
                 )
@@ -149,7 +223,8 @@ private fun DaysOfWeekHeader(daysOfWeek: List<DayOfWeek>) {
             Text(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase(),
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, LocalLocale.current.platformLocale)
+                    .uppercase(),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
@@ -178,9 +253,14 @@ private fun MonthHeader(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-        
+
         Text(
-            text = "${month.yearMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).replaceFirstChar { it.uppercase() }} ${month.yearMonth.year}",
+            text = "${
+                month.yearMonth.month.getDisplayName(
+                    TextStyle.FULL_STANDALONE,
+                    LocalLocale.current.platformLocale
+                ).replaceFirstChar { it.uppercase() }
+            } ${month.yearMonth.year}",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -206,7 +286,7 @@ private fun DayCell(
     onClick: () -> Unit
 ) {
     val isToday = date == LocalDate.now()
-    
+
     // Определяем форму для эффекта "ленты"
     val shape = when {
         isStartDate && isEndDate -> CircleShape
@@ -246,6 +326,61 @@ private fun DayCell(
                 fontWeight = if (isStartDate || isEndDate || isToday) FontWeight.Bold else FontWeight.Normal
             )
             if (isToday && !isStartDate && !isEndDate) {
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun DaySingleCell(
+    date: LocalDate,
+    isSelectedDate: Boolean,
+    isCurrentMonth: Boolean,
+    onClick: () -> Unit
+) {
+    val isToday = date == LocalDate.now()
+
+
+    val shape = when {
+        isSelectedDate -> CircleShape
+        else -> RoundedCornerShape(8.dp)
+    }
+
+    val backgroundColor = when {
+        isSelectedDate -> MaterialTheme.colorScheme.primary
+        else -> Color.Transparent
+    }
+
+    val textColor = when {
+        isSelectedDate -> MaterialTheme.colorScheme.onPrimary
+        !isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+        isToday -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f)
+            .padding(vertical = 2.dp)
+            .background(backgroundColor, shape)
+            .clip(shape)
+            .clickable(enabled = date >= LocalDate.now()) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = date.dayOfMonth.toString(),
+                color = textColor,
+                fontSize = 14.sp,
+                fontWeight = if (isSelectedDate || isToday) FontWeight.Bold else FontWeight.Normal
+            )
+            if (isToday) {
                 Box(
                     modifier = Modifier
                         .size(4.dp)

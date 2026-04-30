@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.impuls.billing.ui.blocking_screen.BlockingScreenRoot
 import com.impuls.billing.ui.home_screen.HomeScreenRoot
 import com.impuls.billing.ui.login_screen.LoginScreenRoot
 import com.impuls.billing.ui.payment_history.HistoryPaymentScreenRoot
@@ -147,7 +148,7 @@ fun NavController(
         }
 
         composable<NavigationRoute.BlockingRoute> {
-
+            BlockingScreenRoot()
         }
     }
 }
