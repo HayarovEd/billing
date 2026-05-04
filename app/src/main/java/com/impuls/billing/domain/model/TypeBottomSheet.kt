@@ -2,5 +2,6 @@ package com.impuls.billing.domain.model
 
 enum class TypeBottomSheet{
     PERIODS,
-    CALENDAR
+    CALENDAR,
+    SINGLE_CALENDAR,
 }

@@ -40,6 +40,8 @@ import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
 import com.impuls.billing.domain.model.TypeBottomSheet
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.ContentCalendarBottomSheet
+import com.impuls.billing.ui.uikit.ContentHistoryBottomSheet
 import com.impuls.billing.ui.uikit.NothingFind
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.asPeriodText
@@ -249,6 +251,8 @@ private fun HistoryPaymentScreen(
                             }
                         )
                     }
+
+                    else -> {}
                 }
 
             }

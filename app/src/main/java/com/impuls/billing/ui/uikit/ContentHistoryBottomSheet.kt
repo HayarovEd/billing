@@ -1,4 +1,4 @@
-package com.impuls.billing.ui.payment_history
+package com.impuls.billing.ui.uikit
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -34,10 +34,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
+import com.impuls.billing.domain.utils.toCurrentLocalDateTime
 import com.impuls.billing.ui.theme.BillingTheme
-import com.impuls.billing.ui.uikit.DateRangeCalendar
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
+import kotlin.time.Clock
 
 @Composable
 fun ContentHistoryBottomSheet(
@@ -88,6 +90,81 @@ fun ContentHistoryBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ContentSingleCalendarBottomSheet(
+    modifier: Modifier = Modifier,
+    currentDate: LocalDate,
+    onClickDate: () -> Unit,
+    updateCurrentDate: (LocalDate) -> Unit,
+    onClickCancel: () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        DateCalendar(
+            currentDate = currentDate.toJavaLocalDate(),
+            updateCurrentDate = {
+                updateCurrentDate(it.toKotlinLocalDate())
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Кнопка Отмена
+            OutlinedButton(
+                onClick = onClickCancel,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.close_24dp),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+
+            // Кнопка Подтвердить/Сохранить
+            Button(
+                onClick = onClickDate,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp,
+                    pressedElevation = 4.dp
+                )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.check_circle_24dp),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.confirm),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -229,12 +306,26 @@ private fun Preview() {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 private fun Preview1() {
     BillingTheme {
         ContentCalendarBottomSheet(
             onClickPeriod = {_,_->},
+            onClickCancel = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview2() {
+    BillingTheme {
+        ContentSingleCalendarBottomSheet(
+            currentDate = Clock.System.now().toCurrentLocalDateTime(),
+            onClickDate = {},
+            updateCurrentDate = {},
             onClickCancel = {}
         )
     }

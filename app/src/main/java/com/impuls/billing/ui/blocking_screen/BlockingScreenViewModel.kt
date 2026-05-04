@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.BlockingRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
@@ -81,6 +82,19 @@ class BlockingScreenViewModel(
                             dateFrom = period.first,
                             dateTo = period.second
                         )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(BlockingScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
+
+            BlockingScreenAction.InsertBlock -> {
+                loadData(
+                    action = {
+                        insertBlock(it)
                     },
                     navigate = {
                         viewModelScope.launch {
@@ -182,6 +196,40 @@ class BlockingScreenViewModel(
                 }
             }
         }
+    }
+
+    private fun insertBlock(token: String) {
+        _state.value.vgroup?.let { vg ->
+            viewModelScope.launch {
+                _state.value.copy(
+                    isLoading = true,
+                )
+                    .updateState()
+                when (val result = blockingRepository.insertBlocking(
+                    token = token,
+                    changeTime = _state.value.selectedDate,
+                    vgId = vgId,
+                    agrmId = vg.agrmId,
+                    blkReq = when (vg.blocked) {
+                        TypeBlockVGroup.UNBLOCKED -> 2
+                        TypeBlockVGroup.USER_BLOCKED -> 0
+                        else -> return@launch
+                    }
+                )) {
+                    is ResultWork.Error -> {
+                        eventChannel.send(BlockingScreenEvent.OnMessage(result.error.asUiText()))
+                    }
+                    is ResultWork.Success -> {
+                        loadVgroups(token)
+                    }
+                }
+                _state.value.copy(
+                    isLoading = false,
+                )
+                    .updateState()
+            }
+        }
+
     }
 
     private fun BlockingScreenState.updateState() {

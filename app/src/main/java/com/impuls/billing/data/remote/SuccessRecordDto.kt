@@ -9,3 +9,9 @@ data class SuccessRecordDto(
     @SerialName("recordNumber")
     val recordNumber: Long
 )
+
+@Serializable
+data class SuccessValueDto(
+    @SerialName("value")
+    val recordNumber: Long
+)

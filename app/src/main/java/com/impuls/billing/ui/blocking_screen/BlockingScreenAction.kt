@@ -6,4 +6,5 @@ import kotlinx.datetime.LocalDate
 sealed interface BlockingScreenAction {
     class UpdateSelectedDate(val date: LocalDate): BlockingScreenAction
     class GetHistoryByPeriod(val periodHistory: PeriodHistory): BlockingScreenAction
+    data object InsertBlock: BlockingScreenAction
 }

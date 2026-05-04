@@ -3,7 +3,7 @@ package com.impuls.billing.data.repository
 import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.toBlocking
 import com.impuls.billing.data.remote.BlockingDto
-import com.impuls.billing.data.remote.SuccessRecordDto
+import com.impuls.billing.data.remote.SuccessValueDto
 import com.impuls.billing.data.remote.requests.BlockingRequest
 import com.impuls.billing.domain.model.BlockVgroup
 import com.impuls.billing.domain.repository.BlockingRepository
@@ -52,7 +52,7 @@ class BlockingRepositoryImpl(
                     }
                 },
                 data = {
-                    it.body<SuccessRecordDto>().recordNumber
+                    it.body<SuccessValueDto>().recordNumber
                 }
             )
         }

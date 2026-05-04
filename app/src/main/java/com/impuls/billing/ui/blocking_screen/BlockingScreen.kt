@@ -37,13 +37,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
-import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.PeriodHistory.*
+import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.TypeBottomSheet
-import com.impuls.billing.ui.payment_history.ContentCalendarBottomSheet
-import com.impuls.billing.ui.payment_history.ContentHistoryBottomSheet
+import com.impuls.billing.ui.blocking_screen.BlockingScreenAction.*
+import com.impuls.billing.ui.uikit.ContentCalendarBottomSheet
+import com.impuls.billing.ui.uikit.ContentHistoryBottomSheet
 import com.impuls.billing.ui.theme.BillingTheme
+import com.impuls.billing.ui.uikit.ContentSingleCalendarBottomSheet
 import com.impuls.billing.ui.uikit.NothingFind
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.asPeriodText
 import org.koin.androidx.compose.koinViewModel
 
@@ -105,6 +109,32 @@ private fun BlockingScreen(
     )
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
+        floatingActionButton = {
+            state.vgroup?.let { vg ->
+                if (vg.blocked == TypeBlockVGroup.UNBLOCKED) {
+                    UiIconButton(
+                        icon = ImageVector.vectorResource(R.drawable.mobile_block_24dp),
+                        size = 24.dp,
+                        buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                        onClick = {
+                            updateTypeBottomSheet(TypeBottomSheet.SINGLE_CALENDAR)
+                            updateShowBottomSheet(true)
+                        }
+                    )
+                }
+                if (vg.blocked == TypeBlockVGroup.USER_BLOCKED) {
+                    UiIconButton(
+                        icon = ImageVector.vectorResource(R.drawable.unlocked_black),
+                        size = 24.dp,
+                        buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                        onClick = {
+                            updateTypeBottomSheet(TypeBottomSheet.SINGLE_CALENDAR)
+                            updateShowBottomSheet(true)
+                        }
+                    )
+                }
+            }
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier
@@ -180,13 +210,13 @@ private fun BlockingScreen(
                     TypeBottomSheet.PERIODS -> {
                         ContentHistoryBottomSheet(
                             onClickPeriodWeek = {
-                                onAction(BlockingScreenAction.GetHistoryByPeriod(PeriodHistory.LastWeek))
+                                onAction(GetHistoryByPeriod(LastWeek))
                             },
                             onClickPeriodMonth = {
-                                onAction(BlockingScreenAction.GetHistoryByPeriod(PeriodHistory.LastMonth))
+                                onAction(GetHistoryByPeriod(LastMonth))
                             },
                             onClickPeriodToday = {
-                                onAction(BlockingScreenAction.GetHistoryByPeriod(PeriodHistory.Today))
+                                onAction(GetHistoryByPeriod(Today))
                             },
                             onClickPeriodCustom = {
                                 updateTypeBottomSheet(TypeBottomSheet.CALENDAR)
@@ -204,13 +234,31 @@ private fun BlockingScreen(
                                 updateShowBottomSheet(false)
                                 updateTypeBottomSheet(TypeBottomSheet.PERIODS)
                                 onAction(
-                                    BlockingScreenAction.GetHistoryByPeriod(
-                                        PeriodHistory.SelectedPeriod(
+                                    GetHistoryByPeriod(
+                                        SelectedPeriod(
                                             dateFrom = start,
                                             dateTo = end
                                         )
                                     )
                                 )
+                            }
+                        )
+                    }
+
+                    TypeBottomSheet.SINGLE_CALENDAR -> {
+                        ContentSingleCalendarBottomSheet(
+                            currentDate = state.selectedDate,
+                            updateCurrentDate = {
+                                onAction(UpdateSelectedDate(it))
+                            },
+                            onClickCancel = {
+                                updateShowBottomSheet(false)
+                                updateTypeBottomSheet(TypeBottomSheet.PERIODS)
+                            },
+                            onClickDate = {
+                                updateShowBottomSheet(false)
+                                updateTypeBottomSheet(TypeBottomSheet.PERIODS)
+                                onAction(InsertBlock)
                             }
                         )
                     }
