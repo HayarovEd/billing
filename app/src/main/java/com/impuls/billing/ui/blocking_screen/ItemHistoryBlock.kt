@@ -11,7 +11,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.BlockVgroup
-import com.impuls.billing.domain.model.HistoryStatusPayment
 import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.utils.MAX_YEAR
 import com.impuls.billing.domain.utils.parseToLocalDateTime
@@ -82,7 +80,7 @@ fun ItemHistoryBlock(
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = historyBlock.changeTime.date.toDebitUi2(context),
+                        text = historyBlock.changeTime?.date?.toDebitUi2(context)?:"----",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -106,72 +104,6 @@ fun ItemHistoryBlock(
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-    }
-}
-
-@Composable
-fun StatusBadge(status: HistoryStatusPayment) {
-    val (backgroundColor, textColor, text) = when (status) {
-        HistoryStatusPayment.APPROVED -> {
-            Triple(
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                MaterialTheme.colorScheme.primary,
-                stringResource(R.string.success_payment)
-            )
-        }
-
-        HistoryStatusPayment.APPROVED_ON_FILE -> {
-            Triple(
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                MaterialTheme.colorScheme.primary,
-                stringResource(R.string.success_payment)
-            )
-        }
-
-        HistoryStatusPayment.CANCELLED -> {
-            Triple(
-                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f),
-                MaterialTheme.colorScheme.error,
-                stringResource(R.string.cancelled_payment)
-            )
-        }
-    }
-
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = backgroundColor
-    ) {
-        Text(
-            text = text,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun DetailRow(
-    label: String,
-    value: String,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

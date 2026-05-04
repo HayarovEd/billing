@@ -73,6 +73,21 @@ class BlockingScreenViewModel(
                     periodHistory = action.periodHistory,
                 )
                     .updateState()
+                loadData(
+                    action = {
+                        val period = action.periodHistory.convertToPairDate()
+                        loadHistoryBlocks(
+                            token = it,
+                            dateFrom = period.first,
+                            dateTo = period.second
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(BlockingScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
             }
         }
     }

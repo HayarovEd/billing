@@ -26,6 +26,7 @@ import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.utils.EMPTY_YEAR
 import com.impuls.billing.domain.utils.fromBillingToLocalDateTime
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
@@ -233,7 +234,9 @@ fun BlockingDto.toBlocking(): BlockVgroup {
         agrmId = agrmId,
         agrmNum = agrmNum,
         blkReq = convertToTypeBlockVGroup(blkReq),
-        changeTime = fromBillingToLocalDateTime(changeTime),
+        changeTime = if (changeTime == EMPTY_YEAR) null else fromBillingToLocalDateTime(
+            changeTime
+        ),
         comment = comment,
         freewill = freewill,
         groupId = groupId,

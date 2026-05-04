@@ -20,3 +20,4 @@ const val LABEL_BEARER = "label_bearer"
 const val TAG_SCROLL_UN_BLOCK = "unblock_tag"
 
 const val MAX_YEAR = 9999
+const val EMPTY_YEAR = "0000-00-00 00:00:00"

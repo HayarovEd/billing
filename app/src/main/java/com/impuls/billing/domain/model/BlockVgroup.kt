@@ -7,7 +7,7 @@ data class BlockVgroup(
     val agrmId: Long,
     val agrmNum: String,
     val blkReq: TypeBlockVGroup,
-    val changeTime: LocalDateTime,
+    val changeTime: LocalDateTime?,
     val comment: String,
     val freewill: Boolean,
     val groupId: Long,
