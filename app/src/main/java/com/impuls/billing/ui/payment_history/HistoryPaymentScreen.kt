@@ -33,12 +33,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.TypeBottomSheet
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.NothingFind
 import com.impuls.billing.ui.uikit.ObserveAsEvents
@@ -148,7 +148,7 @@ private fun HistoryPaymentScreen(
                                 modifier = Modifier.weight(1f),
                                 icon = ImageVector.vectorResource(it.iconRes),
                                 stringValue = when (it) {
-                                    TypeScreen.WRITEOFF -> {
+                                    TypeScreen.WRITE_OFF -> {
                                         "-${"%.2f".format(state.debitsSum)} ${stringResource(R.string.rub_symbol)}"
                                     }
 
@@ -166,7 +166,7 @@ private fun HistoryPaymentScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     when (state.typeScreen) {
-                        TypeScreen.WRITEOFF -> {
+                        TypeScreen.WRITE_OFF -> {
                             if (state.historyDebits.isEmpty()) {
                                 NothingFind()
                             } else {
@@ -215,13 +215,13 @@ private fun HistoryPaymentScreen(
                     TypeBottomSheet.PERIODS -> {
                         ContentHistoryBottomSheet(
                             onClickPeriodWeek = {
-                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastWeek))
+                                onAction(HistoryPaymentScreenAction.GetHistoryByPeriod(PeriodHistory.LastWeek))
                             },
                             onClickPeriodMonth = {
-                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.LastMonth))
+                                onAction(HistoryPaymentScreenAction.GetHistoryByPeriod(PeriodHistory.LastMonth))
                             },
                             onClickPeriodToday = {
-                                onAction(HistoryPaymentScreenAction.getHistoryByPeriod(PeriodHistory.Today))
+                                onAction(HistoryPaymentScreenAction.GetHistoryByPeriod(PeriodHistory.Today))
                             },
                             onClickPeriodCustom = {
                                 updateTypeBottomSheet(TypeBottomSheet.CALENDAR)
@@ -239,7 +239,7 @@ private fun HistoryPaymentScreen(
                                 updateShowBottomSheet(false)
                                 updateTypeBottomSheet(TypeBottomSheet.PERIODS)
                                 onAction(
-                                    HistoryPaymentScreenAction.getHistoryByPeriod(
+                                    HistoryPaymentScreenAction.GetHistoryByPeriod(
                                         PeriodHistory.SelectedPeriod(
                                             dateFrom = start,
                                             dateTo = end

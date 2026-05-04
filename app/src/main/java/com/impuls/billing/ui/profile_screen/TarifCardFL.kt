@@ -42,6 +42,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,14 +57,16 @@ import kotlin.random.Random
 @Composable
 fun TarifCardFL(
     modifier: Modifier = Modifier,
-    clientVroup: ClientVroup,
+    clientVgroup: ClientVroup,
     onClickUnblock: () -> Unit,
+    onClickPayment: () -> Unit,
 ) {
-    val containerColorColor = when (clientVroup.blocked) {
+    val containerColorColor = when (clientVgroup.blocked) {
         TypeBlockVGroup.UNBLOCKED -> MaterialTheme.colorScheme.surface
         TypeBlockVGroup.USER_BLOCKED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
         TypeBlockVGroup.ADMIN_BLOCKED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
         TypeBlockVGroup.OFF_ACTIVE -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+        TypeBlockVGroup.BALANCE_BLOCKED -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
     }
     var widthCard by remember { mutableIntStateOf(0) }
     var heightCard by remember { mutableIntStateOf(0) }
@@ -79,9 +82,9 @@ fun TarifCardFL(
             containerColor = containerColorColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        elevation = CardDefaults.cardElevation(
+        /*elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
-        )
+        )*/
     ) {
         Box( modifier = Modifier
             .fillMaxWidth()) {
@@ -110,7 +113,7 @@ fun TarifCardFL(
                             ) {
                                 Text(
                                     modifier = modifier.fillMaxWidth(),
-                                    text = "${clientVroup.speed}\n${stringResource(R.string.unit_m_s)}",
+                                    text = "${clientVgroup.speed}\n${stringResource(R.string.unit_m_s)}",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -125,7 +128,7 @@ fun TarifCardFL(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = clientVroup.tarifDescr,
+                                text = clientVgroup.tarifDescr,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -134,11 +137,11 @@ fun TarifCardFL(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = clientVroup.agentDescr,
+                                    text = clientVgroup.agentDescr,
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
-                                if (clientVroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
+                                if (clientVgroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
                                     Spacer(modifier = Modifier.weight(1f))
                                     Button(
                                         onClick = onClickUnblock,
@@ -157,7 +160,7 @@ fun TarifCardFL(
                                         )
                                     }
                                 }
-                                if (clientVroup.blocked == TypeBlockVGroup.UNBLOCKED) {
+                                if (clientVgroup.blocked == TypeBlockVGroup.UNBLOCKED) {
                                     Spacer(modifier = Modifier.weight(1f))
                                     Button(
                                         onClick = onClickUnblock,
@@ -171,6 +174,25 @@ fun TarifCardFL(
                                     ) {
                                         Icon(
                                             imageVector = ImageVector.vectorResource(R.drawable.lock_padlock),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                                if (clientVgroup.blocked == TypeBlockVGroup.BALANCE_BLOCKED) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Button(
+                                        onClick = onClickPayment,
+                                        modifier = Modifier
+                                            .height(48.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
                                             contentDescription = null,
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -201,21 +223,22 @@ fun TarifCardFL(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.abonent_price, clientVroup.serviceRent),
+                        text = stringResource(R.string.abonent_price, clientVgroup.serviceRent),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            if (clientVroup.blocked!= TypeBlockVGroup.UNBLOCKED) {
+            if (clientVgroup.blocked!= TypeBlockVGroup.UNBLOCKED) {
                 val color = MaterialTheme.colorScheme.errorContainer
                 val textColor = MaterialTheme.colorScheme.onErrorContainer
                 val textMeasurer = rememberTextMeasurer()
                 val measuredText =
                     textMeasurer.measure(
-                        AnnotatedString(clientVroup.blocked.asTypeBlockVGroupText().asString()),
+                        text = AnnotatedString(clientVgroup.blocked.asTypeBlockVGroupText().asString()),
                         style = TextStyle(fontSize = 10.sp, color = textColor),
+                        overflow = TextOverflow.Visible
                     )
 
                 Canvas(modifier = Modifier
@@ -271,8 +294,9 @@ private fun Preview() {
     }
     BillingTheme {
         TarifCardFL(
-            clientVroup = vgroups.first(),
+            clientVgroup = vgroups.first(),
             onClickUnblock = {},
+            onClickPayment = {},
         )
     }
 }
@@ -301,8 +325,9 @@ private fun Preview1() {
     }
     BillingTheme {
         TarifCardFL(
-            clientVroup = vgroups.first(),
-            onClickUnblock = {}
+            clientVgroup = vgroups.first(),
+            onClickUnblock = {},
+            onClickPayment = {},
         )
     }
 }
@@ -331,8 +356,9 @@ private fun Preview2() {
     }
     BillingTheme {
         TarifCardFL(
-            clientVroup = vgroups.first(),
+            clientVgroup = vgroups.first(),
             onClickUnblock = {},
+            onClickPayment = {},
         )
     }
 }
@@ -361,8 +387,40 @@ private fun Preview3() {
     }
     BillingTheme {
         TarifCardFL(
-            clientVroup = vgroups.first(),
-            onClickUnblock = {}
+            clientVgroup = vgroups.first(),
+            onClickUnblock = {},
+            onClickPayment = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview4() {
+    val vgroups = (1..1).map {
+        ClientVroup(
+            agrmId = 45,
+            vgId = it.toLong(),
+            blocked = TypeBlockVGroup.BALANCE_BLOCKED,
+            tarifId = it * 10L,
+            tarifDescr = "Просто - 100 (Импульс) 1000 руб",
+            login = "login $it",
+            serviceVolume = 1000L,
+            serviceRent = 500.0,
+            addresses = emptyList(),
+            speed = 100,
+            agentDescr = "Netflow ООО НПО ИМПУЛЬС",
+            currentModifier = ModifierData(
+                type = "ddds",
+                value = Random.nextDouble(0.8, 1.0),
+            )
+        )
+    }
+    BillingTheme {
+        TarifCardFL(
+            clientVgroup = vgroups.first(),
+            onClickUnblock = {},
+            onClickPayment = {},
         )
     }
 }

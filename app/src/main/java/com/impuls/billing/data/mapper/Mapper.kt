@@ -1,5 +1,6 @@
 package com.impuls.billing.data.mapper
 
+import com.impuls.billing.data.remote.BlockingDto
 import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.ClientShortStatDto
 import com.impuls.billing.data.remote.DebitDto
@@ -12,6 +13,7 @@ import com.impuls.billing.data.remote.notices.ClientNoticesDto
 import com.impuls.billing.data.remote.payment_history.PaymentHistoryDto
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
+import com.impuls.billing.domain.model.BlockVgroup
 import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
@@ -222,6 +224,30 @@ fun ClientNoticesDto.toClientNotices(): ClientNotices {
                 value = it.value
             )
         }
+    )
+}
+
+fun BlockingDto.toBlocking(): BlockVgroup {
+    return BlockVgroup(
+        uid = uid,
+        agrmId = agrmId,
+        agrmNum = agrmNum,
+        blkReq = convertToTypeBlockVGroup(blkReq),
+        changeTime = fromBillingToLocalDateTime(changeTime),
+        comment = comment,
+        freewill = freewill,
+        groupId = groupId,
+        id = id,
+        login = login,
+        mgrDescr = mgrDescr,
+        mgrName = mgrName,
+        recordId = recordId,
+        timeTo = fromBillingToLocalDateTime(timeTo),
+        unBlockedManagerDescr = unBlockedManagerDescr,
+        unBlockedManagerLogin = unBlockedManagerLogin,
+        unBlockedManagerName = unBlockedManagerName,
+        username = username,
+        vgId = vgId,
     )
 }
 

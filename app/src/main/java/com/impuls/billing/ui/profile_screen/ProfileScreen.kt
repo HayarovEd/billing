@@ -215,15 +215,18 @@ private fun ProfileScreenScreen(
                                         }
                                     }
                                 )
-                            }
-                            state.clientVGroups?.let {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                TarifCardFL(
-                                    clientVroup = it,
-                                    onClickUnblock = {
-                                        onNavigateToBlocking(it.vgId)
-                                    }
-                                )
+                                state.clientVGroups?.let {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    TarifCardFL(
+                                        clientVgroup = it,
+                                        onClickUnblock = {
+                                            onNavigateToBlocking(it.vgId)
+                                        },
+                                        onClickPayment = {
+                                            onNavigateToPayment(agrm.code)
+                                        }
+                                    )
+                                }
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             UsbBoxCardFL(

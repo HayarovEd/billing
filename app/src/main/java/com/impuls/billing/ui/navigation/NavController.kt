@@ -148,7 +148,15 @@ fun NavController(
         }
 
         composable<NavigationRoute.BlockingRoute> {
-            BlockingScreenRoot()
+            BlockingScreenRoot(
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.LoginRoute) {
+                        popUpTo<NavigationRoute.LoginRoute> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

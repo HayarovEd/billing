@@ -87,3 +87,9 @@ fun LocalDate.toDebitUi(context: Context): String {
     val monthName = months[month.number - 1]
     return "$monthName ${this.year}"
 }
+
+fun LocalDate.toDebitUi2(context: Context): String {
+    val monthNames = context.resources.getStringArray(R.array.month_names_genitive)
+    val monthName = monthNames[month.number - 1]
+    return "${this.day} $monthName ${this.year} ${context.resources.getString(R.string.of_year)}"
+}

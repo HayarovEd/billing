@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.impuls.billing.domain.repository.AccountRepository
+import com.impuls.billing.domain.repository.BlockingRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.domain.utils.convertToPairDate
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.NavigationRoute
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +20,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 class BlockingScreenViewModel(
     private val accountRepository: AccountRepository,
+    private val blockingRepository: BlockingRepository,
     private val dataStoreRepository: DataStoreRepository,
     private val jwtRepository: JwtRepository,
     savedStateHandle: SavedStateHandle
@@ -34,7 +40,8 @@ class BlockingScreenViewModel(
         .onStart {
             loadData(
                 action = {
-                    loadVGroups(it)
+                    loadInitialData(it)
+                    loadVgroups(it)
                 },
                 navigate = {
                     viewModelScope.launch {
@@ -60,15 +67,62 @@ class BlockingScreenViewModel(
                 )
                     .updateState()
             }
+
+            is BlockingScreenAction.GetHistoryByPeriod -> {
+                _state.value.copy(
+                    periodHistory = action.periodHistory,
+                )
+                    .updateState()
+            }
         }
     }
 
-    private fun loadVGroups(token: String) {
+    private fun loadVgroups(token: String) {
         viewModelScope.launch {
             when (val result = accountRepository.getVGroups(
                 token = token,
                 agrmId = null,
                 vgId = vgId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(BlockingScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        vGroups = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun loadInitialData(token: String) {
+        val period = state.value.periodHistory.convertToPairDate()
+        loadHistoryBlocks(
+            token = token,
+            dateFrom = period.first,
+            dateTo = period.second
+        )
+    }
+
+
+    private fun loadHistoryBlocks(
+        token: String,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ) {
+        viewModelScope.launch {
+            _state.value.copy(
+                isLoading = true,
+            )
+                .updateState()
+            when (val result = blockingRepository.getBlocking(
+                token = token,
+                vgId = vgId,
+                dateTo = dateTo.plus(1, DateTimeUnit.DAY),
+                dateFrom = dateFrom.plus(1, DateTimeUnit.DAY)
             )) {
                 is ResultWork.Error -> {
                     _state.value.copy(
@@ -81,12 +135,13 @@ class BlockingScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         isLoading = false,
-                        vGroups = result.data,
+                        historyBlocks = result.data,
                     )
                         .updateState()
                 }
             }
         }
+
     }
 
     private fun loadData(

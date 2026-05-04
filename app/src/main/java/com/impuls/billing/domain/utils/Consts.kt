@@ -18,3 +18,5 @@ const val LAST_PASSWORD = "last_password"
 const val LABEL_BEARER = "label_bearer"
 
 const val TAG_SCROLL_UN_BLOCK = "unblock_tag"
+
+const val MAX_YEAR = 9999

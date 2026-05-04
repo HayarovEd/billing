@@ -97,6 +97,7 @@ fun convertToTypeBlockVGroup(number: Long): TypeBlockVGroup {
         0L -> TypeBlockVGroup.UNBLOCKED
         2L -> TypeBlockVGroup.USER_BLOCKED
         3L -> TypeBlockVGroup.ADMIN_BLOCKED
+        4L -> TypeBlockVGroup.BALANCE_BLOCKED
         10L -> TypeBlockVGroup.OFF_ACTIVE
         else -> TypeBlockVGroup.OFF_ACTIVE
     }
@@ -116,6 +117,11 @@ fun LocalDate.toBillingFormat2(): String {
 @SuppressLint("DefaultLocale")
 fun LocalDateTime.toUiFormat(): String {
     return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)} ${time.hour}:${time.minute}"
+}
+
+@SuppressLint("DefaultLocale")
+fun LocalDateTime.toUiShortFormat(): String {
+    return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)}"
 }
 
 fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
@@ -179,4 +185,12 @@ fun formatPhoneNumber(phone: String): String {
         }
         else -> phone
     }
+}
+
+@OptIn(FormatStringsInDatetimeFormats::class)
+fun parseToLocalDateTime(dateTimeString: String): LocalDateTime {
+    val formatter = LocalDateTime.Format {
+        byUnicodePattern("yyyy-MM-dd HH:mm:ss")
+    }
+    return formatter.parse(dateTimeString)
 }

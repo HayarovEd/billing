@@ -11,7 +11,7 @@ data class HistoryPaymentScreenState(
     val historyDebits: List<HistoryDebit> = emptyList(),
     val isLoading: Boolean = false,
     val periodHistory: PeriodHistory = PeriodHistory.Today,
-    val typeScreen: TypeScreen = TypeScreen.WRITEOFF
+    val typeScreen: TypeScreen = TypeScreen.WRITE_OFF
 ) {
     val paymentsSum = historyPayments.sumOf { it.amount }
     val debitsSum = historyDebits.sumOf { it.amount }
@@ -22,7 +22,7 @@ enum class TypeScreen(
     val iconRes: Int,
     val titleRes: Int,
 ) {
-    WRITEOFF(
+    WRITE_OFF(
         iconRes = R.drawable.payment_arrow_down_24dp,
         titleRes = R.string.debits
     ),
@@ -30,9 +30,4 @@ enum class TypeScreen(
         iconRes = R.drawable.add_card_24dp,
         titleRes = R.string.deposits
     )
-}
-
-enum class TypeBottomSheet{
-    PERIODS,
-    CALENDAR
 }

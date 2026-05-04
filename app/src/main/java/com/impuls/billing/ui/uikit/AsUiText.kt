@@ -212,5 +212,6 @@ fun TypeBlockVGroup.asTypeBlockVGroupText(): UiText {
         TypeBlockVGroup.USER_BLOCKED -> StringResource(R.string.blocked_user)
         TypeBlockVGroup.ADMIN_BLOCKED -> StringResource(R.string.blocked_admin)
         TypeBlockVGroup.OFF_ACTIVE -> StringResource(R.string.off_active)
+        TypeBlockVGroup.BALANCE_BLOCKED -> StringResource(R.string.blocked_balance)
     }
 }

@@ -6,7 +6,6 @@ import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
-import kotlinx.datetime.LocalDate
 
 interface AccountRepository {
 
@@ -60,11 +59,4 @@ interface AccountRepository {
     ): ResultWork<Boolean, DataError>
 
     suspend fun logOut(token: String): ResultWork<Boolean, DataError>
-    suspend fun blocking(
-        token: String,
-        vgId: Long,
-        agrmId: Long,
-        changeTime: LocalDate,
-        blkReq: Int
-    ): ResultWork<Long, DataError>
 }

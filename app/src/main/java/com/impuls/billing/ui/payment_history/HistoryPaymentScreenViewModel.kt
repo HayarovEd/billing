@@ -67,7 +67,7 @@ class HistoryPaymentScreenViewModel(
                     .updateState()
             }
 
-            is HistoryPaymentScreenAction.getHistoryByPeriod -> {
+            is HistoryPaymentScreenAction.GetHistoryByPeriod -> {
                 _state.value.copy(
                     periodHistory = action.periodHistory,
                 )
