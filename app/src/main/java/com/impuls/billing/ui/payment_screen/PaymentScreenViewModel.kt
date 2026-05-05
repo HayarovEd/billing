@@ -29,7 +29,7 @@ class PaymentScreenViewModel(
 
     private val providerNumber =
         when (savedStateHandle.toRoute<NavigationRoute.PaymentRoute>().operId) {
-            20645L, 10127L, 3824L, 1818L, 2L -> NUMBER_NPO_CODIT
+            20645L, 10127L, 3824L, 1818L, 2L, 24304L, 19011L, 24836L -> NUMBER_NPO_CODIT
             20686L -> NUMBER_EMNET
             20964L -> NUMBER_PTK
             else -> null

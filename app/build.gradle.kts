@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.001"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,22 +59,22 @@ dependencies {
 
 
     //datastore
-    api(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences)
 
     //ktor
-    api(libs.ktor.client.core)
-    api(libs.ktor.client.okhttp)
-    api(libs.ktor.client.content.negotiation)
-    api(libs.ktor.serialization.kotlinx.json)
-    api(libs.ktor.client.logging)
-    api(libs.ktor.client.andriod)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.andriod)
     implementation(libs.ktor.serialization.kotlinx.xml)
     implementation(libs.ktor.serialization.kotlinx.json)
 
 
     //Koin
-    api(libs.koin.core)
-    api(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
     // Coil
@@ -92,6 +92,5 @@ dependencies {
 
     implementation(libs.compose)
 
-    //shimmer
-    implementation(libs.compose.shimmer)
+
 }

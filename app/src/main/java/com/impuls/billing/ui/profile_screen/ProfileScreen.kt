@@ -138,7 +138,7 @@ private fun ProfileScreenScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
-        floatingActionButton = {
+       /* floatingActionButton = {
             UiIconButton(
                 icon = ImageVector.vectorResource(R.drawable.chat_24dp),
                 buttonColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
@@ -146,7 +146,7 @@ private fun ProfileScreenScreen(
 
                 }
             )
-        }
+        }*/
     ) { contentPadding ->
         if (state.isLoading) {
             Box(
