@@ -13,8 +13,9 @@ sealed class NavigationRoute {
     data object ProfileRoute : NavigationRoute()
 
     @Serializable
-    data class PaymentRpute(
-        val number: String
+    data class PaymentRoute(
+        val number: String,
+        val operId: Long,
     ) : NavigationRoute()
 
     @Serializable

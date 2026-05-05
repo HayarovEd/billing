@@ -31,7 +31,6 @@ import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.domain.repository.PaymentRepository
 import com.impuls.billing.domain.utils.BASE_PAYMENT_URL
 import com.impuls.billing.domain.utils.DataError
-import com.impuls.billing.domain.utils.NUMBER_NPO_CODIT
 import com.impuls.billing.domain.utils.ResultWork
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -48,11 +47,11 @@ class CKassaPaymentRepository(
 ) : PaymentRepository {
 
 
-    override suspend fun loadPaymentData(): ResultWork<CompanyPayment, DataError> {
+    override suspend fun loadPaymentData(providerNumber: String,): ResultWork<CompanyPayment, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("${BASE_PAYMENT_URL}provider-info/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}provider-info/$providerNumber") {
                         contentType(ContentType.Application.Json)
                     }
                 },
@@ -78,11 +77,12 @@ class CKassaPaymentRepository(
     }
 
     override suspend fun checkAccount(
+        providerNumber: String,
         number: String,
     ): ResultWork<ResultCheck, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(request = {
-                client.post("${BASE_PAYMENT_URL}check-pers-acc/$NUMBER_NPO_CODIT") {
+                client.post("${BASE_PAYMENT_URL}check-pers-acc/$providerNumber") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         "{\"properties\":{\"Л_СЧЕТ\":\"$number\"}}"
@@ -95,6 +95,7 @@ class CKassaPaymentRepository(
     }
 
     override suspend fun payCard(
+        providerNumber: String,
         amount: Int,
         comission: Int,
         greenZone: Boolean,
@@ -105,7 +106,7 @@ class CKassaPaymentRepository(
     ): ResultWork<PaymentCard, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(request = {
-                client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                client.post("${BASE_PAYMENT_URL}do-pay/$providerNumber") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         PayCardRequest(
@@ -126,6 +127,7 @@ class CKassaPaymentRepository(
     }
 
     override suspend fun paySber(
+        providerNumber: String,
         amount: Int,
         comission: Int,
         greenZone: Boolean,
@@ -137,7 +139,7 @@ class CKassaPaymentRepository(
     ): ResultWork<PaymentSber, DataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(request = {
-                client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                client.post("${BASE_PAYMENT_URL}do-pay/$providerNumber") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         PaymentSberRequest(
@@ -162,6 +164,7 @@ class CKassaPaymentRepository(
 
 
     override suspend fun paySbp(
+        providerNumber: String,
         amount: Int,
         comission: Int,
         greenZone: Boolean,
@@ -173,7 +176,7 @@ class CKassaPaymentRepository(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("${BASE_PAYMENT_URL}do-pay/$NUMBER_NPO_CODIT") {
+                    client.post("${BASE_PAYMENT_URL}do-pay/$providerNumber") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             PayCardRequest(

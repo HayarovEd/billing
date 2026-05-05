@@ -52,7 +52,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProfileScreenRoot(
     viewModel: ProfileScreenViewModel = koinViewModel(),
-    onNavigateToPayment: (String) -> Unit,
+    onNavigateToPayment: (String, Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToMore: (Long) -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
@@ -103,7 +103,7 @@ private fun ProfileScreenScreen(
     snakeBarHostState: SnackbarHostState,
     isVisibleDialog: Boolean,
     updateVisibilityDialog: (Boolean) -> Unit,
-    onNavigateToPayment: (String) -> Unit,
+    onNavigateToPayment: (String, Long) -> Unit,
     onExitFromApp: () -> Unit,
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
     onNavigateToSettings: (Long) -> Unit,
@@ -119,7 +119,7 @@ private fun ProfileScreenScreen(
 
     if (openCloseDialog) {
         Dialog(
-            onDismissRequest =  {
+            onDismissRequest = {
                 openCloseDialog = false
             }
         ) {
@@ -141,7 +141,7 @@ private fun ProfileScreenScreen(
         floatingActionButton = {
             UiIconButton(
                 icon = ImageVector.vectorResource(R.drawable.chat_24dp),
-                buttonColor =  MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                buttonColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
                 onClick = {
 
                 }
@@ -206,7 +206,7 @@ private fun ProfileScreenScreen(
                                 AgreementCardFL(
                                     agreement = agrm,
                                     onClickPayment = {
-                                        onNavigateToPayment(agrm.code)
+                                        onNavigateToPayment(agrm.code, agrm.operId)
                                     },
                                     onClickPaymentHistory = {
                                         if (state.vGroups.isNotEmpty()) {
@@ -223,7 +223,7 @@ private fun ProfileScreenScreen(
                                             onNavigateToBlocking(it.vgId)
                                         },
                                         onClickPayment = {
-                                            onNavigateToPayment(agrm.code)
+                                            onNavigateToPayment(agrm.code, agrm.operId)
                                         }
                                     )
                                 }
@@ -331,10 +331,10 @@ private fun Preview() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {_ ->},
-            onNavigateToPayment = {},
+            onNavigateToSettings = { _ -> },
+            onNavigateToPayment = { _, _ -> },
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->},
+            onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {}
@@ -425,23 +425,25 @@ private fun Preview1() {
         )
     )
 
-    val vgroup = listOf(ClientVroup(
-        agrmId = 11,
-        vgId = 1000,
-        blocked = TypeBlockVGroup.UNBLOCKED,
-        tarifId = 107,
-        tarifDescr = "descr",
-        agentDescr = "",
-        login = "login",
-        speed = 5000,
-        serviceVolume = 0,
-        serviceRent = 700.0,
-        currentModifier = ModifierData(
-            type = "TODO()",
-            value = 1.0
-        ),
-        addresses = listOf()
-    ))
+    val vgroup = listOf(
+        ClientVroup(
+            agrmId = 11,
+            vgId = 1000,
+            blocked = TypeBlockVGroup.UNBLOCKED,
+            tarifId = 107,
+            tarifDescr = "descr",
+            agentDescr = "",
+            login = "login",
+            speed = 5000,
+            serviceVolume = 0,
+            serviceRent = 700.0,
+            currentModifier = ModifierData(
+                type = "TODO()",
+                value = 1.0
+            ),
+            addresses = listOf()
+        )
+    )
 
 
     BillingTheme {
@@ -451,10 +453,10 @@ private fun Preview1() {
                 vGroups = vgroup
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {_->},
-            onNavigateToPayment = {},
+            onNavigateToSettings = { _ -> },
+            onNavigateToPayment = { _, _ -> },
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->},
+            onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {}
@@ -552,10 +554,10 @@ private fun Preview1_1() {
                 account = clientAccount,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {_->},
-            onNavigateToPayment = {},
+            onNavigateToSettings = { _ -> },
+            onNavigateToPayment = { _, _ -> },
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->},
+            onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {}
@@ -577,10 +579,10 @@ private fun Preview2() {
                 isLoading = true,
             ),
             snakeBarHostState = snackBarState,
-            onNavigateToSettings = {_ ->},
-            onNavigateToPayment = {},
+            onNavigateToSettings = { _ -> },
+            onNavigateToPayment = { _, _ -> },
             onExitFromApp = {},
-            onClickPaymentHistory = {_,_,_ ->},
+            onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = true,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},

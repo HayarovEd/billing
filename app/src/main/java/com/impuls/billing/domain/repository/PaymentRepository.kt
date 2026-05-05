@@ -11,10 +11,17 @@ import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 
 interface PaymentRepository {
-    suspend fun loadPaymentData(): ResultWork<CompanyPayment, DataError>
-    suspend fun loadLogoUrl(category: String, service: String): ResultWork<ImageData, DataError>
-    suspend fun checkAccount(number: String): ResultWork<ResultCheck, DataError>
+    suspend fun loadPaymentData(providerNumber: String): ResultWork<CompanyPayment, DataError>
+    suspend fun loadLogoUrl(
+        category: String,
+        service: String
+    ): ResultWork<ImageData, DataError>
+    suspend fun checkAccount(
+        providerNumber: String,
+        number: String
+    ): ResultWork<ResultCheck, DataError>
     suspend fun payCard(
+        providerNumber: String,
         amount: Int,
         comission: Int = 0,
         greenZone: Boolean = false,
@@ -25,6 +32,7 @@ interface PaymentRepository {
     ): ResultWork<PaymentCard, DataError>
 
     suspend fun paySber(
+        providerNumber: String,
         amount: Int,
         comission: Int = 0,
         greenZone: Boolean = false,
@@ -35,10 +43,13 @@ interface PaymentRepository {
         phone: String
     ): ResultWork<PaymentSber, DataError>
 
-    suspend fun checkStatusPayment(regPayNum: String): ResultWork<CheckPaymentStatus, DataError>
+    suspend fun checkStatusPayment(
+        regPayNum: String
+    ): ResultWork<CheckPaymentStatus, DataError>
     suspend fun paySbp(
+        providerNumber: String,
         amount: Int,
-        comission: Int = 0,
+        commission: Int = 0,
         greenZone: Boolean = false,
         offline: Boolean = false,
         payCurrency: String = "RUB",

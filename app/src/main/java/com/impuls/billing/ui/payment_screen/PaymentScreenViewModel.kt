@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.impuls.billing.domain.repository.PaymentRepository
+import com.impuls.billing.domain.utils.NUMBER_EMNET
+import com.impuls.billing.domain.utils.NUMBER_NPO_CODIT
+import com.impuls.billing.domain.utils.NUMBER_PTK
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asTextMessage
 import com.impuls.billing.ui.uikit.asUiText
@@ -24,10 +27,17 @@ class PaymentScreenViewModel(
     private val paymentRepository: PaymentRepository,
 ) : ViewModel() {
 
+    private val providerNumber =
+        when (savedStateHandle.toRoute<NavigationRoute.PaymentRoute>().operId) {
+            20645L, 10127L, 3824L, 1818L, 2L -> NUMBER_NPO_CODIT
+            20686L -> NUMBER_EMNET
+            20964L -> NUMBER_PTK
+            else -> null
+        }
 
     private val _state = MutableStateFlow(
         PaymentScreenState(
-            number = savedStateHandle.toRoute<NavigationRoute.PaymentRpute>().number,
+            number = savedStateHandle.toRoute<NavigationRoute.PaymentRoute>().number,
         )
     )
     val state = _state
@@ -93,33 +103,36 @@ class PaymentScreenViewModel(
     }
 
     private fun loadInitialData() {
-        _state.value.copy(
-            isLoading = true,
-        )
-            .updateState()
-        viewModelScope.launch {
-            when (val result = paymentRepository.loadPaymentData()) {
-                is ResultWork.Error -> {
-                    _state.value.copy(
-                        isLoading = false,
-                    )
-                        .updateState()
-                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                }
+        providerNumber?.let {
+            _state.value.copy(
+                isLoading = true,
+            )
+                .updateState()
+            viewModelScope.launch {
+                when (val result = paymentRepository.loadPaymentData(providerNumber)) {
+                    is ResultWork.Error -> {
+                        _state.value.copy(
+                            isLoading = false,
+                        )
+                            .updateState()
+                        eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                    }
 
-                is ResultWork.Success -> {
-                    _state.value.copy(
-                        isLoading = false,
-                        companyPayment = result.data
-                    )
-                        .updateState()
-                    loadImage(
-                        category = result.data.serviceType,
-                        service = result.data.serviceCode
-                    )
+                    is ResultWork.Success -> {
+                        _state.value.copy(
+                            isLoading = false,
+                            companyPayment = result.data
+                        )
+                            .updateState()
+                        loadImage(
+                            category = result.data.serviceType,
+                            service = result.data.serviceCode
+                        )
+                    }
                 }
             }
         }
+
     }
 
     private fun loadImage(
@@ -148,23 +161,27 @@ class PaymentScreenViewModel(
     private fun checkLs() {
 
         viewModelScope.launch {
-            delay(300)
-            state.value.number?.let { nmb ->
-                when (val result = paymentRepository.checkAccount(
-                    number = nmb
-                )) {
-                    is ResultWork.Error -> {
-                        eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                    }
+            providerNumber?.let {
+                delay(300)
+                state.value.number?.let { nmb ->
+                    when (val result = paymentRepository.checkAccount(
+                        number = nmb,
+                        providerNumber = providerNumber
+                    )) {
+                        is ResultWork.Error -> {
+                            eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                        }
 
-                    is ResultWork.Success -> {
-                        _state.value.copy(
-                            resultCheck = result.data
-                        )
-                            .updateState()
+                        is ResultWork.Success -> {
+                            _state.value.copy(
+                                resultCheck = result.data
+                            )
+                                .updateState()
+                        }
                     }
                 }
             }
+
         }
     }
 
@@ -198,35 +215,39 @@ class PaymentScreenViewModel(
         state.value.companyPayment?.let { company ->
             viewModelScope.launch {
                 state.value.amountNull?.let { amount ->
-                    _state.value.copy(
-                        isLoading = true,
-                        paymentSber = null,
-                    )
-                        .updateState()
-                    state.value.number?.let {
-                        when (val result = paymentRepository.payCard(
-                            payCurrency = company.currency,
-                            amount = amount,
-                            ledgerAccount = it
-                        )) {
-                            is ResultWork.Error -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                )
-                                    .updateState()
-                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                            }
+                    providerNumber?.let {
+                        _state.value.copy(
+                            isLoading = true,
+                            paymentSber = null,
+                        )
+                            .updateState()
+                        state.value.number?.let {
+                            when (val result = paymentRepository.payCard(
+                                providerNumber = providerNumber,
+                                payCurrency = company.currency,
+                                amount = amount,
+                                ledgerAccount = it
+                            )) {
+                                is ResultWork.Error -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                    )
+                                        .updateState()
+                                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                                }
 
-                            is ResultWork.Success -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                    paymentScreenType = PaymentScreenType.CARD,
-                                    paymentCard = result.data
-                                )
-                                    .updateState()
+                                is ResultWork.Success -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                        paymentScreenType = PaymentScreenType.CARD,
+                                        paymentCard = result.data
+                                    )
+                                        .updateState()
+                                }
                             }
                         }
                     }
+
 
                 }
 
@@ -238,39 +259,40 @@ class PaymentScreenViewModel(
         state.value.companyPayment?.let { company ->
             viewModelScope.launch {
                 state.value.amountNull?.let { amount ->
-                    _state.value.copy(
-                        isLoading = true,
-                        paymentCard = null,
-                    )
-                        .updateState()
-                    state.value.number?.let {
-                        when (val result = paymentRepository.paySber(
-                            payCurrency = company.currency,
-                            amount = amount,
-                            phone = state.value.paymentPhone,
-                            ledgerAccount = it
-                        )) {
-                            is ResultWork.Error -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                )
-                                    .updateState()
-                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                            }
+                    providerNumber?.let {
+                        _state.value.copy(
+                            isLoading = true,
+                            paymentCard = null,
+                        )
+                            .updateState()
+                        state.value.number?.let {
+                            when (val result = paymentRepository.paySber(
+                                providerNumber = providerNumber,
+                                payCurrency = company.currency,
+                                amount = amount,
+                                phone = state.value.paymentPhone,
+                                ledgerAccount = it
+                            )) {
+                                is ResultWork.Error -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                    )
+                                        .updateState()
+                                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                                }
 
-                            is ResultWork.Success -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                    paymentScreenType = PaymentScreenType.SBER_PAY,
-                                    paymentSber = result.data
-                                )
-                                    .updateState()
+                                is ResultWork.Success -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                        paymentScreenType = PaymentScreenType.SBER_PAY,
+                                        paymentSber = result.data
+                                    )
+                                        .updateState()
+                                }
                             }
                         }
                     }
-
                 }
-
             }
         }
     }
@@ -279,38 +301,39 @@ class PaymentScreenViewModel(
         state.value.companyPayment?.let { company ->
             viewModelScope.launch {
                 state.value.amountNull?.let { amount ->
-                    _state.value.copy(
-                        isLoading = true,
-                        paymentCard = null,
-                    )
-                        .updateState()
-                    state.value.number?.let {
-                        when (val result = paymentRepository.paySbp(
-                            payCurrency = company.currency,
-                            amount = amount,
-                            ledgerAccount = it
-                        )) {
-                            is ResultWork.Error -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                )
-                                    .updateState()
-                                eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
-                            }
+                    providerNumber?.let {
+                        _state.value.copy(
+                            isLoading = true,
+                            paymentCard = null,
+                        )
+                            .updateState()
+                        state.value.number?.let {
+                            when (val result = paymentRepository.paySbp(
+                                providerNumber = providerNumber,
+                                payCurrency = company.currency,
+                                amount = amount,
+                                ledgerAccount = it
+                            )) {
+                                is ResultWork.Error -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                    )
+                                        .updateState()
+                                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                                }
 
-                            is ResultWork.Success -> {
-                                _state.value.copy(
-                                    isLoading = false,
-                                    paymentScreenType = PaymentScreenType.SBP,
-                                    paymentSbp = result.data
-                                )
-                                    .updateState()
+                                is ResultWork.Success -> {
+                                    _state.value.copy(
+                                        isLoading = false,
+                                        paymentScreenType = PaymentScreenType.SBP,
+                                        paymentSbp = result.data
+                                    )
+                                        .updateState()
+                                }
                             }
                         }
                     }
-
                 }
-
             }
         }
     }

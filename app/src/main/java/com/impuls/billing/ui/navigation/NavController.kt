@@ -72,8 +72,13 @@ fun NavController(
         }
         composable<NavigationRoute.ProfileRoute> {
             ProfileScreenRoot(
-                onNavigateToPayment = {
-                    navController.navigate(NavigationRoute.PaymentRpute(it))
+                onNavigateToPayment = { number, operId ->
+                    navController.navigate(
+                        NavigationRoute.PaymentRoute(
+                            number = number,
+                            operId = operId
+                        )
+                    )
                 },
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.LoginRoute)
@@ -108,7 +113,7 @@ fun NavController(
             )
         }
 
-        composable<NavigationRoute.PaymentRpute> {
+        composable<NavigationRoute.PaymentRoute> {
             PaymentScreenRoot(
                 navigateToBack = {
                     navController.navigateUp()
