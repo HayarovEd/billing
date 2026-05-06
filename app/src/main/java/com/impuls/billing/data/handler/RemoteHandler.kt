@@ -1,7 +1,9 @@
 package com.impuls.billing.data.handler
 
+import com.impuls.billing.data.remote.ErrorDto
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
@@ -22,7 +24,7 @@ suspend fun <D> handleResponse(
             ResultWork.Success(data(response))
         } else {
             when (response.status.value) {
-                400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
+                400 -> ResultWork.Error(DataError.CustomError(response.body<ErrorDto>().message))
                 401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(DataError.Network.UNKNOWN)
             }

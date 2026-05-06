@@ -155,17 +155,17 @@ fun ContentDialogSetContent(
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    /*Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.cancel),
                         style = MaterialTheme.typography.labelMedium
-                    )
+                    )*/
                 }
 
                 // Кнопка Подтвердить/Сохранить
                 Button(
                     onClick = if (isShowRepeatSendCode) onConfirmCode else onConfirmContent,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.5f),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 2.dp,
@@ -235,18 +235,19 @@ private fun RowWithTextField(
     content: String,
     onUpdateContent: (String) -> Unit
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(5.dp),
     ) {
         Text(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier,
             text = "${title}:",
             style = MaterialTheme.typography.labelMedium
         )
-        Spacer(modifier = modifier.width(3.dp))
+        Spacer(modifier = modifier.height(3.dp))
         UiTextField(
-            modifier = Modifier.weight(1.5f),
+            modifier = Modifier,
             content = content,
             label = "",
             onClickContent = { onUpdateContent(it) }

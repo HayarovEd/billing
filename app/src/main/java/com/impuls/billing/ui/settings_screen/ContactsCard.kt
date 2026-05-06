@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.impuls.billing.R.drawable
 import com.impuls.billing.R.string
-import com.impuls.billing.domain.utils.formatPhoneNumber
 import com.impuls.billing.ui.uikit.ContentDialogSetContent
 import com.impuls.billing.ui.theme.BillingTheme
 
@@ -81,7 +80,7 @@ fun ContactsCard(
                     drawable.mobile_check_24dp),
                 label = stringResource(string.phone),
                 labelButton = stringResource(string.change_mobile),
-                value = formatPhoneNumber(mobile),
+                value = mobile,
                 isConfirmed = mobileIsConfirmed,
                 description = stringResource(string.desc_phone),
                 subTitle = stringResource(string.phone_number),
@@ -165,8 +164,8 @@ private fun InfoContactRow(
     if (isShowDialog) {
         Dialog(
             onDismissRequest = {
-                updateVisibleDialog(false)
-                isShowRepeatSendCode = false
+               /* updateVisibleDialog(false)
+                isShowRepeatSendCode = false*/
             }
         ) {
             ContentDialogSetContent(

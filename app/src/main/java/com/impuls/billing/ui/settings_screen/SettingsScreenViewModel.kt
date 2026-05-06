@@ -394,9 +394,12 @@ class SettingsScreenViewModel(
                 }
 
                 is ResultWork.Success -> {
-                    loadIntitalData(token)
                     validateMobilePhone(token)
                     timer()
+                    _state.value.copy(
+                        clientInfo = state.value.clientInfo?.copy(mobile = phone)
+                    )
+                        .updateState()
                 }
             }
         }
@@ -459,9 +462,13 @@ class SettingsScreenViewModel(
                 }
 
                 is ResultWork.Success -> {
-                    loadIntitalData(token)
+                    //loadIntitalData(token)
                     validateEmail(token)
                     timer()
+                    _state.value.copy(
+                        clientInfo = state.value.clientInfo?.copy(email = email)
+                    )
+                        .updateState()
                 }
             }
         }
@@ -488,7 +495,7 @@ class SettingsScreenViewModel(
         token: String,
         code: String
     ) {
-        state.value.phoneRet?.let {
+        state.value.emailRet?.let {
             viewModelScope.launch {
                 when (val result = accountRepository.confirmValidateClientEmail(
                     token = token,

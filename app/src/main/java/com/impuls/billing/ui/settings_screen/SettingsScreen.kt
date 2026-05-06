@@ -44,6 +44,9 @@ fun SettingsScreenRoot(
     var isVisibleDialog by retain { mutableStateOf(false) }
     var isVisibleLogOffDialog by retain { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+
+    var visiblePhoneDialog by retain { mutableStateOf(false) }
+    var visibleEmailDialog by retain { mutableStateOf(false) }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             SettingsScreenEvent.NavigateEvent -> onNavigateToLogin()
