@@ -77,7 +77,7 @@ fun PortraitOnly() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         onDispose {
-            originalOrientation?.let { activity?.requestedOrientation = it }
+            originalOrientation?.let { activity.requestedOrientation = it }
         }
     }
 }

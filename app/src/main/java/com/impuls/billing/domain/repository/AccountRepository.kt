@@ -59,4 +59,5 @@ interface AccountRepository {
     ): ResultWork<Boolean, DataError>
 
     suspend fun logOut(token: String): ResultWork<Boolean, DataError>
+    suspend fun getClientVgroupPassword(token: String, vgId: Long): ResultWork<String, DataError>
 }

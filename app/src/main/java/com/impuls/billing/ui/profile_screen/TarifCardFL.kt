@@ -58,6 +58,7 @@ import kotlin.random.Random
 fun TarifCardFL(
     modifier: Modifier = Modifier,
     clientVgroup: ClientVroup,
+    vGroupPassword: String?,
     onClickUnblock: () -> Unit,
     onClickPayment: () -> Unit,
 ) {
@@ -131,11 +132,26 @@ fun TarifCardFL(
                                 }
                             }
                             Spacer(modifier = Modifier.width(5.dp))
-                            Text(
-                                text = clientVgroup.agentDescr,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            Column() {
+                                Text(
+                                    text = clientVgroup.agentDescr,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                vGroupPassword?.let {
+                                    Text(
+                                        text = "${stringResource(R.string.login)}: ${clientVgroup.login}",
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                    Text(
+                                        text = "${stringResource(R.string.password)}: $vGroupPassword",
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                }
+
+                            }
                             if (clientVgroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
                                 Spacer(modifier = Modifier.weight(1f))
                                 Surface(
@@ -298,6 +314,7 @@ private fun Preview() {
     BillingTheme {
         TarifCardFL(
             clientVgroup = vgroups.first(),
+            vGroupPassword = "sdfsdgsdgdg",
             onClickUnblock = {},
             onClickPayment = {},
         )
@@ -329,6 +346,7 @@ private fun Preview1() {
     BillingTheme {
         TarifCardFL(
             clientVgroup = vgroups.first(),
+            vGroupPassword = "sdfsdgsdgdg",
             onClickUnblock = {},
             onClickPayment = {},
         )
@@ -360,6 +378,7 @@ private fun Preview2() {
     BillingTheme {
         TarifCardFL(
             clientVgroup = vgroups.first(),
+            vGroupPassword = "sdfsdgsdgdg",
             onClickUnblock = {},
             onClickPayment = {},
         )
@@ -391,6 +410,7 @@ private fun Preview3() {
     BillingTheme {
         TarifCardFL(
             clientVgroup = vgroups.first(),
+            vGroupPassword = "sdfsdgsdgdg",
             onClickUnblock = {},
             onClickPayment = {},
         )
@@ -422,6 +442,7 @@ private fun Preview4() {
     BillingTheme {
         TarifCardFL(
             clientVgroup = vgroups.first(),
+            vGroupPassword = "sdfsdgsdgdg",
             onClickUnblock = {},
             onClickPayment = {},
         )

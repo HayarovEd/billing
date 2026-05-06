@@ -12,6 +12,7 @@ data class ProfileScreenState(
     val emailRet: Long? = null,
     val vGroups: List<ClientVroup> = emptyList(),
     val vGroupUsbBoxes: List<VgroupUsbBox> = emptyList(),
+    val vGroupPassword: String = "",
 ) {
     val clientVGroups = vGroups.firstOrNull()
 }

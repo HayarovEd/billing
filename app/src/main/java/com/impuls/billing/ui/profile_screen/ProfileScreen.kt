@@ -215,6 +215,7 @@ private fun ProfileScreenScreen(
                                     Spacer(modifier = Modifier.height(12.dp))
                                     TarifCardFL(
                                         clientVgroup = it,
+                                        vGroupPassword = state.vGroupPassword,
                                         onClickUnblock = {
                                             onNavigateToBlocking(it.vgId)
                                         },

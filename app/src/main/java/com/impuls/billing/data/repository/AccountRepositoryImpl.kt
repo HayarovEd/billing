@@ -6,6 +6,7 @@ import com.impuls.billing.data.mapper.toClientInfo
 import com.impuls.billing.data.mapper.toClientNotices
 import com.impuls.billing.data.mapper.toClientVGroup
 import com.impuls.billing.data.remote.ClientInfoDto
+import com.impuls.billing.data.remote.PasswordDto
 import com.impuls.billing.data.remote.SuccessDto
 import com.impuls.billing.data.remote.SuccessRecordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
@@ -264,7 +265,7 @@ class AccountRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post ("account/notices") {
+                    client.post("account/notices") {
                         bearerAuth(token)
                         contentType(ContentType.Application.Json)
                         setBody(
@@ -300,7 +301,7 @@ class AccountRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post ("account/password") {
+                    client.post("account/password") {
                         bearerAuth(token)
                         contentType(ContentType.Application.Json)
                         setBody(
@@ -324,7 +325,7 @@ class AccountRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.delete ("account/logout") {
+                    client.delete("account/logout") {
                         bearerAuth(token)
                         contentType(ContentType.Application.Json)
                     }
@@ -336,6 +337,24 @@ class AccountRepositoryImpl(
         }
     }
 
-
+    override suspend fun getClientVgroupPassword(
+        token: String,
+        vgId: Long,
+    ): ResultWork<String, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/vgroupPassword") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("vgid", vgId)
+                    }
+                },
+                data = {
+                    it.body<PasswordDto>().password
+                }
+            )
+        }
+    }
 
 }

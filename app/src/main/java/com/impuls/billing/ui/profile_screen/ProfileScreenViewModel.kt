@@ -8,6 +8,7 @@ import com.impuls.billing.domain.repository.HomeRepository
 import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -386,10 +387,18 @@ class ProfileScreenViewModel(
                     )
                         .updateState()
                     if (result.data.isNotEmpty()) {
-                        loadUsbBoxes(
+                        val deferredUsbBoxes = async {  loadUsbBoxes(
                             token = token,
                             vgId = result.data.first().vgId
-                        )
+                        )}
+                        val deferredVgroupPassword = async {
+                            loadVgroupPassword(
+                                token = token,
+                                vgId = result.data.first().vgId
+                            )
+                        }
+                        deferredUsbBoxes.await()
+                        deferredVgroupPassword.await()
                     }
                 }
             }
@@ -412,6 +421,29 @@ class ProfileScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         vGroupUsbBoxes = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun loadVgroupPassword(
+        token: String,
+        vgId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getClientVgroupPassword(
+                token = token,
+                vgId = vgId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        vGroupPassword = result.data,
                     )
                         .updateState()
                 }

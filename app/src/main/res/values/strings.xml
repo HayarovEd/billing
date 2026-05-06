@@ -169,6 +169,7 @@
     <string name="date_unblock">Дата снятия статуса</string>
     <string name="of_year">года</string>
     <string name="history_blocks">История блокировок</string>
+    <string name="password">Пароль</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

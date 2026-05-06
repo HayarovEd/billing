@@ -166,7 +166,7 @@ class CKassaPaymentRepository(
     override suspend fun paySbp(
         providerNumber: String,
         amount: Int,
-        comission: Int,
+        commission: Int,
         greenZone: Boolean,
         offline: Boolean,
         payCurrency: String,
@@ -181,7 +181,7 @@ class CKassaPaymentRepository(
                         setBody(
                             PayCardRequest(
                                 amount = amount * 100,
-                                comission = comission,
+                                comission = commission,
                                 greenZone = greenZone,
                                 offline = offline,
                                 payCurrency = payCurrency,
