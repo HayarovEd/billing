@@ -122,7 +122,7 @@ private fun LoginScreen(
     if (isOpenPasswordDialog) {
         Dialog(
             onDismissRequest = {
-                updateIsShowPasswordDialog(false)
+               // updateIsShowPasswordDialog(false)
             }
         ) {
             ForgetPasswordDialogContent(

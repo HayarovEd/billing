@@ -1,6 +1,8 @@
 package com.impuls.billing.ui.profile_screen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -79,18 +79,19 @@ fun TarifCardFL(
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = containerColorColor,
+         //   containerColor = containerColorColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        /*elevation = CardDefaults.cardElevation(
+        elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
-        )*/
+        )
     ) {
         Box( modifier = Modifier
             .fillMaxWidth()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(color = containerColorColor)
                     .padding(16.dp)
             ) {
                 Row(
@@ -98,116 +99,118 @@ fun TarifCardFL(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.size(64.dp)
+                        Text(
+                            text = clientVgroup.tarifDescr,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxSize()
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                modifier = Modifier.size(64.dp)
                             ) {
-                                Text(
-                                    modifier = modifier.fillMaxWidth(),
-                                    text = "${clientVgroup.speed}\n${stringResource(R.string.unit_m_s)}",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    textAlign = TextAlign.Center
-                                )
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text(
+                                        modifier = modifier.fillMaxWidth(),
+                                        text = "${clientVgroup.speed}\n${stringResource(R.string.unit_m_s)}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
+                            Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                text = clientVgroup.tarifDescr,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
+                                text = clientVgroup.agentDescr,
+                                fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = clientVgroup.agentDescr,
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                if (clientVgroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Button(
-                                        onClick = onClickUnblock,
-                                        modifier = Modifier
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
+                            if (clientVgroup.blocked == TypeBlockVGroup.USER_BLOCKED) {
+                                Spacer(modifier = Modifier.weight(1f))
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clickable(
+                                            onClick = onClickUnblock
+                                        )
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize()
                                     ) {
                                         Icon(
                                             imageVector = ImageVector.vectorResource(R.drawable.unlocked_black),
                                             contentDescription = null,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                }
-                                if (clientVgroup.blocked == TypeBlockVGroup.UNBLOCKED) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Button(
-                                        onClick = onClickUnblock,
-                                        modifier = Modifier
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = ImageVector.vectorResource(R.drawable.lock_padlock),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                }
-                                if (clientVgroup.blocked == TypeBlockVGroup.BALANCE_BLOCKED) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Button(
-                                        onClick = onClickPayment,
-                                        modifier = Modifier
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp)
+                                            modifier = Modifier
+                                                .padding()
+                                                .size(24.dp)
                                         )
                                     }
                                 }
                             }
-
-
-                           /* if (clientVroup.blocked!= TypeBlockVGroup.UNBLOCKED) {
-                                Text(
-                                    text = clientVroup.blocked.asTypeBlockVGroupText().asString(),
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                            }*/
+                            if (clientVgroup.blocked == TypeBlockVGroup.UNBLOCKED) {
+                                Spacer(modifier = Modifier.weight(1f))
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clickable(
+                                            onClick = onClickUnblock
+                                        )
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.lock_padlock),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .padding()
+                                                .size(24.dp)
+                                        )
+                                    }
+                                }
+                            }
+                            if (clientVgroup.blocked == TypeBlockVGroup.BALANCE_BLOCKED) {
+                                Spacer(modifier = Modifier.weight(1f))
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clickable(
+                                            onClick = onClickPayment
+                                        )
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .padding()
+                                                .size(24.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -143,7 +143,7 @@ fun ClientVgroupFullResponse.toClientVGroup(): ClientVroup {
         login = vGroup.login,
         serviceVolume = vGroup.serviceVolume,
         serviceRent = vGroup.serviceRent,
-        agentDescr = vGroup.agentDescr,
+        agentDescr = vGroup.agentDescr.replace("Netflow", ""),
         speed = vGroup.curShape / 1000,
         currentModifier = ModifierData(
             type = vGroup.currentModifier.type,
