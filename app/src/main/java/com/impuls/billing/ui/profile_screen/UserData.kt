@@ -216,9 +216,6 @@ fun InfoRowWithStatus(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = if (label == "Телефон")
-                    FontFamily.Monospace
-                else null
             )
 
             Icon(

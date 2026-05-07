@@ -86,6 +86,7 @@ fun ProfileRowWithSave(
                 content = currentContent,
                 code = currentCode,
                 count = count,
+                isPhone = false,
                 isShowRepeatSendCode = isShowRepeatSendCode,
                 onUpdateContent = {
                     currentContent = it

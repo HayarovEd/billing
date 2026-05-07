@@ -23,13 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.utils.MASK
+import com.impuls.billing.domain.utils.MASK_NUMBER
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.PhoneVisualTransformation
 import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.UiTextField2
 
-private const val mask = "+0(000)000-00-00"
-private const val maskNumber = '0'
 
 @Composable
 fun PhoneTypeUi(
@@ -100,7 +100,7 @@ fun PhoneTypeUi(
             label = stringResource(R.string.phone_number),
             keyboardType = KeyboardType.Phone,
             isOnlyDigit = true,
-            visualTransformation = PhoneVisualTransformation(mask, maskNumber),
+            visualTransformation = PhoneVisualTransformation(MASK, MASK_NUMBER),
         )
 
         Spacer(modifier = Modifier.weight(1f))

@@ -28,10 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
+import com.impuls.billing.domain.utils.MASK
+import com.impuls.billing.domain.utils.MASK_NUMBER
 import com.impuls.billing.ui.theme.BillingTheme
 
 @Composable
@@ -42,6 +45,7 @@ fun ContentDialogSetContent(
     content: String,
     code: String,
     count: Int,
+    isPhone: Boolean,
     isShowRepeatSendCode: Boolean,
     onUpdateContent: (String) -> Unit,
     onUpdateCode: (String) -> Unit,
@@ -118,12 +122,14 @@ fun ContentDialogSetContent(
                     RowWithTextField(
                         title = stringResource(R.string.code_confirm),
                         content = code,
+                        isPhone = false,
                         onUpdateContent = { onUpdateCode(it) }
                     )
                 } else {
                     RowWithTextField(
                         title = title,
                         content = content,
+                        isPhone = isPhone,
                         onUpdateContent = { onUpdateContent(it) }
                     )
                 }
@@ -237,6 +243,7 @@ fun ContentDialogSetContent(
 private fun RowWithTextField(
     modifier: Modifier = Modifier,
     title: String,
+    isPhone: Boolean,
     content: String,
     onUpdateContent: (String) -> Unit
 ) {
@@ -254,6 +261,7 @@ private fun RowWithTextField(
         UiTextField(
             modifier = Modifier,
             content = content,
+            visualTransformation = if (isPhone) PhoneVisualTransformation(MASK, MASK_NUMBER) else VisualTransformation.None,
             label = "",
             onClickContent = { onUpdateContent(it) }
         )
@@ -417,6 +425,7 @@ fun ContentDialogUpdatePassword(
                 RowWithTextField(
                     title = stringResource(R.string.current_password),
                     content = currentPassword,
+                    isPhone = false,
                     onUpdateContent = { onUpdateCurrentPassword(it) }
                 )
             }
@@ -431,6 +440,7 @@ fun ContentDialogUpdatePassword(
                 RowWithTextField(
                     title = stringResource(R.string.new_password),
                     content = newPassword,
+                    isPhone = false,
                     onUpdateContent = { onUpdateNewPassword(it) }
                 )
             }
@@ -446,6 +456,7 @@ fun ContentDialogUpdatePassword(
                 RowWithTextField(
                     title = stringResource(R.string.confirm_password),
                     content = confirmPassword,
+                    isPhone = false,
                     onUpdateContent = { onUpdateConfirmPassword(it) }
                 )
             }
@@ -532,6 +543,7 @@ private fun Preview() {
             count = 8,
             isShowRepeatSendCode = false,
             title = "Номер телефона",
+            isPhone = true,
             onUpdateCode = {},
             onUpdateContent = {},
             onCancel = {},
@@ -553,6 +565,7 @@ private fun Preview2() {
             count = 8,
             isShowRepeatSendCode = true,
             title = "Номер телефона",
+            isPhone = true,
             onUpdateCode = {},
             onUpdateContent = {},
             onCancel = {},
@@ -573,6 +586,7 @@ private fun Preview3() {
             code = "",
             count = 0,
             isShowRepeatSendCode = true,
+            isPhone = false,
             title = "Номер телефона",
             onUpdateCode = {},
             onUpdateContent = {},

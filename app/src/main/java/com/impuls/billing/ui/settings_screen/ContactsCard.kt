@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.impuls.billing.R.drawable
 import com.impuls.billing.R.string
+import com.impuls.billing.domain.utils.formatPhoneNumber
 import com.impuls.billing.ui.uikit.ContentDialogSetContent
 import com.impuls.billing.ui.theme.BillingTheme
 
@@ -81,6 +82,7 @@ fun ContactsCard(
                 label = stringResource(string.phone),
                 labelButton = stringResource(string.change_mobile),
                 value = mobile,
+                isPhone = true,
                 isConfirmed = mobileIsConfirmed,
                 description = stringResource(string.desc_phone),
                 subTitle = stringResource(string.phone_number),
@@ -111,6 +113,7 @@ fun ContactsCard(
                 label = stringResource(string.email),
                 labelButton = stringResource(string.change_email),
                 value = email,
+                isPhone = false,
                 isConfirmed = emailIsConfirmed,
                 description = stringResource(string.desc_email),
                 subTitle = stringResource(string.email_adrress),
@@ -143,6 +146,7 @@ private fun InfoContactRow(
     label: String,
     labelButton: String,
     value: String,
+    isPhone: Boolean,
     isConfirmed: Boolean,
     count: Int,
     description: String,
@@ -171,6 +175,7 @@ private fun InfoContactRow(
             ContentDialogSetContent(
                 description = description,
                 title = subTitle,
+                isPhone = isPhone,
                 content = currentContent,
                 code = currentCode,
                 count = count,
@@ -237,7 +242,9 @@ private fun InfoContactRow(
                         color = onSurfaceVariant
                     )
                     Text(
-                        text = value.ifBlank { defaultContent },
+                        text = if (value.isBlank()) defaultContent else {
+                            if (isPhone) formatPhoneNumber(value) else value
+                        },
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = if (label == "Телефон") FontFamily.Monospace else null
@@ -304,6 +311,7 @@ private fun Preview2() {
         InfoContactRow(
             icon = ImageVector.vectorResource(
                 drawable.alternate_email_24dp),
+            isPhone = false,
             label = stringResource(string.email),
             labelButton = stringResource(string.change_email),
             value = "edr@rqwt.er",

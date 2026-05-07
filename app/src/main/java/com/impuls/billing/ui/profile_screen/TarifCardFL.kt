@@ -168,7 +168,7 @@ fun TarifCardFL(
                                         modifier = Modifier.fillMaxSize()
                                     ) {
                                         Icon(
-                                            imageVector = ImageVector.vectorResource(R.drawable.unlocked_black),
+                                            imageVector = ImageVector.vectorResource(R.drawable.play),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .padding()
@@ -193,7 +193,7 @@ fun TarifCardFL(
                                         modifier = Modifier.fillMaxSize()
                                     ) {
                                         Icon(
-                                            imageVector = ImageVector.vectorResource(R.drawable.lock_padlock),
+                                            imageVector = ImageVector.vectorResource(R.drawable.pause),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .padding()
