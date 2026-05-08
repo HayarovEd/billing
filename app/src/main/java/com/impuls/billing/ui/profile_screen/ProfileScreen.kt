@@ -54,6 +54,7 @@ fun ProfileScreenRoot(
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
+    onClickPromisePayment: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -87,7 +88,8 @@ fun ProfileScreenRoot(
         updateVisibilityDialog = {
             isVisibleDialog = it
         },
-        onNavigateToBlocking = onNavigateToBlocking
+        onNavigateToBlocking = onNavigateToBlocking,
+        onClickPromisePayment = onClickPromisePayment
     )
 }
 
@@ -104,6 +106,7 @@ private fun ProfileScreenScreen(
     onClickPaymentHistory: (Long, Long, Long) -> Unit,
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
+    onClickPromisePayment: (Long) -> Unit,
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -209,6 +212,9 @@ private fun ProfileScreenScreen(
                                             val vg = state.vGroups.first()
                                             onClickPaymentHistory(agrm.agrmId, vg.vgId, vg.tarifId)
                                         }
+                                    },
+                                    onClickPromisePayment = {
+                                        onClickPromisePayment(agrm.agrmId)
                                     }
                                 )
                                 state.clientVGroups?.let {
@@ -334,7 +340,8 @@ private fun Preview() {
             onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
-            onNavigateToBlocking = {}
+            onNavigateToBlocking = {},
+            onClickPromisePayment = {}
         )
     }
 }
@@ -456,7 +463,8 @@ private fun Preview1() {
             onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
-            onNavigateToBlocking = {}
+            onNavigateToBlocking = {},
+            onClickPromisePayment = {}
         )
     }
 }
@@ -557,7 +565,8 @@ private fun Preview1_1() {
             onClickPaymentHistory = { _, _, _ -> },
             isVisibleDialog = false,
             updateVisibilityDialog = {},
-            onNavigateToBlocking = {}
+            onNavigateToBlocking = {},
+            onClickPromisePayment = {}
         )
     }
 }
@@ -583,6 +592,7 @@ private fun Preview2() {
             isVisibleDialog = true,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
+            onClickPromisePayment = {}
         )
     }
 }

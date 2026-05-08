@@ -109,6 +109,13 @@ fun NavController(
                             vgId = it
                         )
                     )
+                },
+                onClickPromisePayment = {
+                    navController.navigate(
+                        NavigationRoute.PromiseRoute(
+                            agrmId = it
+                        )
+                    )
                 }
             )
         }
@@ -162,6 +169,10 @@ fun NavController(
                     }
                 }
             )
+        }
+
+        composable<NavigationRoute.PromiseRoute> {
+
         }
     }
 }

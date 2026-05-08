@@ -30,6 +30,7 @@ fun AgreementCardFL(
     modifier: Modifier = Modifier,
     onClickPayment: () -> Unit,
     onClickPaymentHistory: () -> Unit,
+    onClickPromisePayment: () -> Unit,
 ) {
     // Форматирование чисел
     val balanceFormat = DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US).apply {
@@ -187,15 +188,11 @@ fun AgreementCardFL(
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                Button(
-                    onClick = onClickPayment,
+                OutlinedButton(
+                    onClick = onClickPromisePayment,
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
@@ -203,16 +200,44 @@ fun AgreementCardFL(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.handshake_24dp),
                             contentDescription = null,
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = stringResource(R.string.add_balance),
+                            text = stringResource(R.string.promise_payment),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onClickPayment,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.payment_card_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.add_balance),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -257,7 +282,8 @@ private fun Preview() {
                 code = "222"
             ),
             onClickPayment = {},
-            onClickPaymentHistory = {}
+            onClickPaymentHistory = {},
+            onClickPromisePayment = {}
         )
     }
 }

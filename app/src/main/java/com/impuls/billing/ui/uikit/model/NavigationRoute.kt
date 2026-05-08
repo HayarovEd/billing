@@ -40,5 +40,9 @@ sealed class NavigationRoute {
         val vgId: Long,
     ) : NavigationRoute()
 
+    @Serializable
+    data class PromiseRoute(
+        val agrmId: Long
+    ) : NavigationRoute()
 
 }

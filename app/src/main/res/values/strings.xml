@@ -170,6 +170,7 @@
     <string name="of_year">года</string>
     <string name="history_blocks">История блокировок</string>
     <string name="password">Пароль</string>
+    <string name="promise_payment">Обещанный платеж</string>
 
     <string-array name="months_nominative">
         <item>январь</item>
