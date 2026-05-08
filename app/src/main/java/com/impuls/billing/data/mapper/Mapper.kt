@@ -4,6 +4,7 @@ import com.impuls.billing.data.remote.BlockingDto
 import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.ClientShortStatDto
 import com.impuls.billing.data.remote.DebitDto
+import com.impuls.billing.data.remote.PPSettingsDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
@@ -22,6 +23,7 @@ import com.impuls.billing.domain.model.HistoryDebit
 import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.Notice
+import com.impuls.billing.domain.model.PPSettings
 import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.VgroupUsbBox
@@ -251,6 +253,20 @@ fun BlockingDto.toBlocking(): BlockVgroup {
         unBlockedManagerName = unBlockedManagerName,
         username = username,
         vgId = vgId,
+    )
+}
+
+fun PPSettingsDto.toPPSettings(): PPSettings {
+    return PPSettings(
+        promiseAvailable = promiseAvailable,
+        promiseBlockDays = promiseBlockDays,
+        promiseFee = promiseFee,
+        promiseLimit = promiseLimit,
+        promiseMax = promiseMax,
+        promiseMin = promiseMin,
+        promiseOnDays = promiseOnDays,
+        promiseRent = promiseRent,
+        promiseTill = promiseTill
     )
 }
 
