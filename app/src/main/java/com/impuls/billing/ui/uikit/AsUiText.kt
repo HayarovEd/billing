@@ -117,6 +117,12 @@ fun DataError.asUiText(): UiText {
                 R.string.passwords_not_equals
             )
         }
+
+        DataError.SuccessWork.SUCCESS_SET_PROMISE_PAYMENT -> {
+            StringResource(
+                R.string.success_promise_payment
+            )
+        }
     }
 }
 

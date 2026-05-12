@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.impuls.billing.domain.repository.BillingPaymentRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
+import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.billing.ui.uikit.model.NavigationRoute
@@ -56,6 +57,18 @@ class PromiseScreenViewModel(
     fun onAction(action: PromiseScreenAction) {
         when (action) {
             is PromiseScreenAction.UpdateAmount -> updateAmount(action.amount)
+            PromiseScreenAction.SetPromisePayment -> {
+                loadData(
+                    action = {
+                        setPromisePayment(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(PromiseScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -166,6 +179,42 @@ class PromiseScreenViewModel(
             }
         }
 
+    }
+
+    private fun setPromisePayment(token: String) {
+        viewModelScope.launch {
+            _state.value.amount.toDoubleOrNull()?.let { amt ->
+                _state.update {
+                    it.copy(
+                        activeSetPromiseButton = false
+                    )
+                }
+                when (val result = billingPaymentRepository.setPromisePayment(
+                    token = token,
+                    agrmId = agrmId,
+                    amount = amt
+                )) {
+                    is ResultWork.Error -> {
+                        _state.update {
+                            it.copy(
+                                activeSetPromiseButton = true
+                            )
+                        }
+                        eventChannel.send(PromiseScreenEvent.OnMessage(message = result.error.asUiText()))
+                    }
+
+                    is ResultWork.Success -> {
+                        _state.update {
+                            it.copy(
+                                activeSetPromiseButton = true
+                            )
+                        }
+                        loadInitialData(token)
+                        eventChannel.send(PromiseScreenEvent.OnMessage(message = DataError.SuccessWork.SUCCESS_SET_PROMISE_PAYMENT.asUiText()))
+                    }
+                }
+            }
+        }
     }
 
 

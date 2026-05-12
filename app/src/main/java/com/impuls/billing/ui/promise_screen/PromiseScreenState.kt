@@ -7,7 +7,8 @@ data class PromiseScreenState(
     // val isLoading: Boolean = false,
     val resultUiState: ResultUiState = ResultUiState.Loading,
     val amount: String = "",
-    val amountError: AmountTextError = AmountTextError.NO_ERROR
+    val amountError: AmountTextError = AmountTextError.NO_ERROR,
+    val activeSetPromiseButton: Boolean = true
 ) {
     /*private val success = (resultUiState as ResultUiState.Success)
     val doubleAmount = amount.toDoubleOrNull()

@@ -180,6 +180,7 @@
     <string name="more_max_promise">Больше максимальной суммы</string>
     <string name="less_min_promise">Меньше минимальной суммы</string>
     <string name="more_recomended_promise">Больше рекомендуемого платежа</string>
+    <string name="success_promise_payment">Обещанный платеж получен</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

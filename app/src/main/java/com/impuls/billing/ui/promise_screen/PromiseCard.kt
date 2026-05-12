@@ -49,6 +49,7 @@ fun PromiseCard(
     promisePayment: Double,
     amount: String,
     todayDate: LocalDate = Clock.System.now().toCurrentLocalDate(),
+    isEnableUpdateButton: Boolean,
     ppSettings: PPSettings?,
     textError: AmountTextError,
     updateAmount: (String) -> Unit,
@@ -131,7 +132,7 @@ fun PromiseCard(
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = setPromise,
-                        enabled = amount.isNotBlank() && textError == AmountTextError.NO_ERROR,
+                        enabled = amount.isNotBlank() && textError == AmountTextError.NO_ERROR &&isEnableUpdateButton,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -181,6 +182,7 @@ private fun Preview() {
             promisePayment = 600.0,
             amount = "",
             textError = AmountTextError.MORE_RECOMMENDED,
+            isEnableUpdateButton = false,
             ppSettings = PPSettings(
                 promiseAvailable = true,
                 promiseBlockDays = 5,
@@ -206,6 +208,7 @@ private fun Preview1() {
             promisePayment = 600.0,
             amount = "",
             textError = AmountTextError.NO_ERROR,
+            isEnableUpdateButton = true,
             updateAmount = {},
             ppSettings = PPSettings(
                 promiseAvailable = false,
@@ -231,6 +234,7 @@ private fun Preview2() {
             promisePayment = 600.0,
             amount = "100",
             textError = AmountTextError.NO_ERROR,
+            isEnableUpdateButton = true,
             ppSettings = PPSettings(
                 promiseAvailable = true,
                 promiseBlockDays = 5,

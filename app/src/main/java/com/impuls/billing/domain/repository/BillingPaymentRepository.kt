@@ -30,4 +30,10 @@ interface BillingPaymentRepository {
         agrmId: Long,
         mode: Long = 0
     ): ResultWork<Double, DataError>
+
+    suspend fun setPromisePayment(
+        token: String,
+        agrmId: Long,
+        amount: Double
+    ): ResultWork<Boolean, DataError>
 }

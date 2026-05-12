@@ -38,6 +38,7 @@ sealed interface DataError : RootError {
 
     enum class SuccessWork: DataError {
         SUCCESS_UPDATE_PASSWORD,
-        SUCCESS_UPDATE_NOTICES
+        SUCCESS_UPDATE_NOTICES,
+        SUCCESS_SET_PROMISE_PAYMENT
     }
 }

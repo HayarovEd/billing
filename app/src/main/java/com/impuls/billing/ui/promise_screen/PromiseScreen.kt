@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.impuls.billing.domain.model.PPSettings
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
+import com.impuls.billing.ui.uikit.UiText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -86,7 +88,10 @@ private fun PromiseScreen(
         ) {
             when (val rs = state.resultUiState) {
                 is ResultUiState.Error -> {
-
+                    val errorText = rs.message?.asString()?: stringResource(R.string.unknown_error)
+                    ErrorPromisePaymentCard(
+                        errorText = errorText
+                    )
                 }
                 ResultUiState.Loading -> {
                     CircularProgressIndicator()
@@ -97,11 +102,12 @@ private fun PromiseScreen(
                         amount = state.amount,
                         ppSettings = rs.ppSettings,
                         textError = state.amountError,
+                        isEnableUpdateButton = state.activeSetPromiseButton,
                         updateAmount = {
                             onAction(PromiseScreenAction.UpdateAmount(it))
                         },
                         setPromise = {
-
+                            onAction(PromiseScreenAction.SetPromisePayment)
                         }
                     )
                 }
@@ -144,6 +150,24 @@ private fun Preview1() {
                         promiseRent = true,
                         promiseTill = 10
                     ),
+                )
+            ),
+            snakeBarHostState = snackBarState,
+            onAction = {},
+            onBack = {}
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun Preview2() {
+    val snackBarState = remember { SnackbarHostState() }
+    BillingTheme {
+        PromiseScreen(
+            state = PromiseScreenState(
+                resultUiState = ResultUiState.Error(
+                    message = UiText.DynamicString("error")
                 )
             ),
             snakeBarHostState = snackBarState,

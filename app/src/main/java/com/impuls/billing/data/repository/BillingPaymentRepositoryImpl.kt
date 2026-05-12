@@ -7,7 +7,9 @@ import com.impuls.billing.data.mapper.toPPSettings
 import com.impuls.billing.data.remote.DebitDto
 import com.impuls.billing.data.remote.PPSettingsDto
 import com.impuls.billing.data.remote.RecommendedPaymentDto
+import com.impuls.billing.data.remote.SuccessDto
 import com.impuls.billing.data.remote.payment_history.PaymentHistoryDto
+import com.impuls.billing.data.remote.requests.PromisePaymentRequest
 import com.impuls.billing.domain.model.HistoryDebit
 import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.PPSettings
@@ -21,6 +23,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +72,30 @@ class BillingPaymentRepositoryImpl(
                 },
                 data = {
                     it.body<RecommendedPaymentDto>().recommendedPayment
+                }
+            )
+        }
+    }
+
+    override suspend fun setPromisePayment(
+        token: String,
+        agrmId: Long,
+        amount: Double,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post ("payment/promisePayment") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(PromisePaymentRequest(
+                            agreementId = agrmId,
+                            sum = amount
+                        ))
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
                 }
             )
         }
