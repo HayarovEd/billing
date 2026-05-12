@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.impuls.billing.domain.model.HistoryDebit
-import com.impuls.billing.domain.utils.toCurrentLocalDateTime
+import com.impuls.billing.domain.utils.toCurrentLocalDate
 import com.impuls.billing.ui.theme.BillingTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,7 +87,7 @@ private fun Preview() {
         HistoryDebitCard(
             history = HistoryDebit(
                 amount = 456.00,
-                yearMonth = Clock.System.now().toCurrentLocalDateTime()
+                yearMonth = Clock.System.now().toCurrentLocalDate()
             )
         )
     }

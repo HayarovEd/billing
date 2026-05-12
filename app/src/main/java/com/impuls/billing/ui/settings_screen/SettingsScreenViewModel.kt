@@ -39,7 +39,7 @@ class SettingsScreenViewModel(
         .onStart {
             loadData(
                 action = {
-                    loadIntitalData(it)
+                    loadInitialData(it)
                 },
                 navigate = {
                     viewModelScope.launch {
@@ -283,7 +283,7 @@ class SettingsScreenViewModel(
     }
 
 
-    private fun loadIntitalData(token: String) {
+    private fun loadInitialData(token: String) {
         viewModelScope.launch {
             _state.value.copy(
                 isLoading = true,
@@ -438,7 +438,7 @@ class SettingsScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadIntitalData(token)
+                        loadInitialData(token)
                     }
                 }
             }
@@ -462,7 +462,7 @@ class SettingsScreenViewModel(
                 }
 
                 is ResultWork.Success -> {
-                    //loadIntitalData(token)
+                    //loadInitialData(token)
                     validateEmail(token)
                     timer()
                     _state.value.copy(
@@ -507,7 +507,7 @@ class SettingsScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadIntitalData(token)
+                        loadInitialData(token)
                     }
                 }
             }
@@ -553,7 +553,7 @@ class SettingsScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadIntitalData(token)
+                        loadInitialData(token)
                         eventChannel.send(SettingsScreenEvent.OnMessage(DataError.SuccessWork.SUCCESS_UPDATE_PASSWORD.asUiText()))
                     }
                 }

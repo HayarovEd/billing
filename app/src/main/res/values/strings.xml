@@ -75,7 +75,7 @@
     <string name="text_not_blank">Поле не может быть пустым</string>
     <string name="next">Продолжить</string>
     <string name="rub_symbol">₽</string>
-    <string name="rub_unit">Руб.</string>
+    <string name="rub_unit">руб.</string>
     <string name="choose_payment">Выберите способ оплаты</string>
     <string name="bank_card">Банковской картой</string>
     <string name="commission">Комиссия</string>
@@ -171,6 +171,15 @@
     <string name="history_blocks">История блокировок</string>
     <string name="password">Пароль</string>
     <string name="promise_payment">Обещанный платеж</string>
+    <string name="promise_payment_unavailable">Обещанный платеж недоступен</string>
+    <string name="period_promise_payment">Срок действия платежа</string>
+    <string name="min_promise_amount">Минимальная сумма платежа</string>
+    <string name="max_promise_amount">Максимальная сумма платежа</string>
+    <string name="recommended_promise">Рекомендуемый платёж</string>
+    <string name="not_number">Неверный формат</string>
+    <string name="more_max_promise">Больше максимальной суммы</string>
+    <string name="less_min_promise">Меньше минимальной суммы</string>
+    <string name="more_recomended_promise">Больше рекомендуемого платежа</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

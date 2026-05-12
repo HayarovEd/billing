@@ -12,6 +12,7 @@ import com.impuls.billing.ui.login_screen.LoginScreenRoot
 import com.impuls.billing.ui.payment_history.HistoryPaymentScreenRoot
 import com.impuls.billing.ui.payment_screen.PaymentScreenRoot
 import com.impuls.billing.ui.profile_screen.ProfileScreenRoot
+import com.impuls.billing.ui.promise_screen.PromiseScreenRoot
 import com.impuls.billing.ui.settings_screen.SettingsScreenRoot
 import com.impuls.billing.ui.splash_screen.SplashScreenRoot
 import com.impuls.billing.ui.uikit.PortraitOnly
@@ -172,7 +173,14 @@ fun NavController(
         }
 
         composable<NavigationRoute.PromiseRoute> {
-
+            PromiseScreenRoot (
+                onNavigateToLogin = {
+                    navController.navigate(NavigationRoute.LoginRoute)
+                },
+                onBack = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }

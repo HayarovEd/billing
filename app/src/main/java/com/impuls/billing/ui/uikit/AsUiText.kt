@@ -7,6 +7,7 @@ import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.payment.StatusPayment
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.ui.promise_screen.AmountTextError
 import com.impuls.billing.ui.settings_screen.TypeNotice
 import com.impuls.billing.ui.uikit.UiText.*
 import kotlinx.datetime.number
@@ -213,5 +214,15 @@ fun TypeBlockVGroup.asTypeBlockVGroupText(): UiText {
         TypeBlockVGroup.ADMIN_BLOCKED -> StringResource(R.string.blocked_admin)
         TypeBlockVGroup.OFF_ACTIVE -> StringResource(R.string.off_active)
         TypeBlockVGroup.BALANCE_BLOCKED -> StringResource(R.string.blocked_balance)
+    }
+}
+
+fun AmountTextError.asAmountTextError(): UiText {
+    return when(this) {
+        AmountTextError.NO_ERROR -> DynamicString("")
+        AmountTextError.NOT_NUMBER -> StringResource(R.string.not_number)
+        AmountTextError.MORE_MAX -> StringResource(R.string.more_max_promise)
+        AmountTextError.LESS_MIN -> StringResource(R.string.less_min_promise)
+        AmountTextError.MORE_RECOMMENDED -> StringResource(R.string.more_recomended_promise)
     }
 }

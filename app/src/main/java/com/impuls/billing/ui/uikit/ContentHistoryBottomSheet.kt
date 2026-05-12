@@ -34,7 +34,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
-import com.impuls.billing.domain.utils.toCurrentLocalDateTime
+import com.impuls.billing.domain.utils.toCurrentLocalDate
 import com.impuls.billing.ui.theme.BillingTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
@@ -323,7 +323,7 @@ private fun Preview1() {
 private fun Preview2() {
     BillingTheme {
         ContentSingleCalendarBottomSheet(
-            currentDate = Clock.System.now().toCurrentLocalDateTime(),
+            currentDate = Clock.System.now().toCurrentLocalDate(),
             onClickDate = {},
             updateCurrentDate = {},
             onClickCancel = {}

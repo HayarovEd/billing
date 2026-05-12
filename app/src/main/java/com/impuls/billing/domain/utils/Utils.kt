@@ -128,25 +128,25 @@ fun PeriodHistory.convertToPairDate(): Pair<LocalDate, LocalDate> {
     val today = Clock.System.now()
     return when (this) {
         PeriodHistory.LastMonth -> Pair(
-            today.minus(1, DateTimeUnit.MONTH, TimeZone.UTC).toCurrentLocalDateTime(),
-            today.toCurrentLocalDateTime()
+            today.minus(1, DateTimeUnit.MONTH, TimeZone.UTC).toCurrentLocalDate(),
+            today.toCurrentLocalDate()
         )
 
         PeriodHistory.LastWeek -> Pair(
-            today.minus(1, DateTimeUnit.WEEK, TimeZone.UTC).toCurrentLocalDateTime(),
-            today.toCurrentLocalDateTime()
+            today.minus(1, DateTimeUnit.WEEK, TimeZone.UTC).toCurrentLocalDate(),
+            today.toCurrentLocalDate()
         )
 
         is PeriodHistory.SelectedPeriod -> Pair(this.dateFrom, this.dateTo)
         PeriodHistory.Today -> Pair(
-            today.minus(1, DateTimeUnit.DAY, TimeZone.UTC).toCurrentLocalDateTime(),
-            today.toCurrentLocalDateTime()
+            today.minus(1, DateTimeUnit.DAY, TimeZone.UTC).toCurrentLocalDate(),
+            today.toCurrentLocalDate()
         )
     }
 }
 
 
-fun Instant.toCurrentLocalDateTime(): LocalDate {
+fun Instant.toCurrentLocalDate(): LocalDate {
     return this.toLocalDateTime(TimeZone.currentSystemDefault()).date
 }
 

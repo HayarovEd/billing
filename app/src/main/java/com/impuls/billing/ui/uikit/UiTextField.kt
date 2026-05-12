@@ -304,8 +304,10 @@ private fun UiTextFieldView() {
 @Composable
 private fun UiTextFieldView10() {
     BillingTheme {
-        UiTextField2(
+        UiTextField(
             content = "",
+            isError = true,
+            error = "err",
             label = "hallo",
             onClickContent = {}
         )
