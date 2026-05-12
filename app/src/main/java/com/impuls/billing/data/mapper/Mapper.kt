@@ -5,6 +5,7 @@ import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.ClientShortStatDto
 import com.impuls.billing.data.remote.DebitDto
 import com.impuls.billing.data.remote.PPSettingsDto
+import com.impuls.billing.data.remote.PromisePaymentDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
@@ -24,6 +25,7 @@ import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.ModifierData
 import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.model.PPSettings
+import com.impuls.billing.domain.model.PromisePayment
 import com.impuls.billing.domain.model.RecoverPassword
 import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.VgroupUsbBox
@@ -267,6 +269,28 @@ fun PPSettingsDto.toPPSettings(): PPSettings {
         promiseOnDays = promiseOnDays,
         promiseRent = promiseRent,
         promiseTill = promiseTill
+    )
+}
+
+fun PromisePaymentDto.toPromisePayment(): PromisePayment {
+    return PromisePayment(
+        agrmId = agrmId,
+        agrmNum = agrmNum,
+        amount = amount,
+        cancelFio = cancelFio,
+        cancelPerson = cancelPerson,
+        currId = currId,
+        debt = debt,
+        fee = fee,
+        modFio = modFio,
+        modPerson = modPerson,
+        payId = payId,
+        promiseDate = fromBillingToLocalDateTime(promiseDate),
+        promiseTill = fromBillingToLocalDateTime(promiseTill),
+        recordId = recordId,
+        status = status,
+        symbol = symbol,
+        username = username
     )
 }
 

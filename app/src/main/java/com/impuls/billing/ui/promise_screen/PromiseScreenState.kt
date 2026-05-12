@@ -1,14 +1,16 @@
 package com.impuls.billing.ui.promise_screen
 
 import com.impuls.billing.domain.model.PPSettings
+import com.impuls.billing.domain.model.PromisePayment
 import com.impuls.billing.ui.uikit.UiText
 
 data class PromiseScreenState(
-    // val isLoading: Boolean = false,
+    val isLoading: Boolean = false,
     val resultUiState: ResultUiState = ResultUiState.Loading,
     val amount: String = "",
     val amountError: AmountTextError = AmountTextError.NO_ERROR,
-    val activeSetPromiseButton: Boolean = true
+    val activeSetPromiseButton: Boolean = true,
+    val promisePayments: List<PromisePayment> = emptyList(),
 ) {
     /*private val success = (resultUiState as ResultUiState.Success)
     val doubleAmount = amount.toDoubleOrNull()

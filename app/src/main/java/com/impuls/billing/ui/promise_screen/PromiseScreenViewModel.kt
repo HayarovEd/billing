@@ -44,6 +44,16 @@ class PromiseScreenViewModel(
                     }
                 }
             )
+            loadData(
+                action = {
+                    loadPromisePayments(it)
+                },
+                navigate = {
+                    viewModelScope.launch {
+                        eventChannel.send(PromiseScreenEvent.NavigateEvent)
+                    }
+                }
+            )
         }
         .stateIn(
             scope = viewModelScope,
@@ -210,6 +220,7 @@ class PromiseScreenViewModel(
                             )
                         }
                         loadInitialData(token)
+                        loadPromisePayments(token)
                         eventChannel.send(PromiseScreenEvent.OnMessage(message = DataError.SuccessWork.SUCCESS_SET_PROMISE_PAYMENT.asUiText()))
                     }
                 }
@@ -217,6 +228,35 @@ class PromiseScreenViewModel(
         }
     }
 
+
+    private fun loadPromisePayments(token: String) {
+        _state.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+        viewModelScope.launch {
+            when (val result = billingPaymentRepository.getPromisePayments(token)) {
+                is ResultWork.Error -> {
+                    _state.update {
+                        it.copy(
+                            activeSetPromiseButton = false
+                        )
+                    }
+                    eventChannel.send(PromiseScreenEvent.OnMessage(message = result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.update {
+                        it.copy(
+                            activeSetPromiseButton = false,
+                            promisePayments = result.data
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     private fun loadData(
         action: (String) -> Unit,

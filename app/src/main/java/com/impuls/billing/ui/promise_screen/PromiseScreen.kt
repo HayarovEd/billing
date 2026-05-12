@@ -1,13 +1,23 @@
 package com.impuls.billing.ui.promise_screen
 
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -17,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +70,7 @@ fun PromiseScreenRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PromiseScreen(
     modifier: Modifier = Modifier,
@@ -70,12 +82,23 @@ private fun PromiseScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
         topBar = {
-            UiIconButton(
-                modifier = modifier
-                    .statusBarsPadding()
-                    .padding(horizontal = 15.dp),
-                icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-                onClick = onBack,
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.promise_payment),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                navigationIcon = {
+                    UiIconButton(
+                        modifier = modifier
+                            .padding(horizontal = 15.dp),
+                        icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+                        onClick = onBack,
+                    )
+                }
             )
         }
     ) { contentPadding ->
@@ -88,14 +111,16 @@ private fun PromiseScreen(
         ) {
             when (val rs = state.resultUiState) {
                 is ResultUiState.Error -> {
-                    val errorText = rs.message?.asString()?: stringResource(R.string.unknown_error)
+                    val errorText = rs.message?.asString() ?: stringResource(R.string.unknown_error)
                     ErrorPromisePaymentCard(
                         errorText = errorText
                     )
                 }
+
                 ResultUiState.Loading -> {
                     CircularProgressIndicator()
                 }
+
                 is ResultUiState.Success -> {
                     PromiseCard(
                         promisePayment = rs.promisePayment,
@@ -110,6 +135,27 @@ private fun PromiseScreen(
                             onAction(PromiseScreenAction.SetPromisePayment)
                         }
                     )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .basicMarquee(),
+                    text = stringResource(R.string.history_promise_payment),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(state.promisePayments) {pm->
+
+                    }
                 }
             }
         }

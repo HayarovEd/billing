@@ -3,6 +3,7 @@ package com.impuls.billing.domain.repository
 import com.impuls.billing.domain.model.HistoryDebit
 import com.impuls.billing.domain.model.HistoryPayment
 import com.impuls.billing.domain.model.PPSettings
+import com.impuls.billing.domain.model.PromisePayment
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import kotlinx.datetime.LocalDate
@@ -36,4 +37,6 @@ interface BillingPaymentRepository {
         agrmId: Long,
         amount: Double
     ): ResultWork<Boolean, DataError>
+
+    suspend fun getPromisePayments(token: String): ResultWork<List<PromisePayment>, DataError>
 }
