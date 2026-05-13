@@ -3,6 +3,7 @@ package com.impuls.billing.ui.uikit
 import android.annotation.SuppressLint
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.StatusPromisePayment
 import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.payment.StatusPayment
 import com.impuls.billing.domain.utils.DataError
@@ -220,6 +221,14 @@ fun TypeBlockVGroup.asTypeBlockVGroupText(): UiText {
         TypeBlockVGroup.ADMIN_BLOCKED -> StringResource(R.string.blocked_admin)
         TypeBlockVGroup.OFF_ACTIVE -> StringResource(R.string.off_active)
         TypeBlockVGroup.BALANCE_BLOCKED -> StringResource(R.string.blocked_balance)
+    }
+}
+
+fun StatusPromisePayment.asStatusPromisePaymentText(): UiText {
+    return when (this) {
+        StatusPromisePayment.EXPIRED -> StringResource(R.string.expired)
+        StatusPromisePayment.PAYED -> StringResource(R.string.payed)
+        StatusPromisePayment.WORKED -> StringResource(R.string.worked)
     }
 }
 

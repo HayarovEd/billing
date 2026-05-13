@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +46,7 @@ import com.impuls.billing.ui.uikit.ContentCalendarBottomSheet
 import com.impuls.billing.ui.uikit.ContentHistoryBottomSheet
 import com.impuls.billing.ui.uikit.NothingFind
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.asPeriodText
 import org.koin.androidx.compose.koinViewModel
 
@@ -51,6 +54,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HistoryPaymentScreenRoot(
     viewModel: HistoryPaymentScreenViewModel = koinViewModel(),
     onNavigateToLogin: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -82,7 +86,8 @@ fun HistoryPaymentScreenRoot(
         },
         updateTypeBottomSheet = {
             typeBottomSheet = it
-        }
+        },
+        onBack = onBack
     )
 }
 
@@ -97,13 +102,33 @@ private fun HistoryPaymentScreen(
     onAction: (HistoryPaymentScreenAction) -> Unit,
     updateShowBottomSheet: (Boolean) -> Unit,
     updateTypeBottomSheet: (TypeBottomSheet) -> Unit,
+    onBack: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
     Scaffold(
-        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.history_operations),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                navigationIcon = {
+                    UiIconButton(
+                        modifier = modifier
+                            .padding(horizontal = 15.dp),
+                        icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+                        onClick = onBack,
+                    )
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { contentPadding ->
         Box(
@@ -116,12 +141,6 @@ private fun HistoryPaymentScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = stringResource(R.string.history_operations),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.clickable {
                             updateShowBottomSheet(true)
@@ -274,7 +293,8 @@ private fun Preview() {
             snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
-            updateTypeBottomSheet = {}
+            updateTypeBottomSheet = {},
+            onBack = {},
         )
     }
 }
@@ -293,7 +313,8 @@ private fun Preview2() {
             snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
-            updateTypeBottomSheet = {}
+            updateTypeBottomSheet = {},
+            onBack = {},
         )
     }
 }
@@ -312,7 +333,8 @@ private fun Preview3() {
             snackbarHostState = snackbarHostState,
             onAction = {},
             updateShowBottomSheet = {},
-            updateTypeBottomSheet = {}
+            updateTypeBottomSheet = {},
+            onBack = {},
         )
     }
 }

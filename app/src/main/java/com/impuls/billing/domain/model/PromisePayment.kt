@@ -17,7 +17,13 @@ data class PromisePayment(
     val promiseDate: LocalDateTime,
     val promiseTill: LocalDateTime,
     val recordId: Int,
-    val status: Int,
+    val status: StatusPromisePayment,
     val symbol: String,
     val username: String
 )
+
+enum class StatusPromisePayment {
+    EXPIRED,
+    PAYED,
+    WORKED
+}

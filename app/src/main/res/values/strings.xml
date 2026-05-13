@@ -182,6 +182,13 @@
     <string name="more_recomended_promise">Больше рекомендуемого платежа</string>
     <string name="success_promise_payment">Обещанный платеж получен</string>
     <string name="history_promise_payment">История обещанных платежей</string>
+    <string name="expired">Просрочен</string>
+    <string name="payed">Оплачен</string>
+    <string name="worked">Действует</string>
+    <string name="comission">Комиссия</string>
+    <string name="date_request">Запрошен</string>
+    <string name="validity_period">Срок действия платежа</string>
+    <string name="settings">Настройки</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

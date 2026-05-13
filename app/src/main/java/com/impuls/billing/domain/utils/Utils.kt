@@ -5,6 +5,7 @@ import com.impuls.billing.domain.model.BillDeliveryType
 import com.impuls.billing.domain.model.HistoryStatusPayment
 import com.impuls.billing.domain.model.PaymentMethodType
 import com.impuls.billing.domain.model.PeriodHistory
+import com.impuls.billing.domain.model.StatusPromisePayment
 import com.impuls.billing.domain.model.TypeBlockVGroup
 import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.domain.model.payment.StatusPayment
@@ -22,7 +23,6 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Instant
-
 
 
 fun convertBillDeliveryType(number: Long): BillDeliveryType {
@@ -103,9 +103,18 @@ fun convertToTypeBlockVGroup(number: Long): TypeBlockVGroup {
     }
 }
 
+fun convertToStatusPromisePayment(number: Int): StatusPromisePayment {
+    return when (number) {
+        1 -> StatusPromisePayment.EXPIRED
+        2 -> StatusPromisePayment.PAYED
+        3 -> StatusPromisePayment.WORKED
+        else -> StatusPromisePayment.EXPIRED
+    }
+}
+
 @SuppressLint("DefaultLocale")
 fun LocalDate.toBillingFormat(): String {
-    return "${this.year}-${String.format("%02d",this.month.number)}-${String.format("%02d",day)}"
+    return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)}"
 }
 
 @SuppressLint("DefaultLocale")
@@ -116,7 +125,12 @@ fun LocalDate.toBillingFormat2(): String {
 
 @SuppressLint("DefaultLocale")
 fun LocalDateTime.toUiFormat(): String {
-    return "${this.year}-${String.format("%02d", this.month.number)}-${String.format("%02d", day)} ${time.hour}:${time.minute}"
+    return "${this.year}-${String.format("%02d", this.month.number)}-${
+        String.format(
+            "%02d",
+            day
+        )
+    } ${time.hour}:${time.minute}"
 }
 
 @SuppressLint("DefaultLocale")
@@ -175,6 +189,7 @@ fun formatPhoneNumber(phone: String): String {
                 )
             }-${phone.substring(9, 11)}"
         }
+
         11 if phone.startsWith("8") -> {
             "+7(${phone.substring(1, 4)})${phone.substring(4, 7)}-${
                 phone.substring(
@@ -183,6 +198,7 @@ fun formatPhoneNumber(phone: String): String {
                 )
             }-${phone.substring(9, 11)}"
         }
+
         else -> phone
     }
 }

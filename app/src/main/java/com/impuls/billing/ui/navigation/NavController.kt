@@ -144,6 +144,9 @@ fun NavController(
             HistoryPaymentScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.LoginRoute)
+                },
+                onBack = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -156,6 +159,9 @@ fun NavController(
                             inclusive = true
                         }
                     }
+                },
+                onBack = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -173,7 +179,7 @@ fun NavController(
         }
 
         composable<NavigationRoute.PromiseRoute> {
-            PromiseScreenRoot (
+            PromiseScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(NavigationRoute.LoginRoute)
                 },

@@ -36,6 +36,7 @@ import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
 import com.impuls.billing.domain.utils.convertToHistoryStatusPayment
+import com.impuls.billing.domain.utils.convertToStatusPromisePayment
 import com.impuls.billing.domain.utils.convertToTypeBlockVGroup
 import com.impuls.billing.domain.utils.convertUserType
 import com.impuls.billing.domain.utils.roundTo
@@ -288,7 +289,7 @@ fun PromisePaymentDto.toPromisePayment(): PromisePayment {
         promiseDate = fromBillingToLocalDateTime(promiseDate),
         promiseTill = fromBillingToLocalDateTime(promiseTill),
         recordId = recordId,
-        status = status,
+        status = convertToStatusPromisePayment(status),
         symbol = symbol,
         username = username
     )

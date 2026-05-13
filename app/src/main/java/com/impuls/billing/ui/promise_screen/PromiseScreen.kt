@@ -154,7 +154,9 @@ private fun PromiseScreen(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     items(state.promisePayments) {pm->
-
+                        PromisePaymentCard(
+                            payment = pm
+                        )
                     }
                 }
             }

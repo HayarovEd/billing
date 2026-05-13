@@ -240,7 +240,7 @@ class PromiseScreenViewModel(
                 is ResultWork.Error -> {
                     _state.update {
                         it.copy(
-                            activeSetPromiseButton = false
+                            isLoading = false
                         )
                     }
                     eventChannel.send(PromiseScreenEvent.OnMessage(message = result.error.asUiText()))
@@ -249,7 +249,7 @@ class PromiseScreenViewModel(
                 is ResultWork.Success -> {
                     _state.update {
                         it.copy(
-                            activeSetPromiseButton = false,
+                            isLoading = false,
                             promisePayments = result.data
                         )
                     }
