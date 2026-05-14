@@ -4,8 +4,12 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
+val appId = "com.impuls.billing"
+val vCode = 1
+val vName = "0.002"
+
 android {
-    namespace = "com.impuls.billing"
+    namespace = appId
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -13,11 +17,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.impuls.billing"
+        applicationId = appId
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.001"
+        versionCode = vCode
+        versionName = vName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,6 +43,11 @@ android {
         compose = true
     }
 }
+
+base {
+    archivesName.set("Billing_${vName}")
+}
+
 
 dependencies {
     implementation(project(":download_install"))
