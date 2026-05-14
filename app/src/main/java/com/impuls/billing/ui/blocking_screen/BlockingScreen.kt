@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,6 +57,7 @@ import org.koin.androidx.compose.koinViewModel
 fun BlockingScreenRoot(
     viewModel: BlockingScreenViewModel = koinViewModel(),
     onNavigateToLogin: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -88,7 +91,8 @@ fun BlockingScreenRoot(
         },
         updateTypeBottomSheet = {
             typeBottomSheet = it
-        }
+        },
+        onBack = onBack
     )
 }
 
@@ -103,12 +107,33 @@ private fun BlockingScreen(
     onAction: (BlockingScreenAction) -> Unit,
     updateTypeBottomSheet: (TypeBottomSheet) -> Unit,
     updateShowBottomSheet: (Boolean) -> Unit,
+    onBack: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.history_blocks),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                navigationIcon = {
+                    UiIconButton(
+                        modifier = modifier
+                            .padding(horizontal = 15.dp),
+                        icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+                        onClick = onBack,
+                    )
+                }
+            )
+        },
         floatingActionButton = {
             state.vgroup?.let { vg ->
                 if (vg.blocked == TypeBlockVGroup.UNBLOCKED) {
@@ -149,12 +174,6 @@ private fun BlockingScreen(
                     modifier = modifier
                         .fillMaxSize()
                 ) {
-                    Text(
-                        text = stringResource(R.string.history_blocks),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.clickable {
                             updateShowBottomSheet(true)
@@ -282,7 +301,8 @@ private fun Preview() {
             showBottomSheet = false,
             onAction = {},
             updateShowBottomSheet = {},
-            updateTypeBottomSheet = {}
+            updateTypeBottomSheet = {},
+            onBack = {},
         )
     }
 }
@@ -299,7 +319,8 @@ private fun Preview1() {
             showBottomSheet = true,
             onAction = {},
             updateShowBottomSheet = {},
-            updateTypeBottomSheet = {}
+            updateTypeBottomSheet = {},
+            onBack = {}
         )
     }
 }

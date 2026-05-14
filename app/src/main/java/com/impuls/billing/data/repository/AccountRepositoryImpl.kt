@@ -5,8 +5,10 @@ import com.impuls.billing.data.mapper.toClientAccount
 import com.impuls.billing.data.mapper.toClientInfo
 import com.impuls.billing.data.mapper.toClientNotices
 import com.impuls.billing.data.mapper.toClientVGroup
+import com.impuls.billing.data.mapper.toSharedPost
 import com.impuls.billing.data.remote.ClientInfoDto
 import com.impuls.billing.data.remote.PasswordDto
+import com.impuls.billing.data.remote.SharedPostDto
 import com.impuls.billing.data.remote.SuccessDto
 import com.impuls.billing.data.remote.SuccessRecordDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
@@ -22,9 +24,11 @@ import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.SharedPost
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.domain.utils.toBillingFormat
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
@@ -37,6 +41,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
 
 class AccountRepositoryImpl(
     private val client: HttpClient,
@@ -352,6 +357,29 @@ class AccountRepositoryImpl(
                 },
                 data = {
                     it.body<PasswordDto>().password
+                }
+            )
+        }
+    }
+
+    override suspend fun getClientSharedPosts(
+        token: String,
+        dateFrom: LocalDate?,
+    ): ResultWork<List<SharedPost>, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("post") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        dateFrom?.let {
+                            parameter("date_from", dateFrom.toBillingFormat())
+                        }
+
+                    }
+                },
+                data = {
+                    it.body<List<SharedPostDto>>().map { sp -> sp.toSharedPost() }
                 }
             )
         }

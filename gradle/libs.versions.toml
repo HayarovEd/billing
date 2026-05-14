@@ -17,6 +17,9 @@ kotlinxDatetime = "0.7.1"
 koinVersion = "4.2.1"
 coil-compose = "2.7.0"
 
+appcompat = "1.7.1"
+workRuntimeKtx = "2.11.2"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
@@ -42,6 +45,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-andriod = { module = "io.ktor:ktor-client-android", version.ref = "ktorVersion" }
 ktor-serialization-kotlinx-xml = { module = "io.ktor:ktor-serialization-kotlinx-xml", version.ref = "ktorVersion" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref="navigationCompose"}
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinVersion" }
@@ -51,8 +55,12 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinVersion" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 

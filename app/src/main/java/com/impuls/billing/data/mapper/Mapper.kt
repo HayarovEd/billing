@@ -7,6 +7,7 @@ import com.impuls.billing.data.remote.DebitDto
 import com.impuls.billing.data.remote.PPSettingsDto
 import com.impuls.billing.data.remote.PromisePaymentDto
 import com.impuls.billing.data.remote.RecoverPasswordDto
+import com.impuls.billing.data.remote.SharedPostDto
 import com.impuls.billing.data.remote.client_account.ClientAccountResponse
 import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
 import com.impuls.billing.data.remote.connected_usb_box.VgroupUsbBoxDto
@@ -27,6 +28,7 @@ import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.model.PPSettings
 import com.impuls.billing.domain.model.PromisePayment
 import com.impuls.billing.domain.model.RecoverPassword
+import com.impuls.billing.domain.model.SharedPost
 import com.impuls.billing.domain.model.ShortStat
 import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.model.payment.ImageData
@@ -292,6 +294,19 @@ fun PromisePaymentDto.toPromisePayment(): PromisePayment {
         status = convertToStatusPromisePayment(status),
         symbol = symbol,
         username = username
+    )
+}
+
+fun SharedPostDto.toSharedPost(): SharedPost {
+    return SharedPost(
+        groupId = groupId,
+        pid = pid,
+        postCatId = postCatId,
+        postTime = fromBillingToLocalDateTime(postTime),
+        status = status,
+        subject = subject,
+        text = text,
+        uid = uid
     )
 }
 

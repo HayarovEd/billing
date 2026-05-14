@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "billing"
 include(":app")
- 
+include(":download_install")

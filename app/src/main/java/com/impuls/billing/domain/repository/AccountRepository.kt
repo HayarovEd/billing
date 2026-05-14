@@ -4,8 +4,10 @@ import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
 import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.SharedPost
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
+import kotlinx.datetime.LocalDate
 
 interface AccountRepository {
 
@@ -60,4 +62,8 @@ interface AccountRepository {
 
     suspend fun logOut(token: String): ResultWork<Boolean, DataError>
     suspend fun getClientVgroupPassword(token: String, vgId: Long): ResultWork<String, DataError>
+    suspend fun getClientSharedPosts(
+        token: String,
+        dateFrom: LocalDate?= null
+    ): ResultWork<List<SharedPost>, DataError>
 }

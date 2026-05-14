@@ -236,6 +236,11 @@ private fun ProfileScreenScreen(
                                 modifier = modifier.heightIn(max = 400.dp),
                                 vGroupUsbBoxes = state.vGroupUsbBoxes
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SharedPostsCard(
+                                modifier = modifier.heightIn(max = 400.dp),
+                                sharedPosts = state.filteredSharedPosts
+                            )
                         }
                     }
                 }

@@ -38,6 +38,7 @@ class ProfileScreenViewModel(
             loadData(
                 action = {
                     loadAccountData(it)
+                    loadSharePosts(it)
                 },
                 navigate = {
                     viewModelScope.launch {
@@ -444,6 +445,22 @@ class ProfileScreenViewModel(
                 is ResultWork.Success -> {
                     _state.value.copy(
                         vGroupPassword = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun loadSharePosts(token: String) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getClientSharedPosts(token = token)) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        sharedPosts = result.data,
                     )
                         .updateState()
                 }

@@ -189,6 +189,8 @@
     <string name="date_request">Запрошен</string>
     <string name="validity_period">Срок действия платежа</string>
     <string name="settings">Настройки</string>
+    <string name="news">Новости</string>
+    <string name="no_new">Новостей нет</string>
 
     <string-array name="months_nominative">
         <item>январь</item>

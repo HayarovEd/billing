@@ -174,6 +174,9 @@ fun NavController(
                             inclusive = true
                         }
                     }
+                },
+                onBack = {
+                    navController.navigateUp()
                 }
             )
         }
