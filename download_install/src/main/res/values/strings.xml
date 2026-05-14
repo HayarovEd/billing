@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="download_update">Загрузка обновления</string>
+    <string name="download_error">Ошибка загрузки</string>
+    <string name="download_success">Обновление загружено</string>
+    <string name="server_error">Ошибка сервера</string>
+    <string name="bad_request">Неверный запрос</string>
+    <string name="timeout_error">Превышен интревал ожидания</string>
+    <string name="unknown_version">Не удалось определить версию приложения</string>
+    <string name="unknown">Неизвестная ошибка</string>
+    <string name="update_downloaded">Обновление загружено</string>
+</resources>
