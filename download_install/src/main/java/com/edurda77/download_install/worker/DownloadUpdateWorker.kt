@@ -57,6 +57,7 @@ class DownloadUpdateWorker(
                     outputStream.write(data, 0, count)
                     if (contentLength > 0) {
                         val progress = (totalDownloaded * 100 / contentLength).toInt()
+                        notificationBuilder.setChannelId(DOWNLOAD_UPDATE_CHANNEL)
                         notificationBuilder
                             .setContentTitle(application.resources.getString(R.string.download_update))
                             .setContentText("${fileName}: $progress%")

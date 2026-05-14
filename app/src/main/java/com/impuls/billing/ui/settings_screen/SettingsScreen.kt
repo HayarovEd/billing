@@ -66,6 +66,14 @@ fun SettingsScreenRoot(
                     )
                 )
             }
+
+            is SettingsScreenEvent.OnUpdateMessage -> {
+                snakeBarHostState.showSnackbar(
+                    event.message.asString(
+                        context
+                    )
+                )
+            }
         }
     }
 
@@ -160,6 +168,18 @@ private fun SettingsScreen(
                     .fillMaxSize()
                     .padding(15.dp)
             ) {
+                if (state.enableUpdate) {
+                    UpdateCard(
+                        isUpdating = state.isUpdating,
+                        percentUpdate = state.percentUpdate,
+                        currentVersion = state.currentVersion,
+                        releaseVersion = state.release?.lastVersion?:0.0,
+                        onUpdateApk = {
+                            onAction(SettingsScreenAction.UpdateApp)
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
                 state.clientInfo?.let { clientInfo ->
                     ContactsCard(
                         mobile = clientInfo.mobile,
@@ -238,7 +258,8 @@ private fun SettingsScreen(
                     }
                     Spacer(
                         modifier = Modifier
-                            .height(12.dp))
+                            .height(12.dp)
+                    )
                     ChangePasswordCard(
                         isVisibleDialog = isVisibleDialog,
                         isUpdatingPassword = state.isUpdatingPassword,

@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.settings_screen
 
+import com.edurda77.download_install.model.LastVersionApp
 import com.impuls.billing.domain.model.ClientInfo
 import com.impuls.billing.domain.model.ClientNotices
 
@@ -11,6 +12,12 @@ data class SettingsScreenState(
     val phoneRet: Long? = null,
     val emailRet: Long? = null,
     val isUpdatingPassword: Boolean = false,
+
+    val release: LastVersionApp? = null,
+    val enableUpdate: Boolean = false,
+    val percentUpdate: Int = 0,
+    val isUpdating: Boolean = false,
+    val currentVersion: Double? = null,
 )
 
 

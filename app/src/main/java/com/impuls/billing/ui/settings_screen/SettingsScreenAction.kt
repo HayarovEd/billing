@@ -33,4 +33,5 @@ sealed interface SettingsScreenAction {
     ) : SettingsScreenAction
 
     data object LogOff: SettingsScreenAction
+    data object UpdateApp: SettingsScreenAction
 }

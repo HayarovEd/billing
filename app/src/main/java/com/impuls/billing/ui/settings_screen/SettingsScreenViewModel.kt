@@ -1,13 +1,20 @@
 package com.impuls.billing.ui.settings_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.edurda77.download_install.refresher.Refresher
+import com.edurda77.download_install.utils.APK_EXT
+import com.edurda77.download_install.utils.DownloadStatus
+import com.edurda77.download_install.utils.ResultDownloadWork
+import com.edurda77.download_install.utils.asUiResultText
 import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.JwtRepository
+import com.impuls.billing.domain.repository.ServiceRepository
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
@@ -24,10 +31,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
+const val DOWNLOAD_VERSION_URL =
+    "https://apps.kvadroks.ru/api/links/7ef64b79-d5e5-4399-a30c-8d0653ed8d8b/version"
+
+const val DOWNLOAD_FILE_URL =
+    "https://apps.kvadroks.ru/api/links/7ef64b79-d5e5-4399-a30c-8d0653ed8d8b/file"
+
 class SettingsScreenViewModel(
     private val accountRepository: AccountRepository,
     private val dataStoreRepository: DataStoreRepository,
     private val jwtRepository: JwtRepository,
+    private val serviceRepository: ServiceRepository,
+    private val refresher: Refresher,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -40,6 +55,7 @@ class SettingsScreenViewModel(
             loadData(
                 action = {
                     loadInitialData(it)
+                    checkEnableUpdates()
                 },
                 navigate = {
                     viewModelScope.launch {
@@ -279,6 +295,8 @@ class SettingsScreenViewModel(
                     }
                 )
             }
+
+            SettingsScreenAction.UpdateApp -> updateApk()
         }
     }
 
@@ -603,6 +621,71 @@ class SettingsScreenViewModel(
                 }
             }
 
+        }
+    }
+
+
+    private fun checkEnableUpdates() {
+        viewModelScope.launch {
+            when (val result =
+                refresher.getLastVersion(DOWNLOAD_VERSION_URL)) {
+                is ResultDownloadWork.Error -> {
+                    eventChannel.send(SettingsScreenEvent.OnUpdateMessage(result.error.asUiResultText()))
+                }
+
+                is ResultDownloadWork.Success -> {
+                    _state.value.copy(
+                        release = result.data
+                    )
+                        .updateState()
+                    val currentVersion = serviceRepository.getVersionName()
+                    currentVersion?.let {
+                        _state.value.copy(
+                            enableUpdate = currentVersion < result.data.lastVersion,
+                            currentVersion = currentVersion
+                        )
+                            .updateState()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateApk() {
+        viewModelScope.launch {
+            state.value.release?.let { release ->
+                refresher.updateInBackground(
+                    url = DOWNLOAD_FILE_URL,
+                    downloadedFileName = "${release.name}-${release.lastVersion}.$APK_EXT"
+                ).collect { collector ->
+                    when (collector) {
+                        is DownloadStatus.Error -> {
+                            eventChannel.send(SettingsScreenEvent.OnUpdateMessage(collector.error.asUiResultText()))
+                        }
+
+                        is DownloadStatus.InProgress -> {
+                            _state.value.copy(
+                                percentUpdate = collector.percentage
+                            )
+                                .updateState()
+                        }
+
+                        DownloadStatus.Started -> {
+                            _state.value.copy(
+                                isUpdating = true
+                            )
+                                .updateState()
+                        }
+
+                        DownloadStatus.Success -> {
+                            _state.value.copy(
+                                isUpdating = false
+                            )
+                                .updateState()
+                        }
+                    }
+                }
+            }
         }
     }
 

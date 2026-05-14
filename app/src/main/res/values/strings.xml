@@ -221,4 +221,8 @@
         <item>ноября</item>
         <item>декабря</item>
     </string-array>
+
+    <string name="enable_update">Доступно обновление</string>
+    <string name="current_version">Текущая версия</string>
+    <string name="update_until">Обновить до версии</string>
 </resources>

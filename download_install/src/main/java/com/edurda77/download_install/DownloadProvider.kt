@@ -1,6 +1,10 @@
 package com.edurda77.download_install
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.edurda77.download_install.downloader.DownloadRepository
 import com.edurda77.download_install.downloader.DownloadRepositoryImpl
@@ -43,6 +47,14 @@ object DownloadProvider {
         InstallerImpl(application)
 
     fun provideNotificationBuilder(application: Application): NotificationCompat.Builder {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Primary Channel" // Or use a string resource
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel = NotificationChannel(PRIMARY_CHANNEL, name, importance)
+            val notificationManager: NotificationManager =
+                application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
         val builder = NotificationCompat.Builder(application, PRIMARY_CHANNEL)
             .setSmallIcon(R.drawable.outline_update_24)
             .setPriority(NotificationCompat.PRIORITY_LOW)
