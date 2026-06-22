@@ -162,3 +162,31 @@ private fun Preview() {
         )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview2() {
+    val sharedPosts = (1..5).map {
+        SharedPost(
+            groupId = 1,
+            pid = it,
+            postCatId = 2,
+            postTime = Clock.System.now().minus(it, DateTimeUnit.DAY, TimeZone.UTC)
+                .toLocalDateTime(
+                    TimeZone.currentSystemDefault()
+                ),
+            status = 1,
+            subject = "Title $it",
+            text = "text shared post $it",
+            uid = 0
+        )
+    }
+    BillingTheme(
+        darkTheme = true
+    ) {
+        SharedPostsCard(
+            sharedPosts = sharedPosts
+        )
+    }
+}
+
