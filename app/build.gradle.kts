@@ -10,16 +10,12 @@ val vName = "0.003"
 
 android {
     namespace = appId
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = appId
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = vCode
         versionName = vName
 
@@ -51,6 +47,7 @@ base {
 
 dependencies {
     implementation(project(":download_install"))
+    implementation(project(":chat"))
 
 
     implementation(libs.androidx.core.ktx)

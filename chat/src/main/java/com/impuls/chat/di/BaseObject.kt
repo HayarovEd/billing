@@ -20,11 +20,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 
-private const val BASE_URL = "http://10.222.222.174:9092/api/"
+//private const val BASE_URL = "http://10.222.222.174:9092/api/"
 private const val APP_PREFERENCES = "chat_preferences"
 
 val baseChatModule = module {
@@ -45,7 +44,7 @@ val baseChatModule = module {
                 socketTimeoutMillis = 100000
             }
             defaultRequest {
-                url(BASE_URL)
+                //url(BASE_URL)
             }
             install(WebSockets) {
                 // Настройки WebSocket

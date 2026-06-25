@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -24,8 +25,10 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -43,6 +46,7 @@ import com.impuls.billing.domain.model.UserType
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
+import com.impuls.billing.ui.uikit.UiIconButton
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,6 +59,7 @@ fun ProfileScreenRoot(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
+    onNavigateToMainChat: (String, String, String, String, String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -89,7 +94,8 @@ fun ProfileScreenRoot(
             isVisibleDialog = it
         },
         onNavigateToBlocking = onNavigateToBlocking,
-        onClickPromisePayment = onClickPromisePayment
+        onClickPromisePayment = onClickPromisePayment,
+        onNavigateToMainChat = onNavigateToMainChat
     )
 }
 
@@ -107,6 +113,13 @@ private fun ProfileScreenScreen(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
+    onNavigateToMainChat: (
+        name: String,
+        login: String,
+        password: String,
+        email: String,
+        groupName: String
+    ) -> Unit
 ) {
 
     var openCloseDialog by remember { mutableStateOf(false) }
@@ -137,15 +150,24 @@ private fun ProfileScreenScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snakeBarHostState) },
-       /* floatingActionButton = {
+        floatingActionButton = {
             UiIconButton(
                 icon = ImageVector.vectorResource(R.drawable.chat_24dp),
                 buttonColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
                 onClick = {
+                    state.account?.let { acc->
+                        onNavigateToMainChat(
+                            acc.account.name,
+                            acc.account.login,
+                            acc.account.password,
+                            acc.account.email,
+                            "Группа 15" //TODO нужно определиться с группами
+                        )
+                    }
 
                 }
             )
-        }*/
+        }
     ) { contentPadding ->
         if (state.isLoading) {
             Box(
@@ -346,7 +368,8 @@ private fun Preview() {
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
-            onClickPromisePayment = {}
+            onClickPromisePayment = {},
+            onNavigateToMainChat = { _, _, _, _, _ -> },
         )
     }
 }
@@ -469,7 +492,8 @@ private fun Preview1() {
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
-            onClickPromisePayment = {}
+            onClickPromisePayment = {},
+            onNavigateToMainChat = { _, _, _, _, _ -> },
         )
     }
 }
@@ -571,7 +595,8 @@ private fun Preview1_1() {
             isVisibleDialog = false,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
-            onClickPromisePayment = {}
+            onClickPromisePayment = {},
+            onNavigateToMainChat = { _, _, _, _, _ -> },
         )
     }
 }
@@ -597,7 +622,8 @@ private fun Preview2() {
             isVisibleDialog = true,
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
-            onClickPromisePayment = {}
+            onClickPromisePayment = {},
+            onNavigateToMainChat = { _, _, _, _, _ -> },
         )
     }
 }

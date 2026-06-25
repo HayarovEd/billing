@@ -16,6 +16,8 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +25,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import kotlin.time.Duration.Companion.seconds
 
 val baseModule = module {
     single<DataStore<Preferences>> {
@@ -46,6 +49,10 @@ val baseModule = module {
             }
             install(Logging) {
                 logger = Logger.DEFAULT
+            }
+            install(WebSockets) {
+                // Настройки WebSocket
+                pingInterval = 30.seconds
             }
             install(ContentNegotiation) {
                 json(Json {

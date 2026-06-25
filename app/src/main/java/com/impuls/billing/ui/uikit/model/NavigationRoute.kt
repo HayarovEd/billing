@@ -44,5 +44,21 @@ sealed class NavigationRoute {
     data class PromiseRoute(
         val agrmId: Long
     ) : NavigationRoute()
-
+   /* @Serializable
+    data class MainRoute(
+        val name: String = "Test App",
+        val login:String = "testapp",
+        val password: String = "ut82fph38u",
+        val email: String = "",
+        val groupName: String = "Группа 15",
+    ): NavigationRoute()
+    @Serializable
+    data class ChatRoute(
+        val chatId: String,
+        val name: String,
+        val login:String,
+        val password: String,
+        val email: String,
+    ): NavigationRoute()
+*/
 }

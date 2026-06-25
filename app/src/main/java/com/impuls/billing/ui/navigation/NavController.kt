@@ -17,6 +17,9 @@ import com.impuls.billing.ui.settings_screen.SettingsScreenRoot
 import com.impuls.billing.ui.splash_screen.SplashScreenRoot
 import com.impuls.billing.ui.uikit.PortraitOnly
 import com.impuls.billing.ui.uikit.model.NavigationRoute
+import com.impuls.chat.ui.chat_screen.ChatScreenRoot
+import com.impuls.chat.ui.main_screen.MainScreenRoot
+import com.impuls.chat.ui.navigation.NavigationChatRoute
 
 
 @Composable
@@ -117,6 +120,17 @@ fun NavController(
                             agrmId = it
                         )
                     )
+                },
+                onNavigateToMainChat = { name, login, password, email, groupName ->
+                    navController.navigate(
+                        NavigationChatRoute.MainRoute(
+                            name = name,
+                            login = login,
+                            password = password,
+                            email = email,
+                            groupName = groupName
+                        )
+                    )
                 }
             )
         }
@@ -187,6 +201,30 @@ fun NavController(
                     navController.navigate(NavigationRoute.LoginRoute)
                 },
                 onBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        //chat
+        composable<NavigationChatRoute.MainRoute> {
+            MainScreenRoot(
+                onNavigateToChat = { chatId, name, login, password, email ->
+                    navController.navigate(
+                        NavigationChatRoute.ChatRoute(
+                            chatId = chatId,
+                            name = name,
+                            login = login,
+                            password = password,
+                            email = email
+                        )
+                    )
+                }
+            )
+        }
+        composable<NavigationChatRoute.ChatRoute> {
+            ChatScreenRoot(
+                onNavigateToLogin = {
                     navController.navigateUp()
                 }
             )

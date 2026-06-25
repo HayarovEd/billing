@@ -14,6 +14,7 @@ import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.SubGroup
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.repository.RemoteChatRepository
+import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
 import io.ktor.client.HttpClient
@@ -47,7 +48,7 @@ internal class RemoteRepositoryImpl(
             Log.d("TAG", "onLoginFromApp: name=$name, username=$username")
             handleResponse(
                 request = {
-                    client.post("auth/login_from_app") {
+                    client.post("${BASE_CHAT_URL}auth/login_from_app") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             LoginFromAppRequest(
@@ -75,7 +76,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("refresh") {
+                    client.post("${BASE_CHAT_URL}refresh") {
                         contentType(ContentType.Application.Json)
                         cookie("refreshToken", refresh)
                     }
@@ -99,7 +100,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.get("groups/") {
+                    client.get("${BASE_CHAT_URL}groups/") {
                         contentType(ContentType.Application.Json)
                         parameter("name", groupName)
                         bearerAuth(accessToken)
@@ -123,7 +124,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("chats") {
+                    client.post("${BASE_CHAT_URL}chats") {
                         contentType(ContentType.Application.Json)
                         parameter("subgroupId", subGroupId)
                         bearerAuth(accessToken)
@@ -152,7 +153,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.get("chats") {
+                    client.get("${BASE_CHAT_URL}chats") {
                         contentType(ContentType.Application.Json)
                         parameter("isMy", isMy)
                         parameter("isOpen", isOpen)
@@ -178,7 +179,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.get("chats/$chatId") {
+                    client.get("${BASE_CHAT_URL}chats/$chatId") {
                         contentType(ContentType.Application.Json)
                         bearerAuth(accessToken)
                     }
@@ -198,7 +199,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("chats/$chatId/message/client") {
+                    client.post("${BASE_CHAT_URL}chats/$chatId/message/client") {
                         contentType(ContentType.Application.Json)
                         bearerAuth(accessToken)
                         setBody(
@@ -221,7 +222,7 @@ internal class RemoteRepositoryImpl(
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.post("chats/$chatId/close") {
+                    client.post("${BASE_CHAT_URL}chats/$chatId/close") {
                         contentType(ContentType.Application.Json)
                         bearerAuth(accessToken)
                     }

@@ -17,6 +17,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
@@ -41,8 +42,11 @@ class AuthRepositoryImpl(
                         )
                     )
                 }
+
             },
             data = {
+                val txt = it.bodyAsText()
+                println(txt)
                 ResultLogin(it.body<TokenDto>().token)
             }
         )
