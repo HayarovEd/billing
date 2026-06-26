@@ -8,6 +8,7 @@ import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.WebSocketChatMessage
 import com.impuls.chat.domain.repository.AuthUseCase
+import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
 import com.impuls.chat.domain.utils.ResultWork
@@ -33,7 +34,8 @@ class ChatScreenViewModel(
     savedStateHandle: SavedStateHandle,
     private val remoteRepository: RemoteChatRepository,
     private val authUseCase: AuthUseCase,
-    private val webSocketChatRepository: WebSocketChatRepository
+    private val webSocketChatRepository: WebSocketChatRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<NavigationChatRoute.ChatRoute>()
@@ -213,12 +215,25 @@ class ChatScreenViewModel(
                     is ResultWork.Success -> {
                         val data = result.data
                         if (data is WebSocketChatMessage.UpdateChatMessage) {
+                            var newMsgs = listOf<Message>()
                             _state.update { state ->
+                                val mergeResult = state.chat?.let { existingChat ->
+                                    Utils.mergeChatUpdates(existingChat, data.chat)
+                                } ?: (data.chat to emptyList())
+
+                                newMsgs = mergeResult.second
+
                                 state.copy(
                                     tmpMessage = null,
-                                    chat = state.chat?.let { existingChat ->
-                                        Utils.mergeChatUpdates(existingChat, data.chat)
-                                    }
+                                    chat = mergeResult.first
+                                )
+                            }
+
+                            newMsgs.forEach { message ->
+                                notificationRepository.showNotification(
+                                    title = data.chat.subgroup.name,
+                                    message = message.text,
+                                    chatId = data.chat.id
                                 )
                             }
                         }

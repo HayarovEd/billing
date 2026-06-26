@@ -37,19 +37,28 @@ internal object Utils {
         }.sortedByDescending { it.date }
     }
 
-    fun mergeChatUpdates(existingChat: Chat, updateChat: Chat): Chat {
+    fun mergeChatUpdates(existingChat: Chat, updateChat: Chat): Pair<Chat, List<Message>> {
+        val newSupportMessages = mutableListOf<Message>()
+
         // Обновляем основные поля чата
         val mergedConnections = existingChat.connections.map { existingConnection ->
             // Ищем обновление для этого connection
             val updatedConnection = updateChat.connections.find { it.id == existingConnection.id }
 
             if (updatedConnection != null) {
+                // Ищем новые сообщения, которых нет в текущем соединении
+                val existingIds = existingConnection.messages.map { it.id }.toSet()
+                val newlyAdded = updatedConnection.messages.filter { it.id !in existingIds }
+
+                // Добавляем новые сообщения от поддержки в список
+                newSupportMessages.addAll(newlyAdded.filter { it.isSupport })
+
                 // Объединяем сообщения: существующие + новые (без дубликатов по id)
                 val mergedMessages = mergeMessages(existingConnection.messages, updatedConnection.messages)
 
                 // Создаем обновленный connection с объединенными сообщениями
                 existingConnection.copy(
-                    start = updatedConnection.start, // или оставить существующий, если нужно
+                    start = updatedConnection.start,
                     end = updatedConnection.end,
                     user = updatedConnection.user,
                     messages = mergedMessages
@@ -66,10 +75,14 @@ internal object Utils {
                 existingChat.connections.none { it.id == updatedConnection.id }
             }
 
+        newConnections.forEach { connection ->
+            newSupportMessages.addAll(connection.messages.filter { it.isSupport })
+        }
+
         val allConnections = mergedConnections + newConnections
 
-        // Возвращаем обновленный чат
-        return existingChat.copy(
+        // Возвращаем обновленный чат и список новых сообщений поддержки
+        val chat = existingChat.copy(
             name = updateChat.name,
             email = updateChat.email,
             phone = updateChat.phone,
@@ -78,6 +91,8 @@ internal object Utils {
             subgroup = updateChat.subgroup,
             connections = allConnections
         )
+
+        return chat to newSupportMessages
     }
 
     fun mergeMessages(existingMessages: List<Message>, newMessages: List<Message>): List<Message> {
