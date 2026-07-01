@@ -1,7 +1,7 @@
 package com.impuls.chat.domain.utils
 
-internal const val WEB_SOCKET_URL = "ws://10.222.222.174:9092/ws"
-internal const val BASE_CHAT_URL = "http://10.222.222.174:9092/api/"
+internal const val WEB_SOCKET_URL = /*"wss://helpdesk.impuls-perm.ru/ws"*/"ws://10.222.222.174:9092/ws"
+internal const val BASE_CHAT_URL = /*"https://helpdesk.impuls-perm.ru/api/"*/"http://10.222.222.174:9092/api/"
 
 
 internal const val MASK = "+0(000)000-00-00"

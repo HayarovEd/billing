@@ -10,6 +10,8 @@ data class MessageDto(
     val date: String,
     @SerialName("id")
     val id: String,
+    @SerialName("is_read")
+    val isRead: Boolean,
     @SerialName("isSupport")
     val isSupport: Boolean,
     @SerialName("text")

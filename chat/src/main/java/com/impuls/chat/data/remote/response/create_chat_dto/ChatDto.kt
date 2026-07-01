@@ -1,7 +1,7 @@
 package com.impuls.chat.data.remote.response.create_chat_dto
 
 
-import com.impuls.chat.data.remote.response.SubgroupDto
+import com.impuls.chat.data.remote.response.GroupDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,14 +15,18 @@ data class ChatDto(
     val email: String,
     @SerialName("id")
     val id: String,
-    @SerialName("isOpen")
+    @SerialName("is_open")
     val isOpen: Boolean,
-    @SerialName("isWork")
+    @SerialName("is_work")
     val isWork: Boolean,
+    @SerialName("is_active")
+    val isActive: Boolean,
+    @SerialName("unread_messages_count")
+    val unreadMessagesCount: Int,
     @SerialName("name")
     val name: String,
     @SerialName("phone")
     val phone: String,
     @SerialName("subgroup")
-    val subgroup: SubgroupDto
+    val subgroup: GroupDto
 )

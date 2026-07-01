@@ -135,7 +135,7 @@ class MainScreenViewModel(
 
 
     private suspend fun getThemes(accessToken: String) {
-        when (val result = remoteRepository.getThemesByGroupName(
+        when (val result = remoteRepository.getGroupByGroupName(
             accessToken = accessToken,
             groupName = _state.value.groupName
         )) {
@@ -145,7 +145,7 @@ class MainScreenViewModel(
             is ResultWork.Success -> {
                 _state.update {
                     it.copy(
-                        themes = result.data
+                        group = result.data
                     )
                 }
             }
@@ -193,7 +193,7 @@ class MainScreenViewModel(
         _state.value.selectedTheme?.let {
             when (val result = remoteRepository.createChat(
                 accessToken = accessToken,
-                subGroupId = it.id,
+                groupId = it.id,
                 name = _state.value.name,
                 phone = _state.value.phone,
                 message = _state.value.message,

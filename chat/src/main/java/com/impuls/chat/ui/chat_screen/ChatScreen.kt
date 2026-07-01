@@ -43,7 +43,7 @@ import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
@@ -94,7 +94,7 @@ private fun ChatScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = state.chat?.subgroup?.name ?: "") },
+                title = { Text(text = state.chat?.group?.name ?: "") },
                 actions = {
                     UiIconButton(
                         icon = ImageVector.vectorResource(R.drawable.close_24dp),
@@ -208,6 +208,7 @@ private fun StatusIndicator(status: StatusMessage) {
         StatusMessage.SENDED -> "..."
         StatusMessage.DELIVERED -> "✓"
         StatusMessage.ERROR_SEND -> "!"
+        StatusMessage.READED -> "✓✓"
     }
     Text(
         text = text,
@@ -264,7 +265,7 @@ private fun ChatWithMessagesPreview() {
     val snackBarState = remember { SnackbarHostState() }
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-    val mockSubGroup = SubGroup(id = "1", name = "Техподдержка")
+    val mockGroup = Group(id = "1", name = "Техподдержка")
     val mockRole = Role(id = "1", name = "User")
     val mockUser = User(
         email = "user@test.com",
@@ -315,7 +316,9 @@ private fun ChatWithMessagesPreview() {
         isWork = true,
         name = "Обращение №123",
         phone = "123456789",
-        subgroup = mockSubGroup
+        group = mockGroup,
+        isActive = true,
+        unreadMessagesCount = 0
     )
 
     ChatScreen(

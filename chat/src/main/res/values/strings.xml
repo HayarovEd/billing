@@ -26,12 +26,12 @@
     <string name="phone_is_empty">Укажите телефон</string>
     <string name="name_is_empty">Укажите имя</string>
     <string name="theme_not_choosed">Выберите тему</string>
-    <string name="create_appeal">Создание обращения</string>
+    <string name="create_appeal">Поддержка</string>
     <string name="your_name">Ваше имя</string>
     <string name="email_label">Email</string>
     <string name="phone_label">Телефон</string>
     <string name="choose_theme_label">Выберите тему:</string>
     <string name="message_label">Сообщение</string>
-    <string name="create_chat_button">Создать чат</string>
+    <string name="create_chat_button">Открыть чат</string>
     <string name="your_chats">Ваши чаты</string>
 </resources>

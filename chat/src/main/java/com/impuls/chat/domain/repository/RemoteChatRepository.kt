@@ -1,7 +1,7 @@
 package com.impuls.chat.domain.repository
 
 import com.impuls.chat.domain.model.Chat
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
@@ -15,14 +15,14 @@ interface RemoteChatRepository {
     ): ResultWork<Token, ChatDataError>
 
     suspend fun onRefresh(refresh: String): ResultWork<Token, ChatDataError>
-    suspend fun getThemesByGroupName(
+    suspend fun getGroupByGroupName(
         accessToken: String,
         groupName: String
-    ): ResultWork<List<SubGroup>, ChatDataError>
+    ): ResultWork<Group, ChatDataError>
 
     suspend fun createChat(
         accessToken: String,
-        subGroupId: String,
+        groupId: String,
         name: String,
         phone: String,
         message: String,

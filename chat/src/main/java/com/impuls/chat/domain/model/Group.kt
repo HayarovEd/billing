@@ -1,7 +1,7 @@
 package com.impuls.chat.domain.model
 
 
-data class SubGroup(
+data class Group(
     val id: String,
     val name: String
 )

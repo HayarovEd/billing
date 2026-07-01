@@ -9,7 +9,5 @@ data class GroupDto(
     @SerialName("id")
     val id: String,
     @SerialName("name")
-    val name: String,
-    @SerialName("subgroups")
-    val subgroups: List<SubgroupDto>
+    val name: String
 )

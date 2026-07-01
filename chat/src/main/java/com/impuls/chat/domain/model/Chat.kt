@@ -12,5 +12,7 @@ data class Chat(
     val isWork: Boolean,
     val name: String,
     val phone: String,
-    val subgroup: SubGroup,
+    val group: Group,
+    val isActive: Boolean,
+    val unreadMessagesCount: Int,
 )

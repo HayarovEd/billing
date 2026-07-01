@@ -1,7 +1,7 @@
 package com.impuls.chat.ui.main_screen
 
 import com.impuls.chat.domain.model.Chat
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 
 data class MainScreenState(
     val name: String = "",
@@ -9,9 +9,9 @@ data class MainScreenState(
     val password: String = "",
     val email: String = "",
     val groupName: String = "",
-    val themes: List<SubGroup> = emptyList(),
+    val group: Group? = null,
     val isLoading: Boolean = false,
-    val selectedTheme: SubGroup? = null,
+    val selectedTheme: Group? = null,
     val phone: String = "",
     val message: String = "",
     val chat: Chat? = null,

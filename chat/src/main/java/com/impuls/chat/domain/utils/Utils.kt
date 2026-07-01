@@ -88,7 +88,7 @@ internal object Utils {
             phone = updateChat.phone,
             isOpen = updateChat.isOpen,
             isWork = updateChat.isWork,
-            subgroup = updateChat.subgroup,
+            group = updateChat.group,
             connections = allConnections
         )
 

@@ -16,7 +16,6 @@ import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.navigation.NavigationChatRoute
 import com.impuls.chat.ui.uikit.asUiText
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -153,7 +152,7 @@ class ChatScreenViewModel(
                 id = "-1",
                 isSupport = false,
                 text = message,
-                statusMessage = StatusMessage.SENDED
+                statusMessage = StatusMessage.SENDED,
             )
             _state.update {
                 it.copy(
@@ -231,7 +230,7 @@ class ChatScreenViewModel(
 
                             newMsgs.forEach { message ->
                                 notificationRepository.showNotification(
-                                    title = data.chat.subgroup.name,
+                                    title = data.chat.group.name,
                                     message = message.text,
                                     chatId = data.chat.id
                                 )

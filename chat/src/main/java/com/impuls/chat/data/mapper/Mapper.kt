@@ -11,17 +11,15 @@ import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
 
-fun GroupDto.convertToSubGroups(): List<SubGroup> {
-    return this.subgroups.map {
-        SubGroup(
-            id = it.id,
-            name = it.name
-        )
-    }
+fun GroupDto.convertToGroup(): Group {
+    return Group(
+        id = id,
+        name = name
+    )
 }
 
 fun RoleDto.convertToRole(): Role {
@@ -47,7 +45,7 @@ fun MessageDto.convertToMessage(): Message {
         id = this.id,
         isSupport = this.isSupport,
         text = this.text,
-        statusMessage = StatusMessage.DELIVERED
+        statusMessage = if (this.isRead) StatusMessage.READED else  StatusMessage.DELIVERED
     )
 }
 
@@ -73,10 +71,12 @@ fun ChatDto.convertToChat(): Chat {
         isWork = this.isWork,
         name = this.name,
         phone = this.phone,
-        subgroup = SubGroup(
+        group = Group(
             id = this.subgroup.id,
             name = this.subgroup.name
-        )
+        ),
+        isActive = this.isActive,
+        unreadMessagesCount = this.unreadMessagesCount
     )
 }
 

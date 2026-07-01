@@ -3,7 +3,7 @@ package com.impuls.chat.data.repository
 import android.util.Log
 import com.impuls.chat.data.handler.handleResponse
 import com.impuls.chat.data.mapper.convertToChat
-import com.impuls.chat.data.mapper.convertToSubGroups
+import com.impuls.chat.data.mapper.convertToGroup
 import com.impuls.chat.data.remote.request.CreateChatRequest
 import com.impuls.chat.data.remote.request.LoginFromAppRequest
 import com.impuls.chat.data.remote.request.MessageRequest
@@ -11,7 +11,7 @@ import com.impuls.chat.data.remote.response.GroupDto
 import com.impuls.chat.data.remote.response.LoginFromAppDto
 import com.impuls.chat.data.remote.response.create_chat_dto.ChatDto
 import com.impuls.chat.domain.model.Chat
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.utils.BASE_CHAT_URL
@@ -93,10 +93,10 @@ internal class RemoteRepositoryImpl(
         }
     }
 
-    override suspend fun getThemesByGroupName(
+    override suspend fun getGroupByGroupName(
         accessToken: String,
         groupName: String,
-    ): ResultWork<List<SubGroup>, ChatDataError> {
+    ): ResultWork<Group, ChatDataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
@@ -107,7 +107,7 @@ internal class RemoteRepositoryImpl(
                     }
                 },
                 data = {
-                    it.body<GroupDto>().convertToSubGroups()
+                    it.body<GroupDto>().convertToGroup()
                 }
             )
         }
@@ -115,7 +115,7 @@ internal class RemoteRepositoryImpl(
 
     override suspend fun createChat(
         accessToken: String,
-        subGroupId: String,
+        groupId: String,
         name: String,
         phone: String,
         message: String,
@@ -126,7 +126,7 @@ internal class RemoteRepositoryImpl(
                 request = {
                     client.post("${BASE_CHAT_URL}chats") {
                         contentType(ContentType.Application.Json)
-                        parameter("subgroupId", subGroupId)
+                        parameter("subgroupId", groupId)
                         bearerAuth(accessToken)
                         setBody(
                             CreateChatRequest(

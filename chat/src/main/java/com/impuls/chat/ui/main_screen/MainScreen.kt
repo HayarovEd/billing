@@ -40,7 +40,7 @@ import com.impuls.chat.R
 import com.impuls.chat.domain.utils.MASK
 import com.impuls.chat.domain.utils.MASK_NUMBER
 import com.impuls.chat.domain.model.Chat
-import com.impuls.chat.domain.model.SubGroup
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.domain.utils.Utils.formatLocalDateTime
 import com.impuls.chat.ui.uikit.ObserveAsEvents
@@ -108,47 +108,6 @@ private fun MainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (state.userChats.isNotEmpty()) {
-                    Text(
-                        text = stringResource(R.string.your_chats),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Start)
-                    )
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
-                        items(state.userChats) { chat ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .clickable { onAction(MainScreenAction.OnChatClick(chat.id)) }
-                                    .padding(16.dp)
-                            ) {
-                                Column {
-                                    Text(
-                                        text = chat.subgroup.name,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = chat.name,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                    Text(
-                                        text = formatLocalDateTime(chat.createdDate),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
                 Text(
                     text = stringResource(R.string.create_appeal),
                     style = MaterialTheme.typography.headlineMedium,
@@ -174,38 +133,6 @@ private fun MainScreen(
                     visualTransformation = PhoneVisualTransformation(MASK, MASK_NUMBER),
                     onClickContent = { onAction(MainScreenAction.UpdatePhone(it)) }
                 )
-
-                Text(
-                    text = stringResource(R.string.choose_theme_label),
-                    modifier = Modifier.align(Alignment.Start),
-                    style = MaterialTheme.typography.labelLarge
-                )
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 4.dp)
-                ) {
-                    items(state.themes) { theme ->
-                        val isSelected = state.selectedTheme?.id == theme.id
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(
-                                    if (isSelected) MaterialTheme.colorScheme.primary 
-                                    else MaterialTheme.colorScheme.surfaceVariant
-                                )
-                                .clickable { onAction(MainScreenAction.UpdateTheme(theme)) }
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = theme.name,
-                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
-                }
 
                 UiTextField(
                     content = state.message,
@@ -234,7 +161,7 @@ private fun MainScreen(
                 }
             }
             
-            if (state.isLoading && state.themes.isEmpty()) {
+            if (state.isLoading) {
                 CircularProgressIndicator()
             }
         }
@@ -261,7 +188,7 @@ private fun Preview() {
 @Composable
 private fun MainScreenWithChatsPreview() {
     val snackBarState = remember { SnackbarHostState() }
-    val mockSubGroup = SubGroup(id = "1", name = "Техподдержка")
+    val mockGroup = Group(id = "1", name = "Техподдержка")
     val mockChats = listOf(
         Chat(
             connections = emptyList(),
@@ -272,7 +199,9 @@ private fun MainScreenWithChatsPreview() {
             isWork = true,
             name = "Проблема с доступом",
             phone = "79026355319",
-            subgroup = mockSubGroup
+            group = mockGroup,
+            isActive = false,
+            unreadMessagesCount = 1
         ),
         Chat(
             connections = emptyList(),
@@ -283,7 +212,9 @@ private fun MainScreenWithChatsPreview() {
             isWork = true,
             name = "Вопрос по оплате",
             phone = "79026355319",
-            subgroup = mockSubGroup
+            group = mockGroup,
+            isActive = true,
+            unreadMessagesCount = 0
         )
     )
 
