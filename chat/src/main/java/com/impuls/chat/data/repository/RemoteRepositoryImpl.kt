@@ -93,16 +93,16 @@ internal class RemoteRepositoryImpl(
         }
     }
 
-    override suspend fun getGroupByGroupName(
+    override suspend fun getGroupByOperId(
         accessToken: String,
-        groupName: String,
+        operId: Long,
     ): ResultWork<Group, ChatDataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.get("${BASE_CHAT_URL}groups/") {
+                    client.get("${BASE_CHAT_URL}groups/oper") {
                         contentType(ContentType.Application.Json)
-                        parameter("name", groupName)
+                        parameter("oper_id", operId)
                         bearerAuth(accessToken)
                     }
                 },

@@ -59,7 +59,7 @@ fun ProfileScreenRoot(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
-    onNavigateToMainChat: (String, String, String, String, String) -> Unit
+    onNavigateToMainChat: (String, String, String, String, Long) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -118,7 +118,7 @@ private fun ProfileScreenScreen(
         login: String,
         password: String,
         email: String,
-        groupName: String
+        operId: Long
     ) -> Unit
 ) {
 
@@ -155,14 +155,16 @@ private fun ProfileScreenScreen(
                 icon = ImageVector.vectorResource(R.drawable.chat_24dp),
                 buttonColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
                 onClick = {
-                    state.account?.let { acc->
-                        onNavigateToMainChat(
-                            acc.account.name,
-                            acc.account.login,
-                            acc.account.password,
-                            acc.account.email,
-                            "НПО Импульс" //TODO нужно определиться с группами
-                        )
+                    state.account?.let { acc ->
+                        if (acc.agreements.isNotEmpty()) {
+                            onNavigateToMainChat(
+                                acc.account.name,
+                                acc.account.login,
+                                acc.account.password,
+                                acc.account.email,
+                                acc.agreements.first().operId
+                            )
+                        }
                     }
 
                 }

@@ -128,7 +128,7 @@ fun NavController(
                             login = login,
                             password = password,
                             email = email,
-                            groupName = groupName
+                            operId = groupName
                         )
                     )
                 }

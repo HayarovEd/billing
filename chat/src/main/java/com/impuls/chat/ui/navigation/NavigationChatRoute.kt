@@ -6,11 +6,11 @@ sealed class NavigationChatRoute {
 
     @Serializable
     data class MainRoute(
-        val name: String = "Test App",
-        val login:String = "testapp",
-        val password: String = "ut82fph38u",
-        val email: String = "",
-        val groupName: String = "НПО Импульс",
+        val name: String,
+        val login:String,
+        val password: String,
+        val email: String,
+        val operId: Long,
     ): NavigationChatRoute()
     @Serializable
     data class ChatRoute(

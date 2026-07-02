@@ -37,7 +37,7 @@ class MainScreenViewModel(
             login = routeData.login,
             password = routeData.password,
             email = routeData.email,
-            groupName = routeData.groupName
+            operId = routeData.operId
         )
     )
     val state = _state
@@ -135,18 +135,20 @@ class MainScreenViewModel(
 
 
     private suspend fun getThemes(accessToken: String) {
-        when (val result = remoteRepository.getGroupByGroupName(
-            accessToken = accessToken,
-            groupName = _state.value.groupName
-        )) {
-            is ResultWork.Error -> {
-                eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
-            }
-            is ResultWork.Success -> {
-                _state.update {
-                    it.copy(
-                        group = result.data
-                    )
+        _state.value.operId?.let { oi->
+            when (val result = remoteRepository.getGroupByOperId(
+                accessToken = accessToken,
+                operId = oi
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                }
+                is ResultWork.Success -> {
+                    _state.update {
+                        it.copy(
+                            group = result.data
+                        )
+                    }
                 }
             }
         }

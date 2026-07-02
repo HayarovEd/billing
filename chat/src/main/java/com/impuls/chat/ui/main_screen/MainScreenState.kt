@@ -8,7 +8,7 @@ data class MainScreenState(
     val login: String = "",
     val password: String = "",
     val email: String = "",
-    val groupName: String = "",
+    val operId: Long? = null,
     val group: Group? = null,
     val isLoading: Boolean = false,
     val selectedTheme: Group? = null,

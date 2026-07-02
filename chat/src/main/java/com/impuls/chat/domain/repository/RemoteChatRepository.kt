@@ -15,9 +15,9 @@ interface RemoteChatRepository {
     ): ResultWork<Token, ChatDataError>
 
     suspend fun onRefresh(refresh: String): ResultWork<Token, ChatDataError>
-    suspend fun getGroupByGroupName(
+    suspend fun getGroupByOperId(
         accessToken: String,
-        groupName: String
+        operId: Long
     ): ResultWork<Group, ChatDataError>
 
     suspend fun createChat(
