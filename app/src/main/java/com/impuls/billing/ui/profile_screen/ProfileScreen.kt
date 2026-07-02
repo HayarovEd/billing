@@ -161,7 +161,7 @@ private fun ProfileScreenScreen(
                             acc.account.login,
                             acc.account.password,
                             acc.account.email,
-                            "Группа 16" //TODO нужно определиться с группами
+                            "НПО Импульс" //TODO нужно определиться с группами
                         )
                     }
 

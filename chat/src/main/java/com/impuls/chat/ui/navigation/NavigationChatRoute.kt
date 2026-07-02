@@ -10,7 +10,7 @@ sealed class NavigationChatRoute {
         val login:String = "testapp",
         val password: String = "ut82fph38u",
         val email: String = "",
-        val groupName: String = "Группа 15",
+        val groupName: String = "НПО Импульс",
     ): NavigationChatRoute()
     @Serializable
     data class ChatRoute(
