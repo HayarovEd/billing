@@ -58,7 +58,7 @@ fun ConnectionDto.convertToConnection(): Connection {
         start = Utils.convertToLocalDateTime(
             this.start
         ),
-        user = this.user.convertToUser()
+        user = this.user?.convertToUser()
     )
 }
 

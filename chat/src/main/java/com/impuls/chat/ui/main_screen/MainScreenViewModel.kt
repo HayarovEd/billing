@@ -196,7 +196,7 @@ class MainScreenViewModel(
                 login = _state.value.login
             )) {
                 is ResultWork.Error -> {
-                    eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                   // eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 }
                 is ResultWork.Success -> {
                     _state.update { st ->

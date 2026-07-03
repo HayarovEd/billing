@@ -15,5 +15,5 @@ data class ConnectionDto(
     @SerialName("start")
     val start: String,
     @SerialName("user")
-    val user: UserDto
+    val user: UserDto?
 )

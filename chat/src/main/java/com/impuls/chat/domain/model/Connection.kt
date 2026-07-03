@@ -7,5 +7,5 @@ data class Connection(
     val id: String,
     val messages: List<Message>,
     val start: LocalDateTime,
-    val user: User
+    val user: User?
 )
