@@ -4,6 +4,7 @@ import android.util.Patterns
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Message
+import com.impuls.chat.domain.model.StatusMessage
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
@@ -99,13 +100,15 @@ internal object Utils {
         // Используем Map для быстрого поиска существующих сообщений по id
         val existingMessageMap = existingMessages.associateBy { it.id }.toMutableMap()
 
-        // Добавляем новые сообщения (если id нет в существующих)
+        // Добавляем или обновляем сообщения
         newMessages.forEach { newMessage ->
-            if (!existingMessageMap.containsKey(newMessage.id)) {
+            val existingMessage = existingMessageMap[newMessage.id]
+            if (existingMessage == null) {
+                existingMessageMap[newMessage.id] = newMessage
+            } else if (existingMessage.statusMessage != StatusMessage.READED) {
+                // Если сообщение уже существует, обновляем его, только если оно еще не помечено как READED
                 existingMessageMap[newMessage.id] = newMessage
             }
-            // Если id уже существует - можно либо пропустить, либо обновить (зависит от логики)
-            // В данном случае пропускаем, чтобы сохранить существующие данные
         }
 
         // Сортируем по дате (опционально)

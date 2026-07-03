@@ -163,7 +163,7 @@ private fun MessageItem(
     onAction: (ChatScreenAction) -> Unit
 ) {
     LaunchedEffect(message.id, message.statusMessage) {
-        if (message.isSupport && message.statusMessage != StatusMessage.READED && message.id != "-1") {
+        if (message.isSupport && message.statusMessage != StatusMessage.READED) {
             onAction(ChatScreenAction.SetMessageAsRead(message.id))
         }
     }
