@@ -225,7 +225,7 @@ fun NavController(
         composable<NavigationChatRoute.ChatRoute> {
             ChatScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigateUp()
+                    navController.popBackStack<NavigationChatRoute.MainRoute>(inclusive = true)
                 }
             )
         }

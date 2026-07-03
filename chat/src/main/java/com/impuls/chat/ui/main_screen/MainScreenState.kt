@@ -10,9 +10,17 @@ data class MainScreenState(
     val email: String = "",
     val operId: Long? = null,
     val group: Group? = null,
-    val isLoading: Boolean = false,
+   //val isLoading: Boolean = false,
     val phone: String = "",
     val message: String = "",
     val chat: Chat? = null,
     val userChats: List<Chat> = emptyList(),
+    val status: MainStatus = MainStatus.IDLE
 )
+
+enum class MainStatus {
+    IDLE,
+    LOADING,
+    SUCCESS,
+    ERROR
+}

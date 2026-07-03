@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -45,8 +46,18 @@ class MainScreenViewModel(
             loadData(
                 action = { token ->
                     coroutineScope {
-                        launch { getThemes(token) }
-                        launch { getUserChats(token) }
+                        _state.update { it.copy(status = MainStatus.LOADING) }
+                        val themesDeferred = async { getThemes(token) }
+                        val chatsDeferred = async { getUserChats(token) }
+                        
+                        val themesResult = themesDeferred.await()
+                        val chatsResult = chatsDeferred.await()
+
+                        if (themesResult && chatsResult) {
+                            _state.update { it.copy(status = MainStatus.SUCCESS) }
+                        } else {
+                            _state.update { it.copy(status = MainStatus.ERROR) }
+                        }
                     }
                 }
             )
@@ -95,11 +106,11 @@ class MainScreenViewModel(
                     createChat(it)
                 }
             }
-            is MainScreenAction.OnChatClick -> {
+          /*  is MainScreenAction.OnChatClick -> {
                 viewModelScope.launch {
                     eventChannel.send(MainScreenEvent.NavigateEvent(action.chatId))
                 }
-            }
+            }*/
         }
     }
 
@@ -109,7 +120,7 @@ class MainScreenViewModel(
         viewModelScope.launch {
             delay(500.milliseconds)
             val currentState = _state.value
-            _state.update { it.copy(isLoading = true) }
+           // _state.update { it.copy(isLoading = true) }
             authUseCase.invoke(
                 function = {
                     action(it)
@@ -122,19 +133,20 @@ class MainScreenViewModel(
                 email = currentState.email,
                 password = currentState.password,
             )
-            _state.update { it.copy(isLoading = false) }
+            //_state.update { it.copy(isLoading = false) }
         }
     }
 
 
-    private suspend fun getThemes(accessToken: String) {
-        _state.value.operId?.let { oi->
+    private suspend fun getThemes(accessToken: String): Boolean {
+        return _state.value.operId?.let { oi ->
             when (val result = remoteRepository.getGroupByOperId(
                 accessToken = accessToken,
                 operId = oi
             )) {
                 is ResultWork.Error -> {
                     eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                    false
                 }
                 is ResultWork.Success -> {
                     _state.update {
@@ -142,18 +154,20 @@ class MainScreenViewModel(
                             group = result.data
                         )
                     }
+                    true
                 }
             }
-        }
+        } ?: true
     }
 
-    private suspend fun getUserChats(accessToken: String) {
-        when (val result = remoteRepository.getOpenChatsByUser(
+    private suspend fun getUserChats(accessToken: String): Boolean {
+        return when (val result = remoteRepository.getOpenChatsByUser(
             accessToken = accessToken,
             login = _state.value.login
         )) {
             is ResultWork.Error -> {
                 eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                false
             }
             is ResultWork.Success -> {
                 _state.update {
@@ -164,6 +178,7 @@ class MainScreenViewModel(
                 if (result.data.isNotEmpty()) {
                     eventChannel.send(MainScreenEvent.NavigateEvent(result.data.last().id))
                 }
+                true
             }
         }
     }

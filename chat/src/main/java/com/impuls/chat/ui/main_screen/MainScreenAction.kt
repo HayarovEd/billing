@@ -7,5 +7,4 @@ sealed interface MainScreenAction {
     class UpdatePhone(val phone: String) : MainScreenAction
     class UpdateMessage(val message: String) : MainScreenAction
     data object CreateChat: MainScreenAction
-    data class OnChatClick(val chatId: String) : MainScreenAction
 }

@@ -7,8 +7,6 @@ import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.StatusMessage
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.FormatStringsInDatetimeFormats
-import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -16,16 +14,6 @@ internal object Utils {
     fun convertToLocalDateTime (timestamp: String): LocalDateTime {
         val instant = Instant.parse(timestamp)
         return instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    }
-
-    @OptIn(FormatStringsInDatetimeFormats::class)
-    fun formatLocalDateTime(dateTime: LocalDateTime): String {
-        return "${dateTime.day}-${dateTime.month.number}-${dateTime.year} ${dateTime.hour}:${dateTime.minute}"
-    }
-
-    fun main() {
-        val dateTime = LocalDateTime(2026, 6, 23, 8, 45)
-        println(formatLocalDateTime(dateTime)) // 23 июня 2026 года 08:45
     }
 
     fun isValidEmail(email: String): Boolean {

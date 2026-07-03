@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -107,6 +108,7 @@ private fun ChatScreen(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
             ChatInput(
+                modifier = Modifier.navigationBarsPadding(),
                 message = state.currentMessage,
                 onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
                 onSend = { onAction(ChatScreenAction.SendMessage(it)) }
@@ -120,7 +122,9 @@ private fun ChatScreen(
         ) {
             MessageList(
                 messages = state.allMessages,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .fillMaxWidth(),
                 onAction = onAction
             )
 
@@ -230,12 +234,13 @@ private fun StatusIndicator(status: StatusMessage) {
 
 @Composable
 private fun ChatInput(
+    modifier: Modifier = Modifier,
     message: String,
     onMessageChange: (String) -> Unit,
     onSend: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
