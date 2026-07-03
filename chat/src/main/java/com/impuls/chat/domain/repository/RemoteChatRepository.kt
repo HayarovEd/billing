@@ -26,13 +26,13 @@ interface RemoteChatRepository {
         name: String,
         phone: String,
         message: String,
-        email: String
+        email: String,
+        login: String,
     ): ResultWork<Chat, ChatDataError>
 
     suspend fun getOpenChatsByUser(
         accessToken: String,
-        isMy: Boolean = true,
-        isOpen: Boolean = true
+        login: String,
     ): ResultWork<List<Chat>, ChatDataError>
 
     suspend fun sendMessage(

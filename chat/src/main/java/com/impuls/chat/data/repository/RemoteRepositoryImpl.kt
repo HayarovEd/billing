@@ -119,18 +119,20 @@ internal class RemoteRepositoryImpl(
         name: String,
         phone: String,
         message: String,
-        email: String
+        email: String,
+        login: String,
     ): ResultWork<Chat, ChatDataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
                     client.post("${BASE_CHAT_URL}chats") {
                         contentType(ContentType.Application.Json)
-                        parameter("subgroupId", groupId)
+                        parameter("groupId", groupId)
                         bearerAuth(accessToken)
                         setBody(
                             CreateChatRequest(
                                 name = name,
+                                login = login,
                                 phone = phone,
                                 message = message,
                                 email = email
@@ -147,16 +149,14 @@ internal class RemoteRepositoryImpl(
 
     override suspend fun getOpenChatsByUser(
         accessToken: String,
-        isMy: Boolean,
-        isOpen: Boolean
+        login: String,
     ): ResultWork<List<Chat>, ChatDataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
-                    client.get("${BASE_CHAT_URL}chats") {
+                    client.get("${BASE_CHAT_URL}chats/user_chats") {
                         contentType(ContentType.Application.Json)
-                        parameter("isMy", isMy)
-                        parameter("isOpen", isOpen)
+                        parameter("login", login)
                         bearerAuth(accessToken)
                     }
                 },

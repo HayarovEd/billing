@@ -11,6 +11,7 @@ data class Chat(
     val isOpen: Boolean,
     val isWork: Boolean,
     val name: String,
+    val login: String,
     val phone: String,
     val group: Group,
     val isActive: Boolean,

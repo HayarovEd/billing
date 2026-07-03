@@ -90,13 +90,6 @@ class MainScreenViewModel(
                     )
                 }
             }
-            is MainScreenAction.UpdateTheme -> {
-                _state.update {
-                    it.copy(
-                        selectedTheme = action.theme
-                    )
-                }
-            }
             MainScreenAction.CreateChat -> {
                 loadData {
                     createChat(it)
@@ -157,6 +150,7 @@ class MainScreenViewModel(
     private suspend fun getUserChats(accessToken: String) {
         when (val result = remoteRepository.getOpenChatsByUser(
             accessToken = accessToken,
+            login = _state.value.login
         )) {
             is ResultWork.Error -> {
                 eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
@@ -167,15 +161,14 @@ class MainScreenViewModel(
                         userChats = result.data
                     )
                 }
+                if (result.data.isNotEmpty()) {
+                    eventChannel.send(MainScreenEvent.NavigateEvent(result.data.last().id))
+                }
             }
         }
     }
 
     private suspend fun createChat(accessToken: String) {
-        if (_state.value.selectedTheme == null) {
-            eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.SELECTED_THEME_NULL))
-            return
-        }
         if (_state.value.message.isEmpty()) {
             eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.MESSAGE_EMPTY))
             return
@@ -192,14 +185,15 @@ class MainScreenViewModel(
             eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.WRONG_EMAIL))
             return
         }
-        _state.value.selectedTheme?.let {
+        _state.value.group?.let {
             when (val result = remoteRepository.createChat(
                 accessToken = accessToken,
                 groupId = it.id,
                 name = _state.value.name,
                 phone = _state.value.phone,
                 message = _state.value.message,
-                email = _state.value.email
+                email = _state.value.email,
+                login = _state.value.login
             )) {
                 is ResultWork.Error -> {
                     eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))

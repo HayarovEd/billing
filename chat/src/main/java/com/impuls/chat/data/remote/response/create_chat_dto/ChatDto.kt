@@ -9,12 +9,13 @@ import kotlinx.serialization.Serializable
 data class ChatDto(
     @SerialName("connections")
     val connections: List<ConnectionDto>,
-    @SerialName("createdDate")
+    @SerialName("created_date")
     val createdDate: String,
     @SerialName("email")
     val email: String,
     @SerialName("id")
     val id: String,
+
     @SerialName("is_open")
     val isOpen: Boolean,
     @SerialName("is_work")
@@ -25,8 +26,10 @@ data class ChatDto(
     val unreadMessagesCount: Int,
     @SerialName("name")
     val name: String,
+    @SerialName("login")
+    val login: String,
     @SerialName("phone")
     val phone: String,
-    @SerialName("subgroup")
-    val subgroup: GroupDto
+    @SerialName("group")
+    val group: GroupDto
 )

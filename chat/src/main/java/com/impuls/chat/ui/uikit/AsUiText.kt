@@ -83,11 +83,6 @@ internal fun MessageErrorEvent.asText(): UiText {
                 R.string.name_is_empty
             )
         }
-        MessageErrorEvent.SELECTED_THEME_NULL -> {
-            StringResource(
-                R.string.theme_not_choosed
-            )
-        }
     }
 }
 

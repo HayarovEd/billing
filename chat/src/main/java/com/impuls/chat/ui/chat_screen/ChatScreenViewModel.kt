@@ -187,6 +187,10 @@ class ChatScreenViewModel(
 
     private fun closeChat(accessToken: String) {
         viewModelScope.launch {
+            eventChannel.send(ChatScreenEvent.NavigateToLogin)
+        }
+
+        /*viewModelScope.launch {
             when (val result = remoteRepository.closeChat(
                 accessToken = accessToken,
                 chatId = routeData.chatId
@@ -200,7 +204,7 @@ class ChatScreenViewModel(
                     eventChannel.send(ChatScreenEvent.NavigateToLogin)
                 }
             }
-        }
+        }*/
     }
 
     private fun updateChat(accessToken: String) {

@@ -11,7 +11,6 @@ data class MainScreenState(
     val operId: Long? = null,
     val group: Group? = null,
     val isLoading: Boolean = false,
-    val selectedTheme: Group? = null,
     val phone: String = "",
     val message: String = "",
     val chat: Chat? = null,

@@ -18,7 +18,8 @@ import com.impuls.chat.domain.utils.Utils
 fun GroupDto.convertToGroup(): Group {
     return Group(
         id = id,
-        name = name
+        name = name,
+        operId = operId
     )
 }
 
@@ -70,10 +71,12 @@ fun ChatDto.convertToChat(): Chat {
         isOpen = this.isOpen,
         isWork = this.isWork,
         name = this.name,
+        login = this.login,
         phone = this.phone,
         group = Group(
-            id = this.subgroup.id,
-            name = this.subgroup.name
+            id = this.group.id,
+            name = this.group.name,
+            operId = this.group.operId
         ),
         isActive = this.isActive,
         unreadMessagesCount = this.unreadMessagesCount

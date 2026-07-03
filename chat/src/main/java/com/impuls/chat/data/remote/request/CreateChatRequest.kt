@@ -12,6 +12,8 @@ data class CreateChatRequest(
     val message: String,
     @SerialName("name")
     val name: String,
+    @SerialName("login")
+    val login: String,
     @SerialName("phone")
     val phone: String
 )

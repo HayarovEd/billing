@@ -9,5 +9,7 @@ data class GroupDto(
     @SerialName("id")
     val id: String,
     @SerialName("name")
-    val name: String
+    val name: String,
+    @SerialName("oper_id")
+    val operId: Long
 )

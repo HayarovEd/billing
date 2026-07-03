@@ -180,7 +180,7 @@ private fun Preview() {
 @Composable
 private fun MainScreenWithChatsPreview() {
     val snackBarState = remember { SnackbarHostState() }
-    val mockGroup = Group(id = "1", name = "Техподдержка")
+    val mockGroup = Group(id = "1", name = "Техподдержка", operId = 1)
     val mockChats = listOf(
         Chat(
             connections = emptyList(),
@@ -193,7 +193,8 @@ private fun MainScreenWithChatsPreview() {
             phone = "79026355319",
             group = mockGroup,
             isActive = false,
-            unreadMessagesCount = 1
+            unreadMessagesCount = 1,
+            login = "eree"
         ),
         Chat(
             connections = emptyList(),
@@ -206,7 +207,8 @@ private fun MainScreenWithChatsPreview() {
             phone = "79026355319",
             group = mockGroup,
             isActive = true,
-            unreadMessagesCount = 0
+            unreadMessagesCount = 0,
+            login = "eree"
         )
     )
 

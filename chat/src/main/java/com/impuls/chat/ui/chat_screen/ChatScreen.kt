@@ -265,7 +265,7 @@ private fun ChatWithMessagesPreview() {
     val snackBarState = remember { SnackbarHostState() }
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-    val mockGroup = Group(id = "1", name = "Техподдержка")
+    val mockGroup = Group(id = "1", name = "Техподдержка", operId = 1)
     val mockRole = Role(id = "1", name = "User")
     val mockUser = User(
         email = "user@test.com",
@@ -318,6 +318,7 @@ private fun ChatWithMessagesPreview() {
         phone = "123456789",
         group = mockGroup,
         isActive = true,
+        login = "user",
         unreadMessagesCount = 0
     )
 

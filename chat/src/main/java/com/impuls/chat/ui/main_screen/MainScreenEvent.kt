@@ -14,5 +14,4 @@ enum class MessageErrorEvent{
     WRONG_EMAIL,
     PHONE_EMPTY,
     NAME_EMPTY,
-    SELECTED_THEME_NULL
 }
