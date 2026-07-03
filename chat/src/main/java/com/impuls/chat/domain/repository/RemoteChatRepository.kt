@@ -47,4 +47,8 @@ interface RemoteChatRepository {
     ): ResultWork<Unit, ChatDataError>
 
     suspend fun getChatById(accessToken: String, chatId: String): ResultWork<Chat, ChatDataError>
+    suspend fun markMessageAsRead(
+        accessToken: String,
+        messageId: String
+    ): ResultWork<Unit, ChatDataError>
 }

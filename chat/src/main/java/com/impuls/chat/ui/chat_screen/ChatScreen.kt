@@ -120,7 +120,8 @@ private fun ChatScreen(
         ) {
             MessageList(
                 messages = state.allMessages,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                onAction = onAction
             )
 
             if (state.isLoading) {
@@ -133,7 +134,8 @@ private fun ChatScreen(
 @Composable
 private fun MessageList(
     messages: List<Message>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAction: (ChatScreenAction) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -150,13 +152,21 @@ private fun MessageList(
         reverseLayout = false
     ) {
         items(messages.sortedBy { it.date }) { message ->
-            MessageItem(message = message)
+            MessageItem(message = message, onAction = onAction)
         }
     }
 }
 
 @Composable
-private fun MessageItem(message: Message) {
+private fun MessageItem(
+    message: Message,
+    onAction: (ChatScreenAction) -> Unit
+) {
+    LaunchedEffect(message.id, message.statusMessage) {
+        if (message.isSupport && message.statusMessage != StatusMessage.READED && message.id != "-1") {
+            onAction(ChatScreenAction.SetMessageAsRead(message.id))
+        }
+    }
     val alignment = if (message.isSupport) Alignment.Start else Alignment.End
     val backgroundColor = if (message.isSupport) {
         MaterialTheme.colorScheme.surfaceVariant

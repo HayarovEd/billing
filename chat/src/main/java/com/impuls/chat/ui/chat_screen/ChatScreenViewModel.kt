@@ -90,6 +90,15 @@ class ChatScreenViewModel(
                     )
                 }
             }
+
+            is ChatScreenAction.SetMessageAsRead -> {
+                loadData {
+                    markMethodAsRead(
+                        messageId = action.messageId,
+                        accessToken = it
+                    )
+                }
+            }
         }
     }
 
@@ -242,6 +251,23 @@ class ChatScreenViewModel(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun markMethodAsRead(
+        messageId: String,
+        accessToken: String
+    ) {
+        viewModelScope.launch {
+            when (val result = remoteRepository.markMessageAsRead(
+                accessToken = accessToken,
+                messageId = messageId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
+                }
+                is ResultWork.Success -> {}
             }
         }
     }

@@ -232,6 +232,23 @@ internal class RemoteRepositoryImpl(
         }
     }
 
+    override suspend fun markMessageAsRead(
+        accessToken: String,
+        messageId: String
+    ): ResultWork<Unit, ChatDataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("${BASE_CHAT_URL}messages/$messageId/read") {
+                        contentType(ContentType.Application.Json)
+                        bearerAuth(accessToken)
+                    }
+                },
+                data = {}
+            )
+        }
+    }
+
     private fun extractRefreshTokenFromResponse(response: HttpResponse): String? {
         return response.setCookie()
             .find { it.name.equals("refreshToken", ignoreCase = true) }
