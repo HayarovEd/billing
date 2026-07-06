@@ -4,20 +4,20 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
+val appId = "com.impuls.billing"
+val vCode = 1
+val vName = "0.003"
+
 android {
-    namespace = "com.impuls.billing"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    namespace = appId
+    compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.impuls.billing"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = appId
+        minSdk = 26
+        targetSdk = 37
+        versionCode = vCode
+        versionName = vName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,7 +40,16 @@ android {
     }
 }
 
+base {
+    archivesName.set("Billing_${vName}")
+}
+
+
 dependencies {
+    implementation(project(":download_install"))
+    implementation(project(":chat"))
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -59,23 +68,23 @@ dependencies {
 
 
     //datastore
-    api(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences)
 
     //ktor
-    api(libs.ktor.client.core)
-    api(libs.ktor.client.okhttp)
-    api(libs.ktor.client.content.negotiation)
-    api(libs.ktor.serialization.kotlinx.json)
-    api(libs.ktor.client.logging)
-    api(libs.ktor.client.andriod)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.andriod)
     implementation(libs.ktor.serialization.kotlinx.xml)
     implementation(libs.ktor.serialization.kotlinx.json)
 
 
     //Koin
-    api(libs.koin.core)
-    api(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
 
     // Coil
     implementation(libs.coil.compose)
@@ -88,4 +97,10 @@ dependencies {
 
     //jsoup
     implementation(libs.jsoup)
+
+
+    implementation(libs.compose)
+
+
+
 }

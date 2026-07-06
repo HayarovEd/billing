@@ -248,10 +248,6 @@ data class ColorFamily(
     val onColorContainer: Color
 )
 
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
-
 
 
 @Composable
@@ -267,8 +263,8 @@ fun BillingTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkScheme
-        else -> lightScheme
+        darkTheme -> mediumContrastDarkColorScheme
+        else -> mediumContrastLightColorScheme
     }
 
     MaterialTheme(

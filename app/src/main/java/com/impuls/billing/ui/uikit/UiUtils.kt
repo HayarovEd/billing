@@ -2,10 +2,13 @@ package com.impuls.billing.ui.uikit
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,6 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
+import com.impuls.billing.R
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
 @Composable
 fun <T> ObserveAsEvents(
@@ -57,4 +63,33 @@ fun openSbpUrl(context: Context, url: String) {
             android.widget.Toast.LENGTH_SHORT
         ).show()
     }
+}
+
+@Composable
+fun PortraitOnly() {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+    DisposableEffect(configuration) {
+        val activity = context as? android.app.Activity
+        val originalOrientation = activity?.requestedOrientation
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onDispose {
+            originalOrientation?.let { activity.requestedOrientation = it }
+        }
+    }
+}
+
+fun LocalDate.toDebitUi(context: Context): String {
+    val months = context.resources.getStringArray(R.array.months_nominative)
+    val monthName = months[month.number - 1]
+    return "$monthName ${this.year}"
+}
+
+fun LocalDate.toDebitUi2(context: Context): String {
+    val monthNames = context.resources.getStringArray(R.array.month_names_genitive)
+    val monthName = monthNames[month.number - 1]
+    return "${this.day} $monthName ${this.year} ${context.resources.getString(R.string.of_year)}"
 }

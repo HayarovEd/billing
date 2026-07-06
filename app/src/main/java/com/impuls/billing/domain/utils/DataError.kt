@@ -1,6 +1,9 @@
 package com.impuls.billing.domain.utils
 
 sealed interface DataError : RootError {
+
+    class CustomError(val message: String): DataError
+
     enum class Network: DataError {
         UNAUTHORIZED,
         SERVER_ERROR,
@@ -18,7 +21,9 @@ sealed interface DataError : RootError {
         EMAIL_BLANK,
         EMAIL_NOT_VALID,
         PASSWORD_BLANK,
-        LOGIN_PASSWORD_INCORRECT
+        LOGIN_PASSWORD_INCORRECT,
+        OLD_PASSWORD_INCORRECT,
+        PASSWORDS_NOT_EQUALS
     }
 
     enum class  DataStore: DataError {
@@ -29,5 +34,11 @@ sealed interface DataError : RootError {
     enum class LocalDateBase : DataError {
         ERROR_READ_DATA,
         ERROR_WRITE_DATA
+    }
+
+    enum class SuccessWork: DataError {
+        SUCCESS_UPDATE_PASSWORD,
+        SUCCESS_UPDATE_NOTICES,
+        SUCCESS_SET_PROMISE_PAYMENT
     }
 }

@@ -1,335 +1,95 @@
 package com.impuls.billing.data.mapper
 
-import com.impuls.billing.data.remote.client_account.GetClientAccountResponse
+import com.impuls.billing.data.remote.BlockingDto
+import com.impuls.billing.data.remote.ClientInfoDto
+import com.impuls.billing.data.remote.ClientShortStatDto
+import com.impuls.billing.data.remote.DebitDto
+import com.impuls.billing.data.remote.PPSettingsDto
+import com.impuls.billing.data.remote.PromisePaymentDto
+import com.impuls.billing.data.remote.RecoverPasswordDto
+import com.impuls.billing.data.remote.SharedPostDto
+import com.impuls.billing.data.remote.client_account.ClientAccountResponse
+import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
+import com.impuls.billing.data.remote.connected_usb_box.VgroupUsbBoxDto
 import com.impuls.billing.data.remote.image_data.ImageDataResponse
-import com.impuls.billing.data.remote.payment_token.PaymentTokenReponse
+import com.impuls.billing.data.remote.notices.ClientNoticesDto
+import com.impuls.billing.data.remote.payment_history.PaymentHistoryDto
 import com.impuls.billing.domain.model.Account
 import com.impuls.billing.domain.model.Agreement
+import com.impuls.billing.domain.model.BlockVgroup
 import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientInfo
+import com.impuls.billing.domain.model.ClientNotices
+import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.HistoryDebit
+import com.impuls.billing.domain.model.HistoryPayment
+import com.impuls.billing.domain.model.ModifierData
+import com.impuls.billing.domain.model.Notice
+import com.impuls.billing.domain.model.PPSettings
+import com.impuls.billing.domain.model.PromisePayment
+import com.impuls.billing.domain.model.RecoverPassword
+import com.impuls.billing.domain.model.SharedPost
+import com.impuls.billing.domain.model.ShortStat
+import com.impuls.billing.domain.model.VgroupUsbBox
 import com.impuls.billing.domain.model.payment.ImageData
-import com.impuls.billing.domain.model.payment.PaymentToken
+import com.impuls.billing.domain.utils.EMPTY_YEAR
+import com.impuls.billing.domain.utils.fromBillingToLocalDateTime
 import com.impuls.billing.domain.utils.convertBillDeliveryType
 import com.impuls.billing.domain.utils.convertPaymentMethodTYpe
 import com.impuls.billing.domain.utils.convertToBoolean
+import com.impuls.billing.domain.utils.convertToHistoryStatusPayment
+import com.impuls.billing.domain.utils.convertToStatusPromisePayment
+import com.impuls.billing.domain.utils.convertToTypeBlockVGroup
 import com.impuls.billing.domain.utils.convertUserType
-import com.impuls.billing.domain.utils.toLocalDateTime
+import com.impuls.billing.domain.utils.roundTo
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 
-/*fun formClientAccount(xml: String): ClientAccount {
+fun ClientAccountResponse.toClientAccount(): ClientAccount {
     return ClientAccount(
-        billDeliveryName = findInXmlString(
-            tag = "billdeliveryname",
-            xml = xml
-        )?:"",
+        billDeliveryName = billDeliveryName,
         account = Account(
-            uid = findInXmlString(
-                tag = "uid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            doctype = findInXmlString(
-                tag = "doctype",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            billDelivery = findInXmlString(
-                tag = "billdelivery",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            category = findInXmlString(
-                tag = "category",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            type = findInXmlString(
-                tag = "type",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            oksm = findInXmlString(
-                tag = "oksm",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            wrongActive = findInXmlString(
-                tag = "wrongactive",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            archive = (findInXmlString(
-                tag = "archive",
-                xml = xml
-            )?.toIntOrNull() ?: 0) != 0,
-            ownerShip = findInXmlString(
-                tag = "ownership",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            mobileIsConfirmed = findInXmlString(
-                tag = "mobileisconfirmed",
-                xml = xml
-            )?.toBoolean()?:false,
-            emailIsConfirmed = findInXmlString(
-                tag = "emailisconfirmed",
-                xml = xml
-            )?.toBoolean()?:false,
-            offerIsAccepted = findInXmlString(
-                tag = "offerisaccepted",
-                xml = xml
-            )?.toBoolean()?:false,
-            soleProprietor = findInXmlString(
-                tag = "soleproprietor",
-                xml = xml
-            )?.toBoolean()?:false,
-            login = findInXmlString(
-                tag = "login",
-                xml = xml
-            )?:"",
-            password = findInXmlString(
-                tag = "pass",
-                xml = xml
-            )?:"",
-            description = findInXmlString(
-                tag = "descr",
-                xml = xml
-            )?:"",
-            name = findInXmlString(
-                tag = "name",
-                xml = xml
-            )?:"",
-            phone = findInXmlString(
-                tag = "phone",
-                xml = xml
-            )?:"",
-            fax = findInXmlString(
-                tag = "fax",
-                xml = xml
-            )?:"",
-            email = findInXmlString(
-                tag = "email",
-                xml = xml
-            )?:"",
-            mobile = findInXmlString(
-                tag = "mobile",
-                xml = xml
-            )?:"",
-            bankName =findInXmlString(
-                tag = "bankname",
-                xml = xml
-            )?:"",
-            branchBankName = findInXmlString(
-                tag = "branchbankname",
-                xml = xml
-            )?:"",
-            treasuryName = findInXmlString(
-                tag = "treasuryname",
-                xml = xml
-            )?:"",
-            treasuryAccount = findInXmlString(
-                tag = "treasuryaccount",
-                xml = xml
-            )?:"",
-            bik = findInXmlString(
-                tag = "bik>",
-                xml = xml
-            )?:"",
-            setti = findInXmlString(
-                tag = "settl",
-                xml = xml
-            )?:"",
-            corr = findInXmlString(
-                tag = "corr",
-                xml = xml
-            )?:"",
-            kpp = findInXmlString(
-                tag = "kpp",
-                xml = xml
-            )?:"",
-            inn = findInXmlString(
-                tag = "inn",
-                xml = xml
-            )?:"",
-            ogrn = findInXmlString(
-                tag = "ogrn",
-                xml = xml
-            )?:"",
-            okpo = findInXmlString(
-                tag = "okpo",
-                xml = xml
-            )?:"",
-            okved = findInXmlString(
-                tag = "okved",
-                xml = xml
-            )?:"",
-            abonentName = findInXmlString(
-                tag = "abonentname",
-                xml = xml
-            )?:"",
-            abonentSurname = findInXmlString(
-                tag = "abonentsurname",
-                xml = xml
-            )?:"",
-            abonentPatronymic = findInXmlString(
-                tag = "abonentpatronymic",
-                xml = xml
-            )?:""
+            uid = account.uid,
+            doctype = account.doctype,
+            billDelivery = convertBillDeliveryType(account.billdelivery),
+            category = account.category,
+            type = convertUserType(account.type),
+            oksm = account.oksm,
+            wrongActive = account.wrongactive,
+            archive = convertToBoolean(account.archive),
+            ownerShip = account.ownership,
+            mobileIsConfirmed = account.mobileisconfirmed,
+            emailIsConfirmed = account.emailisconfirmed,
+            offerIsAccepted = account.offerisaccepted,
+            soleProprietor = account.soleproprietor,
+            login = account.login,
+            password = account.pass,
+            description = account.descr,
+            name = account.name,
+            phone = account.phone,
+            fax = account.fax,
+            email = account.email,
+            mobile = account.mobile,
+            bankName = account.bankname,
+            branchBankName = account.branchbankname,
+            treasuryName = account.treasuryname,
+            treasuryAccount = account.treasuryaccount,
+            bik = account.bik,
+            setti = account.settl,
+            corr = account.corr,
+            kpp = account.kpp,
+            inn = account.inn,
+            ogrn = account.ogrn,
+            okpo = account.okpo,
+            okved = account.okved,
+            abonentName = account.abonentname,
+            abonentSurname = account.abonentsurname,
+            abonentPatronymic = account.abonentpatronymic
         ),
-        agreement = Agreement(
-            agrmId = findInXmlString(
-                tag = "agrmid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            uid = findInXmlString(
-                tag = "uid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            operId = findInXmlString(
-                tag = "operid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            curId = findInXmlString(
-                tag = "curid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            bNotify = findInXmlString(
-                tag = "bnotify",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            vGroups = findInXmlString(
-                tag = "vgroups",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            penaltyMethod = findInXmlString(
-                tag = "penaltymethod",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            monthBlockDay = findInXmlString(
-                tag = "monthblockday",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            balance = findInXmlString(
-                tag = "balance",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-            credit = findInXmlString(
-                tag = "credit",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-            promiseCredit = findInXmlString(
-                tag = "promisecredit",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-            installments = findInXmlString(
-                tag = "installments",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-            balanceStatus = findInXmlString(
-                tag = "balancestatus",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            friendAgrmId = findInXmlString(
-                tag = "friendagrmid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            paymentMethod = findInXmlString(
-                tag = "paymentmethod",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            blockDays = findInXmlString(
-                tag = "blockdays",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            blockMonths = findInXmlString(
-                tag = "blockmonths",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            orderPayDay = findInXmlString(
-                tag = "orderpayday",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            blockOrders = findInXmlString(
-                tag = "blockorders",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            blockAmount = findInXmlString(
-                tag = "blockamount",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-            ownerId = findInXmlString(
-                tag = "ownerid",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            isDefault = findInXmlString(
-                tag = "isdefault",
-                xml = xml
-            )?.toIntOrNull()?:0,
-            number = findInXmlString(
-                tag = "number",
-                xml = xml
-            )?:"",
-            date = findInXmlString(
-                tag = "date",
-                xml = xml
-            )?:"",
-            closeDon = findInXmlString(
-                tag = "closedon",
-                xml = xml
-            )?:"",
-            bCheck = findInXmlString(
-                tag = "bcheck",
-                xml = xml
-            )?:"",
-            symbol = findInXmlString(
-                tag = "symbol",
-                xml = xml
-            )?:"",
-            username = findInXmlString(
-                tag = "username",
-                xml = xml
-            )?:"",
-            initialBalance = findInXmlString(
-                tag = "initialbalance",
-                xml = xml
-            )?.toDoubleOrNull()?:0.0,
-        )
-    )
-}*/
-
-fun GetClientAccountResponse.toClientAccount(): ClientAccount {
-    return ClientAccount(
-        billDeliveryName = ret.billdeliveryname,
-        account = Account(
-            uid = ret.account.uid,
-            doctype = ret.account.doctype,
-            billDelivery = convertBillDeliveryType(ret.account.billdelivery),
-            category = ret.account.category,
-            type = convertUserType(ret.account.type),
-            oksm = ret.account.oksm,
-            wrongActive = ret.account.wrongactive,
-            archive = convertToBoolean(ret.account.archive),
-            ownerShip = ret.account.ownership,
-            mobileIsConfirmed = ret.account.mobileisconfirmed,
-            emailIsConfirmed = ret.account.emailisconfirmed,
-            offerIsAccepted = ret.account.offerisaccepted,
-            soleProprietor = ret.account.soleproprietor,
-            login = ret.account.login,
-            password = ret.account.pass,
-            description = ret.account.descr,
-            name = ret.account.name,
-            phone = ret.account.phone,
-            fax = ret.account.fax,
-            email = ret.account.email,
-            mobile = ret.account.mobile,
-            bankName = ret.account.bankname,
-            branchBankName = ret.account.branchbankname,
-            treasuryName = ret.account.treasuryname,
-            treasuryAccount = ret.account.treasuryaccount,
-            bik = ret.account.bik,
-            setti = ret.account.settl,
-            corr = ret.account.corr,
-            kpp = ret.account.kpp,
-            inn = ret.account.inn,
-            ogrn = ret.account.ogrn,
-            okpo = ret.account.okpo,
-            okved = ret.account.okved,
-            abonentName = ret.account.abonentname,
-            abonentSurname = ret.account.abonentsurname,
-            abonentPatronymic = ret.account.abonentpatronymic
-        ),
-        agreements = ret.agreements.map { 
+        agreements = agreements.map {
             Agreement(
                 agrmId = it.agrmid,
                 uid = it.uid,
@@ -366,17 +126,188 @@ fun GetClientAccountResponse.toClientAccount(): ClientAccount {
     )
 }
 
-fun PaymentTokenReponse.convertToPaymentToken(): PaymentToken {
-    return PaymentToken(
-        token = token,
-        ttl = ttl.toLocalDateTime()
-    )
-}
-
 fun ImageDataResponse.convertToImageData(): ImageData {
     return ImageData(
         color = result.color,
         image = result.image
     )
 }
+
+fun RecoverPasswordDto.convertToRecoverPassword(): RecoverPassword {
+    return RecoverPassword(
+        recordId = recordId,
+        destination = destination
+    )
+}
+
+fun ClientVgroupFullResponse.toClientVGroup(): ClientVroup {
+    return ClientVroup(
+        agrmId = vGroup.agrmId,
+        vgId = vGroup.vgId,
+        blocked = convertToTypeBlockVGroup(vGroup.blocked),
+        tarifId = vGroup.tarifId,
+        tarifDescr = vGroup.tarifDescr,
+        login = vGroup.login,
+        serviceVolume = vGroup.serviceVolume,
+        serviceRent = vGroup.serviceRent,
+        agentDescr = vGroup.agentDescr.replace("Netflow", ""),
+        speed = vGroup.curShape / 1000,
+        currentModifier = ModifierData(
+            type = vGroup.currentModifier.type,
+            value = vGroup.currentModifier.value
+        ),
+        addresses = addresses.map { it.address }
+    )
+}
+
+fun ClientShortStatDto.toShortStat(): ShortStat {
+    return ShortStat(
+        agrmId = agrmId ?: 0L,
+        vgId = vgId ?: 0L,
+        amount = amount ?: 0.0,
+        agentDescr = agentDescr ?: "",
+        currSymbol = currSymbol ?: ""
+    )
+}
+
+fun PaymentHistoryDto.toHistoryPayment(): HistoryPayment {
+    return HistoryPayment(
+        timestamp = Instant.fromEpochSeconds(timestamp)
+            .toLocalDateTime(TimeZone.currentSystemDefault()),
+        amount = amountCurr,
+        uid = uid,
+        status = convertToHistoryStatusPayment(payDto.status),
+        currency = currSymb,
+        message = mgr
+    )
+}
+
+
+fun DebitDto.toHistoryDebit(): HistoryDebit {
+    return HistoryDebit(
+        amount = amount.roundTo(2),
+        yearMonth = LocalDate.parse(yearMonth),
+    )
+}
+
+
+fun VgroupUsbBoxDto.toVgroupUsbBox(): VgroupUsbBox {
+    return VgroupUsbBox(
+        activated = fromBillingToLocalDateTime(service.activated),
+        state = service.state,
+        rate = service.rate,
+        price = catAbove,
+        vgLogin = vgLogin,
+        tarDescr = tarDescr,
+        symbol = symbol
+    )
+}
+
+fun ClientInfoDto.toClientInfo(): ClientInfo {
+    return ClientInfo(
+        email = email,
+        emailIsConfirmed = emailIsConfirmed,
+        kontPerson = kontPerson,
+        mobile = mobile,
+        mobileIsConfirmed = mobileIsConfirmed,
+        offerIsAccepted = offerIsAccepted,
+        passIsTemporary = passIsTemporary,
+        password = password,
+        phone = phone,
+        triggerContactDataReminder = triggerContactDataReminder
+    )
+}
+
+fun ClientNoticesDto.toClientNotices(): ClientNotices {
+    return ClientNotices(
+        uid = uid,
+        notices = notices.map {
+            Notice(
+                descr = it.descr,
+                email = it.email,
+                messenger = it.messenger,
+                name = it.name,
+                sms = it.sms,
+                type = it.type,
+                value = it.value
+            )
+        }
+    )
+}
+
+fun BlockingDto.toBlocking(): BlockVgroup {
+    return BlockVgroup(
+        uid = uid,
+        agrmId = agrmId,
+        agrmNum = agrmNum,
+        blkReq = convertToTypeBlockVGroup(blkReq),
+        changeTime = if (changeTime == EMPTY_YEAR) null else fromBillingToLocalDateTime(
+            changeTime
+        ),
+        comment = comment,
+        freewill = freewill,
+        groupId = groupId,
+        id = id,
+        login = login,
+        mgrDescr = mgrDescr,
+        mgrName = mgrName,
+        recordId = recordId,
+        timeTo = fromBillingToLocalDateTime(timeTo),
+        unBlockedManagerDescr = unBlockedManagerDescr,
+        unBlockedManagerLogin = unBlockedManagerLogin,
+        unBlockedManagerName = unBlockedManagerName,
+        username = username,
+        vgId = vgId,
+    )
+}
+
+fun PPSettingsDto.toPPSettings(): PPSettings {
+    return PPSettings(
+        promiseAvailable = promiseAvailable,
+        promiseBlockDays = promiseBlockDays,
+        promiseFee = promiseFee,
+        promiseLimit = promiseLimit,
+        promiseMax = promiseMax,
+        promiseMin = promiseMin,
+        promiseOnDays = promiseOnDays,
+        promiseRent = promiseRent,
+        promiseTill = promiseTill
+    )
+}
+
+fun PromisePaymentDto.toPromisePayment(): PromisePayment {
+    return PromisePayment(
+        agrmId = agrmId,
+        agrmNum = agrmNum,
+        amount = amount,
+        cancelFio = cancelFio,
+        cancelPerson = cancelPerson,
+        currId = currId,
+        debt = debt,
+        fee = fee,
+        modFio = modFio,
+        modPerson = modPerson,
+        payId = payId,
+        promiseDate = fromBillingToLocalDateTime(promiseDate),
+        promiseTill = fromBillingToLocalDateTime(promiseTill),
+        recordId = recordId,
+        status = convertToStatusPromisePayment(status),
+        symbol = symbol,
+        username = username
+    )
+}
+
+fun SharedPostDto.toSharedPost(): SharedPost {
+    return SharedPost(
+        groupId = groupId,
+        pid = pid,
+        postCatId = postCatId,
+        postTime = fromBillingToLocalDateTime(postTime),
+        status = status,
+        subject = subject,
+        text = text,
+        uid = uid
+    )
+}
+
 

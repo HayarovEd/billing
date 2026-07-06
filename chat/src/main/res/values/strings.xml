@@ -1,0 +1,38 @@
+
+<resources>
+    <string name="no_internet">Отсутствует интернет</string>
+    <string name="server_error">Ошибка сервера</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="email_empty">Логин не может быть пустым</string>
+    <string name="email_unvalid">Неправильный email</string>
+    <string name="error_autorization">Ошибка авторизации</string>
+    <string name="not_data">Нет данных</string>
+    <string name="password_blank">Пароль не может быть пустым</string>
+    <string name="user_disabled">Пользователь неактивен</string>
+    <string name="not_unique_id">Неверный запрос</string>
+    <string name="name_is_blank">Имя не может быть пустым</string>
+    <string name="unique_id_is_blank">Идентификатор не может быть пустым</string>
+    <string name="read_error_data">Ошибка чтения локальных данных</string>
+    <string name="write_error_data">Ошибка записи локальных данных</string>
+    <string name="not_found">Не найдены данные</string>
+    <string name="error_take_data">Ошибка получения данных</string>
+    <string name="no_access">Пользователю не назначены доступы</string>
+    <string name="no_connect">Нет соединения</string>
+    <string name="bad_request">Неверный запрос</string>
+    <string name="request_timeout">Превышен интервал ожидания</string>
+    <string name="lost_connect">Восстанавливаем соединение</string>
+    <string name="write_message">Укажите проблему</string>
+    <string name="wrong_email">Неверный email</string>
+    <string name="phone_is_empty">Укажите телефон</string>
+    <string name="name_is_empty">Укажите имя</string>
+    <string name="theme_not_choosed">Выберите тему</string>
+    <string name="create_appeal">Поддержка</string>
+    <string name="your_name">Ваше имя</string>
+    <string name="email_label">Email</string>
+    <string name="phone_label">Телефон</string>
+    <string name="choose_theme_label">Выберите тему:</string>
+    <string name="message_label">Сообщение</string>
+    <string name="create_chat_button">Открыть чат</string>
+    <string name="your_chats">Ваши чаты</string>
+    <string name="support_unavailable">Служба поддержки недоступна</string>
+</resources>

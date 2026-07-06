@@ -1,6 +1,7 @@
 package com.impuls.billing.ui.payment_screen
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,20 +10,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ProfileRow
-import com.impuls.billing.ui.uikit.UiTextField
+import com.impuls.billing.ui.uikit.UiIconButton
+import com.impuls.billing.ui.uikit.UiTextField2
 
 @Composable
 fun AmountTypeUi(
@@ -30,71 +37,112 @@ fun AmountTypeUi(
     companyPayment: CompanyPayment?,
     imageData: ImageData?,
     number: String?,
-    amountString:String,
+    amountString: String,
     typeErrorAmount: TypeErrorAmount,
     updateAmount: (String) -> Unit,
     updateScreen: () -> Unit,
+    onBack: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(15.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(15.dp), // Консистентный отступ 15.dp
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
         Text(
             text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        companyPayment?.let { company ->
-            imageData?.let {
-                TitleCompany(
-                    name = company.name,
-                    image = it.image,
-                    colorString = it.color
+
+        // Карточка компании
+        if (companyPayment != null && imageData != null) {
+            TitleCompany(
+                name = companyPayment.name,
+                image = imageData.image,
+                colorString = imageData.color,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Лицевой счет
+        ProfileRow(
+            title = stringResource(R.string.ladger_account),
+            content = number ?: "—",
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Поле ввода суммы
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.amount_to_pay),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            UiTextField2(
+                content = amountString,
+                onClickContent = {
+                    updateAmount(it)
+                },
+                label = "0.00",
+                leadingText = "₽",
+                keyboardType = KeyboardType.Decimal,
+                isError = typeErrorAmount != TypeErrorAmount.NO_ERROR && typeErrorAmount != TypeErrorAmount.BLANK,
+            )
+
+            // Сообщение об ошибке (не показываем BLANK до попытки ввода)
+            if (typeErrorAmount != TypeErrorAmount.NO_ERROR && typeErrorAmount != TypeErrorAmount.BLANK) {
+                Text(
+                    text = when (typeErrorAmount) {
+                        TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
+                        TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
+                        TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
         }
-        Spacer(modifier = modifier.height(10.dp))
-        ProfileRow(
-            title = stringResource(R.string.ladger_account),
-            content = number ?: ""
-        )
-        Spacer(modifier = modifier.height(10.dp))
-        UiTextField(
-            content = amountString,
-            label = stringResource(R.string.amount_to_pay),
-            isOnlyDigit = true,
-            keyboardType = KeyboardType.Number,
-            error = when (typeErrorAmount) {
-                TypeErrorAmount.NO_ERROR -> ""
-                TypeErrorAmount.NOT_DIGIT -> stringResource(R.string.no_digit)
-                TypeErrorAmount.LESS_RANGE -> stringResource(R.string.less_range)
-                TypeErrorAmount.BIG_RANGE -> stringResource(R.string.big_range)
-                TypeErrorAmount.BLANK -> stringResource(R.string.text_not_blank)
-            },
-            isError = typeErrorAmount != TypeErrorAmount.NO_ERROR,
-            onClickContent = {
-                updateAmount(it)
-            }
-        )
-        Spacer(modifier = modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Кнопка "Далее"
         Button(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
             onClick = updateScreen,
-            shape = RoundedCornerShape(5.dp),
-            enabled = typeErrorAmount == TypeErrorAmount.NO_ERROR,
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onBackground
+            enabled = typeErrorAmount == TypeErrorAmount.NO_ERROR && amountString.isNotBlank(),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         ) {
             Text(
                 text = stringResource(R.string.next),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
             )
         }
     }
@@ -135,9 +183,10 @@ private fun Preview() {
             ),
             number = "6666",
             amountString = "",
-            typeErrorAmount = TypeErrorAmount.NOT_DIGIT,
+            typeErrorAmount = TypeErrorAmount.BLANK,
             updateAmount = {},
-            updateScreen = {}
+            updateScreen = {},
+            onBack = {}
         )
     }
 }

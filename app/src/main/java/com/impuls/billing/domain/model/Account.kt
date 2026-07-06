@@ -1,15 +1,15 @@
 package com.impuls.billing.domain.model
 
 data class Account (
-    val uid: Int,
-    val doctype: Int,
+    val uid: Long,
+    val doctype: Long,
     val billDelivery: BillDeliveryType,
-    val category: Int,
+    val category: Long,
     val type: UserType,
-    val oksm: Int,
-    val wrongActive: Int,
+    val oksm: Long,
+    val wrongActive: Long,
     val archive: Boolean,
-    val ownerShip: Int,
+    val ownerShip: Long,
     val mobileIsConfirmed: Boolean,
     val emailIsConfirmed: Boolean,
     val offerIsAccepted: Boolean,

@@ -1,6 +1,5 @@
 package com.impuls.billing.ui.payment_screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
@@ -43,39 +45,52 @@ fun ChooseMethodUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.choose_payment),
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
         LazyColumn(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            items(TypePayment.entries) { type->
+            items(TypePayment.entries) { type ->
                 ItemPaymentMethod(
-                    comission = type.comission,
+                    commission = type.comission,
                     isChosenMethod = chosenMethod == type,
                     titleContent = {
                         if (type == TypePayment.CARD) {
@@ -96,20 +111,28 @@ fun ChooseMethodUi(
                 )
             }
         }
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
         Button(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
             onClick = updateScreen,
-            enabled = chosenMethod!=null,
-            shape = RoundedCornerShape(5.dp),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onBackground
+            enabled = chosenMethod != null,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         ) {
             Text(
                 text = stringResource(R.string.next),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
             )
         }
     }

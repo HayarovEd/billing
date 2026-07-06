@@ -2,9 +2,13 @@ package com.impuls.billing.ui.profile_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.impuls.billing.domain.repository.RemoteRepository
+import com.impuls.billing.domain.repository.AccountRepository
+import com.impuls.billing.domain.repository.DataStoreRepository
+import com.impuls.billing.domain.repository.HomeRepository
+import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -14,9 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlin.time.Clock
 
 class ProfileScreenViewModel(
-    private val remoteRepository: RemoteRepository
+    private val accountRepository: AccountRepository,
+    private val dataStoreRepository: DataStoreRepository,
+    private val jwtRepository: JwtRepository,
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
 
 
@@ -27,7 +35,18 @@ class ProfileScreenViewModel(
                 isLoading = true,
             )
                 .updateState()
-            loadAccountData()
+            loadData(
+                action = {
+                    loadAccountData(it)
+                    loadSharePosts(it)
+                },
+                navigate = {
+                    viewModelScope.launch {
+                        eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                    }
+                }
+            )
+
         }
         .stateIn(
             scope = viewModelScope,
@@ -42,37 +61,108 @@ class ProfileScreenViewModel(
     fun onAction(action: ProfileScreenAction) {
         when (action) {
             is ProfileScreenAction.UpdatePhone -> {
-                updatePhone(action.phone)
+                loadData(
+                    action = {
+                        updatePhone(
+                            token = it,
+                            phone = action.phone
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
             }
 
             is ProfileScreenAction.ConfirmEmail -> {
-                confirmValidateClientEmail(action.code)
+                loadData(
+                    action = {
+                        confirmValidateClientEmail(
+                            token = it,
+                            code = action.code
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+
             }
 
             is ProfileScreenAction.ConfirmPhone -> {
-                confirmValidateClientMobileNumber(action.code)
+                loadData(
+                    action = {
+                        confirmValidateClientMobileNumber(
+                            token = it,
+                            code = action.code
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+
             }
 
             ProfileScreenAction.ResentCodeEmail -> {
-                timer()
-                validateEmail()
+                loadData(
+                    action = {
+                        timer()
+                        validateEmail(it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+
             }
 
             ProfileScreenAction.ResentCodePhone -> {
-                timer()
-                validateMobilePhone()
+                loadData(
+                    action = {
+                        timer()
+                        validateMobilePhone(token = it)
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+
             }
 
             is ProfileScreenAction.UpdateEmail -> {
-                updateEmail(action.email)
+                loadData(
+                    action = {
+                        updateEmail(
+                            token = it,
+                            email = action.email
+                        )
+                    },
+                    navigate = {
+                        viewModelScope.launch {
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        }
+                    }
+                )
+
             }
         }
     }
 
 
-    private fun loadAccountData() {
+    private fun loadAccountData(token: String) {
         viewModelScope.launch {
-            when (val result = remoteRepository.getClientAccount()) {
+            when (val result = accountRepository.getClientAccount(token)) {
                 is ResultWork.Error -> {
                     _state.value.copy(
                         isLoading = false,
@@ -83,20 +173,29 @@ class ProfileScreenViewModel(
 
                 is ResultWork.Success -> {
                     _state.value.copy(
-                        isLoading = false,
                         account = result.data
                     )
                         .updateState()
+                    if (result.data.agreements.isNotEmpty()) {
+                        loadVGroups(
+                            token = token,
+                            agrmId = result.data.agreements.first().agrmId
+                        )
+                    }
                 }
             }
         }
     }
 
 
-    private fun updatePhone(phone: String) {
+    private fun updatePhone(
+        token: String,
+        phone: String
+    ) {
         state.value.account?.let { account ->
             viewModelScope.launch {
-                when (val result = remoteRepository.setClientMobilePhone(
+                when (val result = accountRepository.setClientMobilePhone(
+                    token = token,
                     uid = account.account.uid,
                     phone = phone
                 )) {
@@ -105,8 +204,8 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
-                        validateMobilePhone()
+                        loadAccountData(token)
+                        validateMobilePhone(token)
                         timer()
                     }
                 }
@@ -114,9 +213,9 @@ class ProfileScreenViewModel(
         }
     }
 
-    private fun validateMobilePhone() {
+    private fun validateMobilePhone(token: String) {
         viewModelScope.launch {
-            when (val result = remoteRepository.validateClientMobileNumber()) {
+            when (val result = accountRepository.validateClientMobileNumber(token)) {
                 is ResultWork.Error -> {
                     eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
@@ -131,10 +230,14 @@ class ProfileScreenViewModel(
         }
     }
 
-    private fun confirmValidateClientMobileNumber(code: String) {
+    private fun confirmValidateClientMobileNumber(
+        token: String,
+        code: String
+    ) {
         state.value.phoneRet?.let {
             viewModelScope.launch {
-                when (val result = remoteRepository.confirmValidateClientMobileNumber(
+                when (val result = accountRepository.confirmValidateClientMobileNumber(
+                    token = token,
                     id = it,
                     code = code
                 )) {
@@ -143,7 +246,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                        loadAccountData(token)
                     }
                 }
             }
@@ -152,10 +255,14 @@ class ProfileScreenViewModel(
     }
 
 
-    private fun updateEmail(email: String) {
+    private fun updateEmail(
+        token: String,
+        email: String
+    ) {
         state.value.account?.let { account ->
             viewModelScope.launch {
-                when (val result = remoteRepository.setClientEmail(
+                when (val result = accountRepository.setClientEmail(
+                    token = token,
                     uid = account.account.uid,
                     email = email
                 )) {
@@ -164,8 +271,8 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
-                        validateEmail()
+                        loadAccountData(token)
+                        validateEmail(token)
                         timer()
                     }
                 }
@@ -173,11 +280,11 @@ class ProfileScreenViewModel(
         }
     }
 
-    private fun validateEmail() {
+    private fun validateEmail(token: String) {
         viewModelScope.launch {
-            when (val result = remoteRepository.validateClientEmail()) {
+            when (val result = accountRepository.validateClientEmail(token)) {
                 is ResultWork.Error -> {
-                   // eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
 
                 is ResultWork.Success -> {
@@ -190,10 +297,14 @@ class ProfileScreenViewModel(
         }
     }
 
-    private fun confirmValidateClientEmail(code: String) {
+    private fun confirmValidateClientEmail(
+        token: String,
+        code: String
+    ) {
         state.value.phoneRet?.let {
             viewModelScope.launch {
-                when (val result = remoteRepository.confirmValidateClientEmail(
+                when (val result = accountRepository.confirmValidateClientEmail(
+                    token = token,
                     id = it,
                     code = code
                 )) {
@@ -202,7 +313,7 @@ class ProfileScreenViewModel(
                     }
 
                     is ResultWork.Success -> {
-                        loadAccountData()
+                        loadAccountData(token)
                     }
                 }
             }
@@ -222,6 +333,137 @@ class ProfileScreenViewModel(
                 )
                     .updateState()
                 delay(1000)
+            }
+        }
+    }
+
+
+    private fun loadData(
+        action: (String) -> Unit,
+        navigate: () -> Unit
+    ) {
+        viewModelScope.launch {
+            dataStoreRepository.getBearer().collect { token ->
+                if (token != null) {
+                    val expired = jwtRepository.decodeJwt(token)?.expired
+                    expired?.let { exp ->
+                        if (exp < Clock.System.now().epochSeconds) {
+                            dataStoreRepository.removeBearer()
+                            navigate()
+                        } else {
+                            action(token)
+                        }
+                    }
+                } else {
+                    viewModelScope.launch {
+                        navigate()
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun loadVGroups(
+        token: String,
+        agrmId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getVGroups(
+                token = token,
+                agrmId = agrmId
+            )) {
+                is ResultWork.Error -> {
+                    _state.value.copy(
+                        isLoading = false,
+                    )
+                        .updateState()
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        isLoading = false,
+                        vGroups = result.data,
+                    )
+                        .updateState()
+                    if (result.data.isNotEmpty()) {
+                        val deferredUsbBoxes = async {  loadUsbBoxes(
+                            token = token,
+                            vgId = result.data.first().vgId
+                        )}
+                        val deferredVgroupPassword = async {
+                            loadVgroupPassword(
+                                token = token,
+                                vgId = result.data.first().vgId
+                            )
+                        }
+                        deferredUsbBoxes.await()
+                        deferredVgroupPassword.await()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadUsbBoxes(
+        token: String,
+        vgId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = homeRepository.getUsbBoxByVgroup(
+                token = token,
+                vgId = vgId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        vGroupUsbBoxes = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun loadVgroupPassword(
+        token: String,
+        vgId: Long
+    ) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getClientVgroupPassword(
+                token = token,
+                vgId = vgId
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        vGroupPassword = result.data,
+                    )
+                        .updateState()
+                }
+            }
+        }
+    }
+
+    private fun loadSharePosts(token: String) {
+        viewModelScope.launch {
+            when (val result = accountRepository.getClientSharedPosts(token = token)) {
+                is ResultWork.Error -> {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
+                is ResultWork.Success -> {
+                    _state.value.copy(
+                        sharedPosts = result.data,
+                    )
+                        .updateState()
+                }
             }
         }
     }

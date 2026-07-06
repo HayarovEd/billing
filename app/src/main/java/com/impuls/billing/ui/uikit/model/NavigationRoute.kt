@@ -4,33 +4,61 @@ import kotlinx.serialization.Serializable
 
 sealed class NavigationRoute {
     @Serializable
-    data object Login : NavigationRoute()
+    data object LoginRoute : NavigationRoute()
 
     @Serializable
-    data object Splash : NavigationRoute()
+    data object SplashRoute : NavigationRoute()
 
     @Serializable
-    data object Accounts : NavigationRoute()
+    data object ProfileRoute : NavigationRoute()
 
     @Serializable
-    data object Profile : NavigationRoute()
-
-    @Serializable
-    data class Payment(
-        val number: String
+    data class PaymentRoute(
+        val number: String,
+        val operId: Long,
     ) : NavigationRoute()
 
     @Serializable
-    data object Bill : NavigationRoute()
+    data class HomeRoute(
+        val agrmId: Long
+    ) : NavigationRoute()
 
     @Serializable
-    data object HomeInternet : NavigationRoute()
+    data class HistoryPaymentRoute(
+        val agrmId: Long,
+        val vgId: Long,
+        val tariffId: Long,
+    ) : NavigationRoute()
 
     @Serializable
-    data object Blockings : NavigationRoute()
+    data class SettingsRoute(
+        val userId: Long,
+    ) : NavigationRoute()
 
     @Serializable
-    data object PasswordChanger : NavigationRoute()
+    data class BlockingRoute(
+        val vgId: Long,
+    ) : NavigationRoute()
 
-
+    @Serializable
+    data class PromiseRoute(
+        val agrmId: Long
+    ) : NavigationRoute()
+   /* @Serializable
+    data class MainRoute(
+        val name: String = "Test App",
+        val login:String = "testapp",
+        val password: String = "ut82fph38u",
+        val email: String = "",
+        val groupName: String = "Группа 15",
+    ): NavigationRoute()
+    @Serializable
+    data class ChatRoute(
+        val chatId: String,
+        val name: String,
+        val login:String,
+        val password: String,
+        val email: String,
+    ): NavigationRoute()
+*/
 }

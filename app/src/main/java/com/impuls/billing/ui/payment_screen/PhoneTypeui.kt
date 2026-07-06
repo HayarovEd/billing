@@ -1,6 +1,5 @@
 package com.impuls.billing.ui.payment_screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,18 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.impuls.billing.R
 import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.utils.MASK
+import com.impuls.billing.domain.utils.MASK_NUMBER
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.PhoneVisualTransformation
 import com.impuls.billing.ui.uikit.UiIconButton
-import com.impuls.billing.ui.uikit.UiTextField
-
-private const val mask = "+0(000)000-00-00"
-private  const val maskNumber = '0'
+import com.impuls.billing.ui.uikit.UiTextField2
 
 
 @Composable
@@ -45,60 +46,84 @@ fun PhoneTypeUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.sberpay_payment),
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.enter_number_phone),
             style = MaterialTheme.typography.bodyMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
-        UiTextField(
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        UiTextField2(
             content = phone,
-            label = "",
-            visualTransformation = PhoneVisualTransformation(mask, maskNumber),
+            onClickContent = {
+                updatePhone(it)
+            },
+            label = stringResource(R.string.phone_number),
             keyboardType = KeyboardType.Phone,
-            onClickContent = { str ->
-                updatePhone(str.take(mask.count { it == maskNumber }))
-            }
+            isOnlyDigit = true,
+            visualTransformation = PhoneVisualTransformation(MASK, MASK_NUMBER),
         )
-        Spacer(modifier = modifier.height(20.dp))
+
+        Spacer(modifier = Modifier.weight(1f))
+
         Button(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
             onClick = updateScreen,
             enabled = phone.length == 11,
-            shape = RoundedCornerShape(5.dp),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onBackground
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         ) {
             Text(
                 text = stringResource(R.string.get_push),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
             )
         }
     }

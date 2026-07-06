@@ -1,0 +1,227 @@
+package com.impuls.chat.ui.main_screen
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.impuls.chat.domain.repository.AuthUseCase
+import com.impuls.chat.domain.repository.RemoteChatRepository
+import com.impuls.chat.domain.utils.ResultWork
+import com.impuls.chat.domain.utils.Utils
+import com.impuls.chat.ui.navigation.NavigationChatRoute
+import com.impuls.chat.ui.uikit.asUiText
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
+
+class MainScreenViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val remoteRepository: RemoteChatRepository,
+    private val authUseCase: AuthUseCase
+) : ViewModel() {
+
+
+    private val routeData = savedStateHandle.toRoute<NavigationChatRoute.MainRoute>()
+
+    private val _state = MutableStateFlow(
+        MainScreenState(
+            name = routeData.name,
+            login = routeData.login,
+            password = routeData.password,
+            email = routeData.email,
+            operId = routeData.operId
+        )
+    )
+    val state = _state
+        .onStart {
+            loadData(
+                action = { token ->
+                    coroutineScope {
+                        _state.update { it.copy(status = MainStatus.LOADING) }
+                        val themesDeferred = async { getThemes(token) }
+                        val chatsDeferred = async { getUserChats(token) }
+                        
+                        val themesResult = themesDeferred.await()
+                        val chatsResult = chatsDeferred.await()
+
+                        if (themesResult && chatsResult) {
+                            _state.update { it.copy(status = MainStatus.SUCCESS) }
+                        } else {
+                            _state.update { it.copy(status = MainStatus.ERROR) }
+                        }
+                    }
+                }
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = _state.value
+        )
+
+    private val eventChannel = Channel<MainScreenEvent>()
+    val events = eventChannel.receiveAsFlow()
+
+    fun onAction(action: MainScreenAction) {
+        when (action) {
+            is MainScreenAction.UpdateEmail -> {
+                _state.update {
+                    it.copy(
+                        email = action.email
+                    )
+                }
+            }
+            is MainScreenAction.UpdateMessage -> {
+                _state.update {
+                    it.copy(
+                        message = action.message
+                    )
+                }
+            }
+            is MainScreenAction.UpdateName -> {
+                _state.update {
+                    it.copy(
+                        name = action.name
+                    )
+                }
+            }
+            is MainScreenAction.UpdatePhone -> {
+                _state.update {
+                    it.copy(
+                        phone = action.phone
+                    )
+                }
+            }
+            MainScreenAction.CreateChat -> {
+                loadData {
+                    createChat(it)
+                }
+            }
+          /*  is MainScreenAction.OnChatClick -> {
+                viewModelScope.launch {
+                    eventChannel.send(MainScreenEvent.NavigateEvent(action.chatId))
+                }
+            }*/
+        }
+    }
+
+    private fun loadData(
+        action: suspend (String) -> Unit,
+    ) {
+        viewModelScope.launch {
+            delay(500.milliseconds)
+            val currentState = _state.value
+           // _state.update { it.copy(isLoading = true) }
+            authUseCase.invoke(
+                function = {
+                    action(it)
+                },
+                onError = {
+                    eventChannel.send(MainScreenEvent.OnMessage(it.asUiText()))
+                },
+                name = currentState.name,
+                username = currentState.login,
+                email = currentState.email,
+                password = currentState.password,
+            )
+            //_state.update { it.copy(isLoading = false) }
+        }
+    }
+
+
+    private suspend fun getThemes(accessToken: String): Boolean {
+        return _state.value.operId?.let { oi ->
+            when (val result = remoteRepository.getGroupByOperId(
+                accessToken = accessToken,
+                operId = oi
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                    false
+                }
+                is ResultWork.Success -> {
+                    _state.update {
+                        it.copy(
+                            group = result.data
+                        )
+                    }
+                    true
+                }
+            }
+        } ?: true
+    }
+
+    private suspend fun getUserChats(accessToken: String): Boolean {
+        return when (val result = remoteRepository.getOpenChatsByUser(
+            accessToken = accessToken,
+            login = _state.value.login
+        )) {
+            is ResultWork.Error -> {
+                eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                false
+            }
+            is ResultWork.Success -> {
+                _state.update {
+                    it.copy(
+                        userChats = result.data
+                    )
+                }
+                if (result.data.isNotEmpty()) {
+                    eventChannel.send(MainScreenEvent.NavigateEvent(result.data.last().id))
+                }
+                true
+            }
+        }
+    }
+
+    private suspend fun createChat(accessToken: String) {
+        if (_state.value.message.isEmpty()) {
+            eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.MESSAGE_EMPTY))
+            return
+        }
+        if (_state.value.phone.isEmpty()) {
+            eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.PHONE_EMPTY))
+            return
+        }
+        if (_state.value.name.isEmpty()) {
+            eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.NAME_EMPTY))
+            return
+        }
+        if (!Utils.isValidEmail(_state.value.email)) {
+            eventChannel.send(MainScreenEvent.MessageEvent(MessageErrorEvent.WRONG_EMAIL))
+            return
+        }
+        _state.value.group?.let {
+            when (val result = remoteRepository.createChat(
+                accessToken = accessToken,
+                groupId = it.id,
+                name = _state.value.name,
+                phone = _state.value.phone,
+                message = _state.value.message,
+                email = _state.value.email,
+                login = _state.value.login
+            )) {
+                is ResultWork.Error -> {
+                   // eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                }
+                is ResultWork.Success -> {
+                    _state.update { st ->
+                        st.copy(
+                            chat = result.data
+                        )
+                    }
+                    eventChannel.send(MainScreenEvent.NavigateEvent(result.data.id))
+                }
+            }
+        }
+    }
+}

@@ -4,9 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.impuls.billing.data.handler.handleRead
+import com.impuls.billing.data.handler.handleReadFlow
+import com.impuls.billing.data.handler.handleWrite
 import com.impuls.billing.domain.model.LastAuthData
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.utils.DataError
+import com.impuls.billing.domain.utils.LABEL_BEARER
 import com.impuls.billing.domain.utils.LAST_EMAIL
 import com.impuls.billing.domain.utils.LAST_PASSWORD
 import com.impuls.billing.domain.utils.ResultWork
@@ -49,9 +53,32 @@ class DataStoreRepositoryImpl(
         }
     }
 
+    override suspend fun saveBearer(
+        bearer: String
+    ) {
+        dataStore.edit { preferences ->
+            preferences[FIELD_LABEL_BEARER] = bearer
+        }
+    }
+
+
+    override suspend fun getBearer(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[FIELD_LABEL_BEARER]
+        }
+    }
+
+    override suspend fun removeBearer() {
+        dataStore.edit { preferences ->
+            preferences.remove(FIELD_LABEL_BEARER)
+        }
+    }
+
 
     companion object {
         val FIELD_LAST_EMAIL = stringPreferencesKey(LAST_EMAIL)
         val FIELD_LAST_PASSWORD = stringPreferencesKey(LAST_PASSWORD)
+        val FIELD_LABEL_BEARER = stringPreferencesKey(LABEL_BEARER)
+
     }
 }

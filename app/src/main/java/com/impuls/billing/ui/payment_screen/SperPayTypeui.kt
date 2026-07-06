@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.impuls.billing.R
@@ -37,45 +38,62 @@ fun SberPayTypeUi(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        UiIconButton(
+            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
+            onClick = onBack,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = modifier.height(10.dp))
+
+        // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        
         imageData?.let {
+            Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
                 image = it.image,
                 colorString = it.color
             )
         }
-        Spacer(modifier = modifier.height(10.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.sberpay_payment),
             style = MaterialTheme.typography.titleMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
         Text(
             text = stringResource(R.string.sberpay_desc),
             style = MaterialTheme.typography.bodyMedium
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
         Text(
             text = stringResource(R.string.sberpay_warning),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary
         )
-        Spacer(modifier = modifier.height(10.dp))
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
         IconButton(
-            modifier = modifier
+            modifier = Modifier
                 .align(Alignment.CenterHorizontally),
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondary
@@ -83,7 +101,7 @@ fun SberPayTypeUi(
             onClick = checkPayment
         ) {
             Icon(
-                modifier = modifier.padding(4.dp),
+                modifier = Modifier.padding(4.dp),
                 imageVector = ImageVector.vectorResource(R.drawable.autorenew_48dp),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSecondary
