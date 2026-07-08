@@ -18,6 +18,8 @@ object MimeTypes {
         /** Microsoft Word */
         MS_WORD(arrayOf(".doc"), "application/msword"), //
 
+        /** Microsoft Word (OpenXML) */
+        MS_WORD_OPEN_XML(arrayOf(".docx"), "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
 
         /** OpenDocument presentation document */
         OPEN_DOCUMENT_PRESENTATION(arrayOf(".odp"), "application/vnd.oasis.opendocument.presentation"),//

@@ -1,5 +1,8 @@
 package com.impuls.chat.ui.chat_screen
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +48,7 @@ import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import androidx.core.net.toUri
 
 @Composable
 fun MessageItem(
@@ -132,6 +140,7 @@ private fun MessageFiles(
     }
 }
 
+
 @Composable
 private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenAction) -> Unit) {
     val context = LocalContext.current
@@ -201,8 +210,22 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                 Text(
                     text = "Файл: ${file.fileUrl.substringAfterLast("/")}",
                     style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
                     maxLines = 1
                 )
+                IconButton(onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(file.fileUrl.toUri(), file.mimeType.mimeType)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Открыть файл"))
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = "Open file",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
