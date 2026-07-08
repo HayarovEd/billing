@@ -1,5 +1,6 @@
 [versions]
 agp = "9.2.1"
+coilSvg = "3.5.0"
 compose = "2.10.1"
 coreKtx = "1.19.0"
 jsoup = "1.22.2"
@@ -15,7 +16,6 @@ ktorVersion = "3.5.0"
 navigationCompose = "2.9.8"
 kotlinxDatetime = "0.8.0"
 koinVersion = "4.2.2"
-coil-compose = "2.7.0"
 
 appcompat = "1.7.1"
 workRuntimeKtx = "2.11.2"
@@ -24,6 +24,9 @@ kotlinxSerializationJson = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilSvg" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilSvg" }
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilSvg" }
 compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -59,7 +62,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 
 
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
+
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

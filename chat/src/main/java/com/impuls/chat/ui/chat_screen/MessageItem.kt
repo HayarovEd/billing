@@ -4,12 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,8 +24,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.network.NetworkHeaders
+import coil3.network.httpHeaders
+import coil3.request.ImageRequest
+import coil3.svg.SvgDecoder
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.MessageFile
 import com.impuls.chat.domain.model.MimeTypes
@@ -106,7 +110,12 @@ private fun MessageFiles(
     token: String,
     files: List<MessageFile>
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    FlowRow(
+        //modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        maxItemsInEachRow = 3
+    ) {
         files.forEach { file ->
             FileItem(
                 file = file,
@@ -118,23 +127,36 @@ private fun MessageFiles(
 
 @Composable
 private fun FileItem(file: MessageFile,  token: String) {
+    val context = LocalContext.current
     val isImage = file.mimeType is MimeTypes.Image
     val url = BASE_CHAT_URL + "files/" + file.imageUrl
+    val headers = NetworkHeaders.Builder()
+        .set("Authorization", "Bearer $token")
+        .set("Content-Type", file.mimeType?.mimeType?:"application/octet-stream")
+        .build()
     //Log.d("check chat 1234", "url - $sss")
     if (isImage) {
+        val model = if (file.mimeType == MimeTypes.Image.SVG_XML) {
+            ImageRequest.Builder(context)
+                .data(url)
+                .decoderFactory(SvgDecoder.Factory())
+                .httpHeaders(headers)
+                .build()
+        } else  {
+            ImageRequest.Builder(context)
+                .data(url)
+                .httpHeaders(headers)
+                .build()
+        }
         AsyncImage(
            //model = BASE_CHAT_URL + "files/" + file.imageUrl,
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(url)
-                .addHeader("Authorization", "Bearer $token")
-                .addHeader("Content-Type", file.mimeType.mimeType)
-                .build(),
+            model = model,
             contentDescription = null,
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
+                .widthIn(max = 200.dp)
+                //.aspectRatio(16f / 9f)
                 .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Fit
         )
     } else {
         Row(

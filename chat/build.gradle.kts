@@ -62,6 +62,8 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.coil.network.ktor3)
 
     //Koin
     api(libs.koin.core)
