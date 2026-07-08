@@ -12,7 +12,8 @@ data class ChatScreenState(
     val chat: Chat? = null,
     val isLoading: Boolean = false,
     val currentMessage: String = "",
-    val tmpMessage: Message? = null
+    val tmpMessage: Message? = null,
+    val token: String = "",
 ) {
     val allMessages = collectMessages(chat?.connections ?: emptyList()) + listOfNotNull(tmpMessage)
 }

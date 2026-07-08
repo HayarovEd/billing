@@ -3,6 +3,7 @@ package com.impuls.chat.data.mapper
 import com.impuls.chat.data.remote.response.GroupDto
 import com.impuls.chat.data.remote.response.create_chat_dto.ChatDto
 import com.impuls.chat.data.remote.response.create_chat_dto.ConnectionDto
+import com.impuls.chat.data.remote.response.create_chat_dto.FileDto
 import com.impuls.chat.data.remote.response.create_chat_dto.MessageDto
 import com.impuls.chat.data.remote.response.create_chat_dto.RoleDto
 import com.impuls.chat.data.remote.response.create_chat_dto.UserDto
@@ -12,6 +13,8 @@ import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.Group
+import com.impuls.chat.domain.model.MessageFile
+import com.impuls.chat.domain.model.MimeTypes.convertToMimeType
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
 
@@ -46,7 +49,8 @@ fun MessageDto.convertToMessage(): Message {
         id = this.id,
         isSupport = this.isSupport,
         text = this.text,
-        statusMessage = if (this.isRead) StatusMessage.READED else  StatusMessage.DELIVERED
+        statusMessage = if (this.isRead) StatusMessage.READED else  StatusMessage.DELIVERED,
+        files = this.files.map { it.convertToFile() }
     )
 }
 
@@ -80,6 +84,14 @@ fun ChatDto.convertToChat(): Chat {
         ),
         isActive = this.isActive,
         unreadMessagesCount = this.unreadMessagesCount
+    )
+}
+
+fun FileDto.convertToFile(): MessageFile {
+    return MessageFile(
+        fileSize = fileSize,
+        imageUrl = imageUrl,
+        mimeType = convertToMimeType(mimeType)
     )
 }
 

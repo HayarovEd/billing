@@ -15,5 +15,7 @@ data class MessageDto(
     @SerialName("isSupport")
     val isSupport: Boolean,
     @SerialName("text")
-    val text: String
+    val text: String,
+    @SerialName("files")
+    val files: List<FileDto>
 )

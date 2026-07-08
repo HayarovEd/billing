@@ -60,6 +60,9 @@ dependencies {
     //datastore
     implementation(libs.androidx.datastore.preferences)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     //Koin
     api(libs.koin.core)
     api(libs.koin.android)

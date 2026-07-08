@@ -8,5 +8,6 @@ data class Message(
     val id: String,
     val isSupport: Boolean,
     val text: String,
-    val statusMessage: StatusMessage
+    val statusMessage: StatusMessage,
+    val files: List<MessageFile>,
 )

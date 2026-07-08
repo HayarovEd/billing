@@ -1,9 +1,7 @@
 package com.impuls.chat.ui.chat_screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,10 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,22 +25,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.chat.R
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
-import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
@@ -122,6 +116,7 @@ private fun ChatScreen(
         ) {
             MessageList(
                 messages = state.allMessages,
+                token = state.token,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .fillMaxWidth(),
@@ -138,6 +133,7 @@ private fun ChatScreen(
 @Composable
 private fun MessageList(
     messages: List<Message>,
+    token: String,
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit
 ) {
@@ -156,81 +152,14 @@ private fun MessageList(
         reverseLayout = false
     ) {
         items(messages.sortedBy { it.date }) { message ->
-            MessageItem(message = message, onAction = onAction)
+            MessageItem(
+                message = message,
+                token = token,
+                onAction = onAction)
         }
     }
 }
 
-@Composable
-private fun MessageItem(
-    message: Message,
-    onAction: (ChatScreenAction) -> Unit
-) {
-    LaunchedEffect(message.id, message.statusMessage) {
-        if (message.isSupport && message.statusMessage != StatusMessage.READED) {
-            onAction(ChatScreenAction.SetMessageAsRead(message.id))
-        }
-    }
-    val alignment = if (message.isSupport) Alignment.Start else Alignment.End
-    val backgroundColor = if (message.isSupport) {
-        MaterialTheme.colorScheme.surfaceVariant
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
-    }
-    val textColor = if (message.isSupport) {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    } else {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = if (message.isSupport) 0.dp else 16.dp,
-                        bottomEnd = if (message.isSupport) 16.dp else 0.dp
-                    )
-                )
-                .background(backgroundColor)
-                .padding(12.dp)
-        ) {
-            Column {
-                Text(text = message.text, color = textColor)
-                if (!message.isSupport) {
-                    StatusIndicator(status = message.statusMessage)
-                }
-            }
-        }
-        Text(
-            text = message.date.toString().substring(11, 16),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(top = 2.dp)
-        )
-    }
-}
-
-@Composable
-private fun StatusIndicator(status: StatusMessage) {
-    val text = when (status) {
-        StatusMessage.SENDED -> "..."
-        StatusMessage.DELIVERED -> "✓"
-        StatusMessage.ERROR_SEND -> "!"
-        StatusMessage.READED -> "✓✓"
-    }
-    Text(
-        text = text,
-        fontSize = 10.sp,
-        modifier = Modifier.padding(top = 2.dp),
-        color = MaterialTheme.colorScheme.primary
-    )
-}
 
 @Composable
 private fun ChatInput(
@@ -296,21 +225,24 @@ private fun ChatWithMessagesPreview() {
             id = "1",
             isSupport = false,
             text = "Здравствуйте, у меня проблема с приложением",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         ),
         Message(
             date = now,
             id = "2",
             isSupport = true,
             text = "Добрый день! Опишите, пожалуйста, подробнее.",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         ),
         Message(
             date = now,
             id = "3",
             isSupport = false,
             text = "Не загружается список чатов на главном экране",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         )
     )
 

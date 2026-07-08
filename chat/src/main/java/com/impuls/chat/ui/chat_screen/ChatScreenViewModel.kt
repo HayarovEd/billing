@@ -8,6 +8,7 @@ import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.WebSocketChatMessage
 import com.impuls.chat.domain.repository.AuthUseCase
+import com.impuls.chat.domain.repository.DataStoreChatRepository
 import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
@@ -34,7 +35,8 @@ class ChatScreenViewModel(
     private val remoteRepository: RemoteChatRepository,
     private val authUseCase: AuthUseCase,
     private val webSocketChatRepository: WebSocketChatRepository,
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    private val dataStoreRepository: DataStoreChatRepository,
 ) : ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<NavigationChatRoute.ChatRoute>()
@@ -61,6 +63,10 @@ class ChatScreenViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = ChatScreenState()
         )
+
+    init {
+        getToken()
+    }
 
     private val eventChannel = Channel<ChatScreenEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -102,6 +108,18 @@ class ChatScreenViewModel(
         }
     }
 
+
+    private fun getToken() {
+        viewModelScope.launch {
+            dataStoreRepository.getToken().collect { collector->
+                _state.update {
+                    it.copy(
+                        token = collector?.access?:""
+                    )
+                }
+            }
+        }
+    }
 
     private fun loadData(
         action: suspend (String) -> Unit,
@@ -162,6 +180,7 @@ class ChatScreenViewModel(
                 isSupport = false,
                 text = message,
                 statusMessage = StatusMessage.SENDED,
+                files = emptyList() //TODO
             )
             _state.update {
                 it.copy(
