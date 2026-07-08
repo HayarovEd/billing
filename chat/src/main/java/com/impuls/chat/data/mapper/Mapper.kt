@@ -90,7 +90,7 @@ fun ChatDto.convertToChat(): Chat {
 fun FileDto.convertToFile(): MessageFile {
     return MessageFile(
         fileSize = fileSize,
-        imageUrl = imageUrl,
+        fileUrl = imageUrl,
         mimeType = convertToMimeType(mimeType)
     )
 }

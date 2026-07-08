@@ -128,50 +128,67 @@ private fun MessageFiles(
 @Composable
 private fun FileItem(file: MessageFile,  token: String) {
     val context = LocalContext.current
-    val isImage = file.mimeType is MimeTypes.Image
-    val url = BASE_CHAT_URL + "files/" + file.imageUrl
-    val headers = NetworkHeaders.Builder()
-        .set("Authorization", "Bearer $token")
-        .set("Content-Type", file.mimeType?.mimeType?:"application/octet-stream")
-        .build()
+    val url = BASE_CHAT_URL + "files/" + file.fileUrl
     //Log.d("check chat 1234", "url - $sss")
-    if (isImage) {
-        val model = if (file.mimeType == MimeTypes.Image.SVG_XML) {
-            ImageRequest.Builder(context)
-                .data(url)
-                .decoderFactory(SvgDecoder.Factory())
-                .httpHeaders(headers)
+    when (file.mimeType) {
+        is MimeTypes.Image -> {
+            val headers = NetworkHeaders.Builder()
+                .set("Authorization", "Bearer $token")
+                .set("Content-Type", file.mimeType.mimeType)
                 .build()
-        } else  {
-            ImageRequest.Builder(context)
-                .data(url)
-                .httpHeaders(headers)
-                .build()
-        }
-        AsyncImage(
-           //model = BASE_CHAT_URL + "files/" + file.imageUrl,
-            model = model,
-            contentDescription = null,
-            modifier = Modifier
-                .widthIn(max = 200.dp)
-                //.aspectRatio(16f / 9f)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Fit
-        )
-    } else {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Файл: ${file.imageUrl.substringAfterLast("/")}",
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1
+            AsyncImage(
+                //model = BASE_CHAT_URL + "files/" + file.imageUrl,
+                model =   ImageRequest.Builder(context)
+                    .data(url)
+                    .apply {
+                        if (file.mimeType == MimeTypes.Image.SVG_XML) {
+                            decoderFactory(SvgDecoder.Factory())
+                        }
+                    }
+                    .httpHeaders(headers)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .widthIn(max = 200.dp)
+                    //.aspectRatio(16f / 9f)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Fit
             )
+        }
+        is MimeTypes.Audio -> {
+
+        }
+        is MimeTypes.Video -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Файл: ${file.fileUrl.substringAfterLast("/")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1
+                )
+            }
+        }
+        is MimeTypes.MimeType -> {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Файл: ${file.fileUrl.substringAfterLast("/")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1
+                )
+            }
         }
     }
 }
@@ -208,7 +225,7 @@ private fun MessageItemUserPreview() {
                     files = listOf(
                         MessageFile(
                             fileSize = 1024,
-                            imageUrl = "https://example.com/image.jpg",
+                            fileUrl = "https://example.com/image.jpg",
                             mimeType = MimeTypes.Image.JPEG
                         )
                     )
