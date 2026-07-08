@@ -1,9 +1,12 @@
 package com.impuls.chat.ui.chat_screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -14,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -25,21 +29,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.network.NetworkHeaders
+import coil3.network.httpHeaders
+import coil3.request.ImageRequest
+import coil3.svg.SvgDecoder
 import com.impuls.chat.R
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Message
+import com.impuls.chat.domain.model.MessageFile
+import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.User
+import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
 import com.impuls.chat.ui.uikit.UiIconButton
@@ -126,6 +142,86 @@ private fun ChatScreen(
             if (state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+        }
+    }
+
+    if (state.selectedFile != null) {
+        MediaDialog(
+            file = state.selectedFile,
+            token = state.token,
+            onDismiss = { onAction(ChatScreenAction.ViewMedia(null)) }
+        )
+    }
+}
+
+@Composable
+private fun MediaDialog(
+    file: MessageFile,
+    token: String,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val url = BASE_CHAT_URL + "files/" + file.fileUrl
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .clickable { onDismiss() },
+            contentAlignment = Alignment.Center
+        ) {
+            when (file.mimeType) {
+                is MimeTypes.Image -> {
+                    val headers = NetworkHeaders.Builder()
+                        .set("Authorization", "Bearer $token")
+                        .set("Content-Type", file.mimeType.mimeType)
+                        .build()
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(url)
+                            .apply {
+                                if (file.mimeType == MimeTypes.Image.SVG_XML) {
+                                    decoderFactory(SvgDecoder.Factory())
+                                }
+                            }
+                            .httpHeaders(headers)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                is MimeTypes.Video -> {
+                    VideoPlayer(
+                        url = url,
+                        token = token,
+                        isUseController = true,
+                        isPlayWhenReady = false,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+
+                else -> {
+                    Text(text = "Cannot preview this file type", color = Color.White)
+                }
+            }
+            
+            UiIconButton(
+                icon = ImageVector.vectorResource(R.drawable.close_24dp),
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp),
+                color = Color.White
+            )
         }
     }
 }

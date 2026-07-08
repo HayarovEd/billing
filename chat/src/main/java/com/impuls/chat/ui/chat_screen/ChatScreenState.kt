@@ -2,6 +2,7 @@ package com.impuls.chat.ui.chat_screen
 
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Message
+import com.impuls.chat.domain.model.MessageFile
 import com.impuls.chat.domain.utils.Utils.collectMessages
 
 data class ChatScreenState(
@@ -14,6 +15,7 @@ data class ChatScreenState(
     val currentMessage: String = "",
     val tmpMessage: Message? = null,
     val token: String = "",
+    val selectedFile: MessageFile? = null
 ) {
     val allMessages = collectMessages(chat?.connections ?: emptyList()) + listOfNotNull(tmpMessage)
 }

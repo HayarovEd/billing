@@ -105,6 +105,14 @@ class ChatScreenViewModel(
                     )
                 }
             }
+
+            is ChatScreenAction.ViewMedia -> {
+                _state.update {
+                    it.copy(
+                        selectedFile = action.file
+                    )
+                }
+            }
         }
     }
 

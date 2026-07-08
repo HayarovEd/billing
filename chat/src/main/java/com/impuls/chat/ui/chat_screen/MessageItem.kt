@@ -1,12 +1,15 @@
 package com.impuls.chat.ui.chat_screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -82,7 +86,8 @@ fun MessageItem(
                 if (message.files.isNotEmpty()) {
                     MessageFiles(
                         files = message.files,
-                        token = token
+                        token = token,
+                        onAction = onAction
                     )
                     if (message.text.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -108,7 +113,8 @@ fun MessageItem(
 @Composable
 private fun MessageFiles(
     token: String,
-    files: List<MessageFile>
+    files: List<MessageFile>,
+    onAction: (ChatScreenAction) -> Unit
 ) {
     FlowRow(
         //modifier = Modifier.fillMaxWidth(),
@@ -119,14 +125,15 @@ private fun MessageFiles(
         files.forEach { file ->
             FileItem(
                 file = file,
-                token = token
+                token = token,
+                onAction = onAction
             )
         }
     }
 }
 
 @Composable
-private fun FileItem(file: MessageFile,  token: String) {
+private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenAction) -> Unit) {
     val context = LocalContext.current
     val url = BASE_CHAT_URL + "files/" + file.fileUrl
     //Log.d("check chat 1234", "url - $sss")
@@ -138,7 +145,7 @@ private fun FileItem(file: MessageFile,  token: String) {
                 .build()
             AsyncImage(
                 //model = BASE_CHAT_URL + "files/" + file.imageUrl,
-                model =   ImageRequest.Builder(context)
+                model = ImageRequest.Builder(context)
                     .data(url)
                     .apply {
                         if (file.mimeType == MimeTypes.Image.SVG_XML) {
@@ -151,29 +158,37 @@ private fun FileItem(file: MessageFile,  token: String) {
                 modifier = Modifier
                     .widthIn(max = 200.dp)
                     //.aspectRatio(16f / 9f)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onAction(ChatScreenAction.ViewMedia(file)) },
                 contentScale = ContentScale.Fit
             )
         }
+
         is MimeTypes.Audio -> {
 
         }
+
         is MimeTypes.Video -> {
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .widthIn(max = 200.dp)
+                    .aspectRatio(16f / 9f)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .clickable { onAction(ChatScreenAction.ViewMedia(file)) }
             ) {
-                Text(
-                    text = "Файл: ${file.fileUrl.substringAfterLast("/")}",
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1
+                VideoPlayer(
+                    url = url,
+                    token = token,
+                    isUseController = false,
+                    isPlayWhenReady = false,
+                    modifier = Modifier.fillMaxSize()
                 )
+                // Overlay to catch clicks if VideoPlayer consumes them, 
+                // or just to make the whole area clickable for full screen
+                Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
             }
         }
+
         is MimeTypes.MimeType -> {
             Row(
                 modifier = Modifier

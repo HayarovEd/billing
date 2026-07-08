@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     //Ktor
@@ -53,6 +54,10 @@ dependencies {
 
     //navigation
     implementation(libs.androidx.navigation.compose)
+
+    //Media3
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 
     //date-time
     implementation(libs.kotlinx.datetime)
