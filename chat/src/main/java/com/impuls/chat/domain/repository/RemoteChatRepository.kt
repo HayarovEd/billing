@@ -1,10 +1,12 @@
 package com.impuls.chat.domain.repository
 
 import com.impuls.chat.domain.model.Chat
+import com.impuls.chat.domain.model.DownloadType
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
+import kotlinx.coroutines.flow.Flow
 
 interface RemoteChatRepository {
     suspend fun onLoginFromApp(
@@ -51,4 +53,6 @@ interface RemoteChatRepository {
         accessToken: String,
         messageId: String
     ): ResultWork<Unit, ChatDataError>
+
+    suspend fun downloadFile(accessToken: String, fileName: String): Flow<DownloadType>
 }

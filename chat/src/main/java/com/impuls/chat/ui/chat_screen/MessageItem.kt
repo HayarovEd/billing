@@ -1,8 +1,5 @@
 package com.impuls.chat.ui.chat_screen
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +46,6 @@ import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import androidx.core.net.toUri
 
 @Composable
 fun MessageItem(
@@ -144,29 +141,32 @@ private fun MessageFiles(
 @Composable
 private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenAction) -> Unit) {
     val context = LocalContext.current
-    val url = BASE_CHAT_URL + "files/" + file.fileUrl
-    //Log.d("check chat 1234", "url - $sss")
-    when (file.mimeType) {
+    val url = remember(file.fileUrl) { BASE_CHAT_URL + "files/" + file.fileUrl }
+
+    when (val mime = file.mimeType) {
         is MimeTypes.Image -> {
-            val headers = NetworkHeaders.Builder()
-                .set("Authorization", "Bearer $token")
-                .set("Content-Type", file.mimeType.mimeType)
-                .build()
-            AsyncImage(
-                //model = BASE_CHAT_URL + "files/" + file.imageUrl,
-                model = ImageRequest.Builder(context)
+            val imageRequest = remember(url, token, mime) {
+                val headers = NetworkHeaders.Builder()
+                    .set("Authorization", "Bearer $token")
+                    .set("Content-Type", mime.mimeType)
+                    .build()
+
+                ImageRequest.Builder(context)
                     .data(url)
                     .apply {
-                        if (file.mimeType == MimeTypes.Image.SVG_XML) {
+                        if (mime == MimeTypes.Image.SVG_XML) {
                             decoderFactory(SvgDecoder.Factory())
                         }
                     }
                     .httpHeaders(headers)
-                    .build(),
+                    .build()
+            }
+
+            AsyncImage(
+                model = imageRequest,
                 contentDescription = null,
                 modifier = Modifier
                     .widthIn(max = 200.dp)
-                    //.aspectRatio(16f / 9f)
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onAction(ChatScreenAction.ViewMedia(file)) },
                 contentScale = ContentScale.Fit
@@ -174,7 +174,7 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
         }
 
         is MimeTypes.Audio -> {
-
+            // Audio placeholder
         }
 
         is MimeTypes.Video -> {
@@ -192,8 +192,6 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                     isPlayWhenReady = false,
                     modifier = Modifier.fillMaxSize()
                 )
-                // Overlay to catch clicks if VideoPlayer consumes them, 
-                // or just to make the whole area clickable for full screen
                 Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
             }
         }
@@ -208,17 +206,16 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Файл: ${file.fileUrl.substringAfterLast("/")}",
+                    text = remember(file.fileUrl) { "Файл: ${file.fileUrl.substringAfterLast("/")}" },
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                     maxLines = 1
                 )
                 IconButton(onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(file.fileUrl.toUri(), file.mimeType.mimeType)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                    context.startActivity(Intent.createChooser(intent, "Открыть файл"))
+                    onAction(ChatScreenAction.OpenFileAnotherApp(
+                        fileName = file.fileUrl,
+                        mimeType = mime
+                    ))
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.OpenInNew,
@@ -227,6 +224,10 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                     )
                 }
             }
+        }
+
+        null -> {
+            // Unknown file type
         }
     }
 }

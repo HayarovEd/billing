@@ -16,7 +16,7 @@ import androidx.media3.ui.PlayerView
 
 @OptIn(UnstableApi::class)
 @Composable
-fun VideoPlayer(
+internal fun VideoPlayer(
     url: String,
     token: String,
     isUseController: Boolean,

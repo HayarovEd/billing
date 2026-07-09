@@ -35,4 +35,7 @@
     <string name="create_chat_button">Открыть чат</string>
     <string name="your_chats">Ваши чаты</string>
     <string name="support_unavailable">Служба поддержки недоступна</string>
+    <string name="write_file_error">Ошибка записи файла</string>
+    <string name="read_file_error">Ошибка чтения файла</string>
+    <string name="download_file_error">Ошибка загрузки файла</string>
 </resources>

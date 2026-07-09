@@ -4,11 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.impuls.chat.domain.model.DownloadTypeFromUseCase
 import com.impuls.chat.domain.model.Message
+import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.WebSocketChatMessage
 import com.impuls.chat.domain.repository.AuthUseCase
 import com.impuls.chat.domain.repository.DataStoreChatRepository
+import com.impuls.chat.domain.repository.DownloadAnsSaveUseCase
 import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
@@ -37,6 +40,7 @@ class ChatScreenViewModel(
     private val webSocketChatRepository: WebSocketChatRepository,
     private val notificationRepository: NotificationRepository,
     private val dataStoreRepository: DataStoreChatRepository,
+    private val downloadAnsSaveUseCase: DownloadAnsSaveUseCase,
 ) : ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<NavigationChatRoute.ChatRoute>()
@@ -113,16 +117,26 @@ class ChatScreenViewModel(
                     )
                 }
             }
+
+            is ChatScreenAction.OpenFileAnotherApp -> {
+                loadData {
+                    openFile(
+                        fileName = action.fileName,
+                        mimeType = action.mimeType,
+                        accessToken = it
+                    )
+                }
+            }
         }
     }
 
 
     private fun getToken() {
         viewModelScope.launch {
-            dataStoreRepository.getToken().collect { collector->
+            dataStoreRepository.getToken().collect { collector ->
                 _state.update {
                     it.copy(
-                        token = collector?.access?:""
+                        token = collector?.access ?: ""
                     )
                 }
             }
@@ -245,7 +259,10 @@ class ChatScreenViewModel(
 
     private fun updateChat(accessToken: String) {
         viewModelScope.launch {
-            webSocketChatRepository.updateLiveChat(accessToken =accessToken, chatId = routeData.chatId).collect { result ->
+            webSocketChatRepository.updateLiveChat(
+                accessToken = accessToken,
+                chatId = routeData.chatId
+            ).collect { result ->
                 when (result) {
                     is ResultWork.Error -> {
                         eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
@@ -294,13 +311,59 @@ class ChatScreenViewModel(
                 is ResultWork.Error -> {
                     eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
                 }
+
                 is ResultWork.Success -> {}
             }
         }
     }
 
+
+    private fun openFile(
+        fileName: String,
+        mimeType: MimeTypes.MimeType,
+        accessToken: String
+    ) {
+        viewModelScope.launch {
+            downloadAnsSaveUseCase.invoke(
+                accessToken = accessToken,
+                fileName = fileName
+            ).collect { collector ->
+                when (collector) {
+                    is DownloadTypeFromUseCase.Failed -> {
+                        eventChannel.send(ChatScreenEvent.OnMessage(collector.error.asUiText()))
+                    }
+
+                    is DownloadTypeFromUseCase.Finished -> {
+                        eventChannel.send(
+                            ChatScreenEvent.OpenAnotherApp(
+                                uri = collector.uri,
+                                mimeType = mimeType
+                            )
+                        )
+                    }
+
+                    is DownloadTypeFromUseCase.Progress -> {
+                        _state.update {
+                            it.copy(
+                                progressDownload = collector.value
+                            )
+                        }
+                    }
+
+                    DownloadTypeFromUseCase.Started -> {
+                        _state.update {
+                            it.copy(
+                                progressDownload = ""
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     override fun onCleared() {
-        super.onCleared()
         viewModelScope.launch {
             webSocketChatRepository.close()
         }

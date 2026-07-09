@@ -11,6 +11,7 @@ import com.impuls.chat.data.remote.response.GroupDto
 import com.impuls.chat.data.remote.response.LoginFromAppDto
 import com.impuls.chat.data.remote.response.create_chat_dto.ChatDto
 import com.impuls.chat.domain.model.Chat
+import com.impuls.chat.domain.model.DownloadType
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.repository.RemoteChatRepository
@@ -19,6 +20,7 @@ import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.cookie
 import io.ktor.client.request.get
@@ -26,11 +28,16 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.setCookie
+import io.ktor.utils.io.toByteArray
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.withContext
 
 internal class RemoteRepositoryImpl(
@@ -248,6 +255,26 @@ internal class RemoteRepositoryImpl(
             )
         }
     }
+
+    override suspend fun downloadFile(
+        accessToken: String,
+        fileName: String
+    ): Flow<DownloadType> = channelFlow {
+            send(DownloadType.Started)
+
+            val bytesChannel = client.get(BASE_CHAT_URL + "files/" + fileName) {
+                bearerAuth(accessToken)
+                onDownload { bytesSentTotal, contentLength ->
+                    trySend(DownloadType.Progress(value = "$bytesSentTotal of $contentLength"))
+                }
+            }.bodyAsChannel()
+
+            send(DownloadType.Finished(byteArray = bytesChannel.toByteArray()))
+        }.catch { error ->
+            error.printStackTrace()
+            emit(DownloadType.Failed(error = ChatDataError.Network.DOWNLOAD_FILE_ERROR))
+        }
+
 
     private fun extractRefreshTokenFromResponse(response: HttpResponse): String? {
         return response.setCookie()

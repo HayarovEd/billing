@@ -1,5 +1,6 @@
 package com.impuls.chat.ui.chat_screen
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -82,6 +83,14 @@ fun ChatScreenRoot(
                     )
                 )
             }
+
+            is ChatScreenEvent.OpenAnotherApp -> {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(event.uri, event.mimeType.mimeType)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(intent, "Открыть файл"))
+            }
         }
     }
 
@@ -159,7 +168,7 @@ private fun MediaDialog(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    val url = BASE_CHAT_URL + "files/" + file.fileUrl
+    val url = remember(file.fileUrl) { BASE_CHAT_URL + "files/" + file.fileUrl }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -174,22 +183,27 @@ private fun MediaDialog(
                 .clickable { onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            when (file.mimeType) {
+            when (val mime = file.mimeType) {
                 is MimeTypes.Image -> {
-                    val headers = NetworkHeaders.Builder()
-                        .set("Authorization", "Bearer $token")
-                        .set("Content-Type", file.mimeType.mimeType)
-                        .build()
-                    AsyncImage(
-                        model = ImageRequest.Builder(context)
+                    val imageRequest = remember(url, token, mime) {
+                        val headers = NetworkHeaders.Builder()
+                            .set("Authorization", "Bearer $token")
+                            .set("Content-Type", mime.mimeType)
+                            .build()
+
+                        ImageRequest.Builder(context)
                             .data(url)
                             .apply {
-                                if (file.mimeType == MimeTypes.Image.SVG_XML) {
+                                if (mime == MimeTypes.Image.SVG_XML) {
                                     decoderFactory(SvgDecoder.Factory())
                                 }
                             }
                             .httpHeaders(headers)
-                            .build(),
+                            .build()
+                    }
+
+                    AsyncImage(
+                        model = imageRequest,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
@@ -202,8 +216,7 @@ private fun MediaDialog(
                         token = token,
                         isUseController = true,
                         isPlayWhenReady = false,
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
 
@@ -211,7 +224,7 @@ private fun MediaDialog(
                     Text(text = "Cannot preview this file type", color = Color.White)
                 }
             }
-            
+
             UiIconButton(
                 icon = ImageVector.vectorResource(R.drawable.close_24dp),
                 onClick = onDismiss,
@@ -245,11 +258,15 @@ private fun MessageList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         reverseLayout = false
     ) {
-        items(messages.sortedBy { it.date }) { message ->
+        items(
+            items = messages,
+            key = { it.id }
+        ) { message ->
             MessageItem(
                 message = message,
                 token = token,
-                onAction = onAction)
+                onAction = onAction
+            )
         }
     }
 }
