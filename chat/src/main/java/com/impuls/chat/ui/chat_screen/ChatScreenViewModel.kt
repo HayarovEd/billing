@@ -12,11 +12,13 @@ import com.impuls.chat.domain.model.WebSocketChatMessage
 import com.impuls.chat.domain.repository.AuthUseCase
 import com.impuls.chat.domain.repository.DataStoreChatRepository
 import com.impuls.chat.domain.repository.DownloadAnsSaveUseCase
+import com.impuls.chat.domain.repository.FileRepository
 import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
 import com.impuls.chat.domain.utils.ResultWork
 import com.impuls.chat.domain.utils.Utils
+import com.impuls.chat.ui.chat_screen.ChatScreenEvent.*
 import com.impuls.chat.ui.navigation.NavigationChatRoute
 import com.impuls.chat.ui.uikit.asUiText
 import kotlinx.coroutines.channels.Channel
@@ -41,6 +43,7 @@ class ChatScreenViewModel(
     private val notificationRepository: NotificationRepository,
     private val dataStoreRepository: DataStoreChatRepository,
     private val downloadAnsSaveUseCase: DownloadAnsSaveUseCase,
+    private val fileRepository: FileRepository,
 ) : ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<NavigationChatRoute.ChatRoute>()
@@ -128,6 +131,16 @@ class ChatScreenViewModel(
                     )
                 }
             }
+
+            is ChatScreenAction.SaveFileLocal -> {
+                loadData {
+                    downloadFile(
+                        url = action.fileName,
+                        fileName = action.originalName,
+                        accessToken = it
+                    )
+                }
+            }
         }
     }
 
@@ -156,7 +169,7 @@ class ChatScreenViewModel(
                     action(it)
                 },
                 onError = {
-                    eventChannel.send(ChatScreenEvent.OnMessage(it.asUiText()))
+                    eventChannel.send(OnMessage(it.asUiText()))
                 },
                 name = currentState.name,
                 username = currentState.login,
@@ -176,7 +189,7 @@ class ChatScreenViewModel(
             )) {
                 is ResultWork.Error -> {
                     _state.update { it.copy(isLoading = false) }
-                    eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
+                    eventChannel.send(OnMessage(result.error.asUiText()))
                 }
 
                 is ResultWork.Success -> {
@@ -217,7 +230,7 @@ class ChatScreenViewModel(
                 message = message
             )) {
                 is ResultWork.Error -> {
-                    eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
+                    eventChannel.send(OnMessage(result.error.asUiText()))
                     _state.update {
                         it.copy(
                             tmpMessage = it.tmpMessage?.copy(statusMessage = StatusMessage.ERROR_SEND)
@@ -238,7 +251,7 @@ class ChatScreenViewModel(
 
     private fun closeChat(accessToken: String) {
         viewModelScope.launch {
-            eventChannel.send(ChatScreenEvent.NavigateToLogin)
+            eventChannel.send(NavigateToLogin)
         }
 
         /*viewModelScope.launch {
@@ -266,7 +279,7 @@ class ChatScreenViewModel(
             ).collect { result ->
                 when (result) {
                     is ResultWork.Error -> {
-                        eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
+                        eventChannel.send(OnMessage(result.error.asUiText()))
                     }
 
                     is ResultWork.Success -> {
@@ -310,7 +323,7 @@ class ChatScreenViewModel(
                 messageId = messageId
             )) {
                 is ResultWork.Error -> {
-                    eventChannel.send(ChatScreenEvent.OnMessage(result.error.asUiText()))
+                    eventChannel.send(OnMessage(result.error.asUiText()))
                 }
 
                 is ResultWork.Success -> {}
@@ -333,12 +346,12 @@ class ChatScreenViewModel(
             ).collect { collector ->
                 when (collector) {
                     is DownloadTypeFromUseCase.Failed -> {
-                        eventChannel.send(ChatScreenEvent.OnMessage(collector.error.asUiText()))
+                        eventChannel.send(OnMessage(collector.error.asUiText()))
                     }
 
                     is DownloadTypeFromUseCase.Finished -> {
                         eventChannel.send(
-                            ChatScreenEvent.OpenAnotherApp(
+                            OpenAnotherApp(
                                 uri = collector.uri,
                                 mimeType = mimeType
                             )
@@ -361,6 +374,26 @@ class ChatScreenViewModel(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun  downloadFile(
+        url: String,
+        fileName: String,
+        accessToken: String
+    ) {
+        viewModelScope.launch {
+            when (val result = fileRepository.saveFileLocal(
+                url = url,
+                fileName = fileName,
+                token = accessToken
+            )) {
+                is ResultWork.Error -> {
+                    eventChannel.send(OnMessage(result.error.asUiText()))
+                }
+
+                is ResultWork.Success -> { }
             }
         }
     }

@@ -14,4 +14,8 @@ sealed interface ChatScreenAction {
         val originalName: String,
         val mimeType: MimeTypes.MimeType
     ) : ChatScreenAction
+    data class SaveFileLocal(
+        val fileName: String,
+        val originalName: String,
+    ) : ChatScreenAction
 }

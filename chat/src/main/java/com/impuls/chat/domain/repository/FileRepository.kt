@@ -9,4 +9,10 @@ interface FileRepository {
         byteArray: ByteArray,
         fileName: String
     ): ResultWork<Uri, ChatDataError.FileErrorChat>
+
+    suspend fun saveFileLocal(
+        url: String,
+        fileName: String,
+        token: String,
+    ): ResultWork<Unit, ChatDataError.FileErrorChat>
 }
