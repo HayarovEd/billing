@@ -11,6 +11,7 @@ sealed interface ChatScreenAction {
     data class ViewMedia(val file: MessageFile?) : ChatScreenAction
     data class OpenFileAnotherApp(
         val fileName: String,
+        val originalName: String,
         val mimeType: MimeTypes.MimeType
     ) : ChatScreenAction
 }

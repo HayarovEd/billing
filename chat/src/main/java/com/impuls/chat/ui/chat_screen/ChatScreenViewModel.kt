@@ -122,6 +122,7 @@ class ChatScreenViewModel(
                 loadData {
                     openFile(
                         fileName = action.fileName,
+                        originalName = action.originalName,
                         mimeType = action.mimeType,
                         accessToken = it
                     )
@@ -321,11 +322,13 @@ class ChatScreenViewModel(
     private fun openFile(
         fileName: String,
         mimeType: MimeTypes.MimeType,
-        accessToken: String
+        accessToken: String,
+        originalName: String
     ) {
         viewModelScope.launch {
             downloadAnsSaveUseCase.invoke(
                 accessToken = accessToken,
+                originalName = originalName,
                 fileName = fileName
             ).collect { collector ->
                 when (collector) {

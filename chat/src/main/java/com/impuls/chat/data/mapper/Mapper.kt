@@ -91,6 +91,7 @@ fun FileDto.convertToFile(): MessageFile {
     return MessageFile(
         fileSize = fileSize,
         fileUrl = imageUrl,
+        originalName = originalName,
         mimeType = convertToMimeType(mimeType)
     )
 }

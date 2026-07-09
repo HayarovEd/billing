@@ -35,6 +35,8 @@ object MimeTypes {
 
         /** Rich Text Format (RTF) */
         RTF(arrayOf(".rtf"), "application/rtf"), //
+        /** Text, (generally ASCII or ISO 8859-n) */
+        PLAIN(arrayOf(".txt"), "text/plain"),
 
     }
 

@@ -11,5 +11,7 @@ data class FileDto(
     @SerialName("image_url")
     val imageUrl: String,
     @SerialName("mime_type")
-    val mimeType: String
+    val mimeType: String,
+    @SerialName("original_name")
+    val originalName: String,
 )

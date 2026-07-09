@@ -33,19 +33,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil3.compose.AsyncImage
 import coil3.network.NetworkHeaders
 import coil3.network.httpHeaders
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
-import com.bhuvaneshw.pdf.PdfViewer
-import com.bhuvaneshw.pdf.resource.DefaultNetworkResourceHandler
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.MessageFile
 import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.utils.BASE_CHAT_URL
+import com.impuls.chat.ui.chat_screen.ChatScreenAction.OpenFileAnotherApp
+import com.impuls.chat.ui.chat_screen.ChatScreenAction.ViewMedia
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -171,7 +170,7 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                 modifier = Modifier
                     .widthIn(max = 200.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onAction(ChatScreenAction.ViewMedia(file)) },
+                    .clickable { onAction(ViewMedia(file)) },
                 contentScale = ContentScale.Fit
             )
         }
@@ -186,7 +185,7 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                     .widthIn(max = 200.dp)
                     .aspectRatio(16f / 9f)
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onAction(ChatScreenAction.ViewMedia(file)) }
+                    .clickable { onAction(ViewMedia(file)) }
             ) {
                 VideoPlayer(
                     url = url,
@@ -204,70 +203,47 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
         is MimeTypes.MimeType -> {
             Row(
                 modifier = Modifier
-                    .widthIn(max = 200.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                if (mime == MimeTypes.MimeType.PDF) {
-                    val networkResourceHandler = remember(token) {
-                        DefaultNetworkResourceHandler(
-                            beforeConnect = {
-                                setRequestProperty("Authorization", "Bearer $token")
+                when (mime) {
+                    MimeTypes.MimeType.PDF -> {
+                        PdfContent(
+                            modifier = Modifier,
+                            url = url,
+                            token = token,
+                            onAction = {
+                                onAction(ViewMedia(file))
                             }
                         )
                     }
-                    Box(
-                        modifier = Modifier
-                            .height(200.dp)
-                            .weight(1f)
-                            .background(Color.White)
-                    ) {
-                        AndroidView(
-                            factory = { ctx ->
-                                PdfViewer(ctx).apply {
-                                    this.networkResourceHandler = networkResourceHandler
-                                    this.onReady {
-                                        this.ui.toolbarEnabled = false
-                                        this.ui.viewerScrollbar = false
-                                        this.pageAlignMode = PdfViewer.PageAlignMode.DEFAULT
-                                        this.zoomTo(PdfViewer.Zoom.PAGE_FIT)
-                                        this.load(url)
-                                    }
-                                }
-                            },
-                            modifier = Modifier.fillMaxSize(),
-                            onRelease = { it.reInitialize() }
+
+                    else -> {
+                        Text(
+                            text = "Файл: ${file.originalName}",
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1
                         )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable { onAction(ChatScreenAction.ViewMedia(file)) }
-                        )
-                    }
-                } else {
-                    Text(
-                        text = remember(file.fileUrl) { "Файл: ${file.fileUrl.substringAfterLast("/")}" },
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1
-                    )
-                    IconButton(onClick = {
-                        onAction(ChatScreenAction.OpenFileAnotherApp(
-                            fileName = file.fileUrl,
-                            mimeType = mime
-                        ))
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = "Open file",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        IconButton(
+                            onClick = {
+                            onAction(
+                                OpenFileAnotherApp(
+                                    fileName = file.fileUrl,
+                                    originalName = file.originalName,
+                                    mimeType = mime
+                                )
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                contentDescription = "Open file",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
-
             }
         }
 
@@ -310,7 +286,8 @@ private fun MessageItemUserPreview() {
                         MessageFile(
                             fileSize = 1024,
                             fileUrl = "https://example.com/image.jpg",
-                            mimeType = MimeTypes.Image.JPEG
+                            mimeType = MimeTypes.Image.JPEG,
+                            originalName = "image.jpg"
                         )
                     )
                 ),
