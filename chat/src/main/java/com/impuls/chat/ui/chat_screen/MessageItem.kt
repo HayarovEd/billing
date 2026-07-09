@@ -33,11 +33,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import coil3.compose.AsyncImage
 import coil3.network.NetworkHeaders
 import coil3.network.httpHeaders
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
+import com.bhuvaneshw.pdf.PdfViewer
+import com.bhuvaneshw.pdf.resource.DefaultNetworkResourceHandler
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.MessageFile
 import com.impuls.chat.domain.model.MimeTypes
@@ -192,37 +195,79 @@ private fun FileItem(file: MessageFile, token: String, onAction: (ChatScreenActi
                     isPlayWhenReady = false,
                     modifier = Modifier.fillMaxSize()
                 )
-                Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent))
             }
         }
 
         is MimeTypes.MimeType -> {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .widthIn(max = 200.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = remember(file.fileUrl) { "Файл: ${file.fileUrl.substringAfterLast("/")}" },
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
-                )
-                IconButton(onClick = {
-                    onAction(ChatScreenAction.OpenFileAnotherApp(
-                        fileName = file.fileUrl,
-                        mimeType = mime
-                    ))
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                        contentDescription = "Open file",
-                        tint = MaterialTheme.colorScheme.primary
+
+                if (mime == MimeTypes.MimeType.PDF) {
+                    val networkResourceHandler = remember(token) {
+                        DefaultNetworkResourceHandler(
+                            beforeConnect = {
+                                setRequestProperty("Authorization", "Bearer $token")
+                            }
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(200.dp)
+                            .weight(1f)
+                            .background(Color.White)
+                    ) {
+                        AndroidView(
+                            factory = { ctx ->
+                                PdfViewer(ctx).apply {
+                                    this.networkResourceHandler = networkResourceHandler
+                                    this.onReady {
+                                        this.ui.toolbarEnabled = false
+                                        this.ui.viewerScrollbar = false
+                                        this.pageAlignMode = PdfViewer.PageAlignMode.DEFAULT
+                                        this.zoomTo(PdfViewer.Zoom.PAGE_FIT)
+                                        this.load(url)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize(),
+                            onRelease = { it.reInitialize() }
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable { onAction(ChatScreenAction.ViewMedia(file)) }
+                        )
+                    }
+                } else {
+                    Text(
+                        text = remember(file.fileUrl) { "Файл: ${file.fileUrl.substringAfterLast("/")}" },
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1
                     )
+                    IconButton(onClick = {
+                        onAction(ChatScreenAction.OpenFileAnotherApp(
+                            fileName = file.fileUrl,
+                            mimeType = mime
+                        ))
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                            contentDescription = "Open file",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
+
             }
         }
 

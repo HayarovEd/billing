@@ -74,4 +74,7 @@ dependencies {
     api(libs.koin.core)
     api(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    //pdf
+    implementation(libs.pdfviewer.compose)
 }

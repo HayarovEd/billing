@@ -44,6 +44,10 @@ import coil3.network.NetworkHeaders
 import coil3.network.httpHeaders
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
+import com.bhuvaneshw.pdf.compose.PdfSource
+import com.bhuvaneshw.pdf.compose.PdfViewer
+import com.bhuvaneshw.pdf.compose.rememberPdfState
+import com.bhuvaneshw.pdf.resource.DefaultNetworkResourceHandler
 import com.impuls.chat.R
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
@@ -218,6 +222,42 @@ private fun MediaDialog(
                         isPlayWhenReady = false,
                         modifier = Modifier.fillMaxSize()
                     )
+                }
+
+                is MimeTypes.MimeType -> {
+                    if (mime == MimeTypes.MimeType.PDF) {
+                        val pdfState = rememberPdfState(
+                            PdfSource.Url(url)
+                        )
+                        val networkResourceHandler = remember(token) {
+                            DefaultNetworkResourceHandler(
+                                beforeConnect = {
+                                    setRequestProperty("Authorization", "Bearer $token")
+                                }
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White)
+                                .clickable(enabled = false) {}
+                        ) {
+                            PdfViewer(
+                                pdfState = pdfState,
+                                modifier = Modifier.fillMaxSize(),
+                                onCreateViewer = {
+                                    this.networkResourceHandler = networkResourceHandler
+                                    this.onReady {
+                                        this.ui.toolbarEnabled = true
+                                        this.ui.viewerScrollbar = true
+                                        this.zoomTo(com.bhuvaneshw.pdf.PdfViewer.Zoom.PAGE_FIT)
+                                    }
+                                }
+                            )
+                        }
+                    } else {
+                        Text(text = "Cannot preview this file type", color = Color.White)
+                    }
                 }
 
                 else -> {

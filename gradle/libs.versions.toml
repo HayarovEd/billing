@@ -2,6 +2,7 @@
 agp = "9.2.1"
 coilSvg = "3.5.0"
 compose = "2.10.1"
+composeVersion = "1.1.4"
 coreKtx = "1.19.0"
 jsoup = "1.22.2"
 junit = "4.13.2"
@@ -72,6 +73,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+pdfviewer-compose = { module = "com.github.bhuvaneshw.pdfviewer:compose", version.ref = "composeVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
