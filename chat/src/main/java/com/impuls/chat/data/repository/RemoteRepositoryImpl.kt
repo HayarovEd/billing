@@ -4,7 +4,6 @@ import android.util.Log
 import com.impuls.chat.data.handler.handleResponse
 import com.impuls.chat.data.mapper.convertToChat
 import com.impuls.chat.data.mapper.convertToGroup
-import com.impuls.chat.data.mapper.getMimeTypeExtended
 import com.impuls.chat.data.remote.request.CreateChatRequest
 import com.impuls.chat.data.remote.request.LoginFromAppRequest
 import com.impuls.chat.data.remote.request.MessageRequest
@@ -19,6 +18,7 @@ import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
+import com.impuls.chat.domain.utils.getMimeTypeExtended
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.onDownload

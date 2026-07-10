@@ -17,7 +17,6 @@ import com.impuls.chat.domain.model.MessageFile
 import com.impuls.chat.domain.model.MimeTypes.convertToMimeType
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
-import java.io.File
 
 fun GroupDto.convertToGroup(): Group {
     return Group(
@@ -96,68 +95,3 @@ fun FileDto.convertToFile(): MessageFile {
         mimeType = convertToMimeType(mimeType)
     )
 }
-
-fun getMimeTypeExtended(file: File): String {
-    val extension = file.extension.lowercase()
-    return when (extension) {
-        // Изображения
-        "jpg", "jpeg" -> "image/jpeg"
-        "png" -> "image/png"
-        "gif" -> "image/gif"
-        "bmp" -> "image/bmp"
-        "webp" -> "image/webp"
-        "svg" -> "image/svg+xml"
-        "heic" -> "image/heic"
-
-        // Документы
-        "pdf" -> "application/pdf"
-        "doc" -> "application/msword"
-        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        "xls" -> "application/vnd.ms-excel"
-        "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        "ppt" -> "application/vnd.ms-powerpoint"
-        "pptx" -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        "odt" -> "application/vnd.oasis.opendocument.text"
-        "ods" -> "application/vnd.oasis.opendocument.spreadsheet"
-        "odp" -> "application/vnd.oasis.opendocument.presentation"
-        "rtf" -> "application/rtf"
-        "txt" -> "text/plain"
-        "csv" -> "text/csv"
-        "md" -> "text/markdown"
-
-        // Видео
-        "mp4" -> "video/mp4"
-        "avi" -> "video/x-msvideo"
-        "mov" -> "video/quicktime"
-        "wmv" -> "video/x-ms-wmv"
-        "flv" -> "video/x-flv"
-        "mkv" -> "video/x-matroska"
-        "webm" -> "video/webm"
-        "3gp" -> "video/3gpp"
-
-        // Аудио
-        "mp3" -> "audio/mpeg"
-        "wav" -> "audio/wav"
-        "ogg" -> "audio/ogg"
-        "aac" -> "audio/aac"
-        "flac" -> "audio/flac"
-        "m4a" -> "audio/mp4"
-
-        // Архивы
-        "zip" -> "application/zip"
-        "rar" -> "application/vnd.rar"
-        "7z" -> "application/x-7z-compressed"
-        "tar" -> "application/x-tar"
-        "gz" -> "application/gzip"
-
-        // JSON/XML
-        "json" -> "application/json"
-        "xml" -> "application/xml"
-        "html" -> "text/html"
-        "css" -> "text/css"
-        "js" -> "application/javascript"
-
-        else -> "application/octet-stream"
-    }
-}
-

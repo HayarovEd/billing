@@ -1,6 +1,10 @@
 package com.impuls.chat.domain.utils
 
 import android.util.Patterns
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Message
@@ -8,6 +12,7 @@ import com.impuls.chat.domain.model.StatusMessage
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.io.File
 import kotlin.time.Instant
 
 internal object Utils {
@@ -103,4 +108,86 @@ internal object Utils {
         return existingMessageMap.values.sortedBy { it.date }
     }
 
+}
+
+fun getMimeTypeExtended(context: Context, uri: Uri): String {
+    if (uri.scheme == "content") {
+        return context.contentResolver.getType(uri) ?: "application/octet-stream"
+    }
+    val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+    if (extension.isNotEmpty()) {
+        return getMimeTypeFromExtension(extension)
+    }
+    return "application/octet-stream"
+}
+
+fun getFileName(context: Context, uri: Uri): String {
+    var result: String? = null
+    if (uri.scheme == "content") {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (index != -1) {
+                    result = cursor.getString(index)
+                }
+            }
+        }
+    }
+    if (result == null) {
+        result = uri.path
+        val cut = result?.lastIndexOf('/') ?: -1
+        if (cut != -1) {
+            result = result?.substring(cut + 1)
+        }
+    }
+    return result ?: "unknown"
+}
+
+fun getMimeTypeExtended(file: File): String {
+    return getMimeTypeFromExtension(file.extension)
+}
+
+private fun getMimeTypeFromExtension(extension: String): String {
+    return when (extension.lowercase()) {
+        // Изображения
+        "jpg", "jpeg" -> "image/jpeg"
+        "png" -> "image/png"
+        "gif" -> "image/gif"
+        "bmp" -> "image/bmp"
+        "webp" -> "image/webp"
+        "svg" -> "image/svg+xml"
+
+        // Документы
+        "pdf" -> "application/pdf"
+        "doc" -> "application/msword"
+        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "xls" -> "application/vnd.ms-excel"
+        "ppt" -> "application/vnd.ms-powerpoint"
+        "odt" -> "application/vnd.oasis.opendocument.text"
+        "ods" -> "application/vnd.oasis.opendocument.spreadsheet"
+        "odp" -> "application/vnd.oasis.opendocument.presentation"
+        "rtf" -> "application/rtf"
+        "txt" -> "text/plain"
+        "csv" -> "text/csv"
+
+        // Видео
+        "mp4" -> "video/mp4"
+        "avi" -> "video/x-msvideo"
+        "mov" -> "video/quicktime"
+        "wmv" -> "video/x-ms-wmv"
+        "flv" -> "video/x-flv"
+        "mkv" -> "video/x-matroska"
+        "webm" -> "video/webm"
+
+        // Аудио
+        "mp3" -> "audio/mpeg"
+        "wav" -> "audio/wav"
+        "ogg" -> "audio/ogg"
+        "aac" -> "audio/aac"
+        "flac" -> "audio/flac"
+        "m4a" -> "audio/mp4"
+
+
+        else -> "application/octet-stream"
+    }
 }

@@ -4,6 +4,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -65,6 +66,7 @@ import com.bhuvaneshw.pdf.compose.PdfViewer
 import com.bhuvaneshw.pdf.compose.rememberPdfState
 import com.bhuvaneshw.pdf.resource.DefaultNetworkResourceHandler
 import com.impuls.chat.R
+import com.impuls.chat.domain.model.BaseMessage
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Group
@@ -156,6 +158,10 @@ fun ChatScreenRoot(
                 context.startActivity(Intent.createChooser(intent, "Открыть файл"))
             }
         }
+    }
+
+    BackHandler {
+        onNavigateToLogin()
     }
 
     ChatScreen(
@@ -350,7 +356,7 @@ private fun MediaDialog(
 
 @Composable
 private fun MessageList(
-    messages: List<Message>,
+    messages: List<BaseMessage>,
     token: String,
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit

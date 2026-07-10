@@ -110,9 +110,6 @@ object MimeTypes {
         /** MPEG Video */
         MPEG(arrayOf(".mpg", ".mpeg"), "video/mpeg"),//
 
-        /** MPEG transport stream */
-        MPEG_TS(arrayOf(".ts"), "video/mp2t"),
-
         /** OGG video */
         OGG(arrayOf(".ogv"), "video/ogg"),//
 

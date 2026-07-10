@@ -1,5 +1,6 @@
 package com.impuls.chat.ui.chat_screen
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.impuls.chat.domain.model.DownloadTypeFromUseCase
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.StatusMessage
+import com.impuls.chat.domain.model.TmpMessage
 import com.impuls.chat.domain.model.WebSocketChatMessage
 import com.impuls.chat.domain.repository.AuthUseCase
 import com.impuls.chat.domain.repository.DataStoreChatRepository
@@ -30,9 +32,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 
 class ChatScreenViewModel(
@@ -224,17 +223,11 @@ class ChatScreenViewModel(
     private fun sendMessage(
         accessToken: String,
         message: String,
-        uriFiles: List<android.net.Uri>
+        uriFiles: List<Uri>
     ) {
         viewModelScope.launch {
-            val newMessage = Message(
-                date = Clock.System.now()
-                    .toLocalDateTime(TimeZone.currentSystemDefault()),
-                id = "-1",
-                isSupport = false,
-                text = message,
-                statusMessage = StatusMessage.SENDED,
-                files = emptyList() //TODO
+            val newMessage = TmpMessage(
+                urisFile = uriFiles
             )
             _state.update {
                 it.copy(
