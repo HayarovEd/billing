@@ -1,11 +1,10 @@
 package com.impuls.chat.ui.chat_screen
 
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +28,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,14 +46,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -79,9 +86,12 @@ import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.Utils
+import com.impuls.chat.domain.utils.getFileName
+import com.impuls.chat.domain.utils.getMimeTypeExtended
 import com.impuls.chat.ui.uikit.ObserveAsEvents
 import com.impuls.chat.ui.uikit.UiIconButton
 import com.impuls.chat.ui.uikit.UiTextField
+import com.impuls.chat.ui.uikit.toImage
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
@@ -103,6 +113,10 @@ fun ChatScreenRoot(
         uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
     }
 
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+        uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+    }
+
     val cameraImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -116,29 +130,16 @@ fun ChatScreenRoot(
         filePickerLauncher.launch("*/*")
     }
 
+    fun onAttachImage() {
+        imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+    }
+
     fun onAttachCamera() {
         val directory = context.externalCacheDir ?: context.cacheDir
         val file = File.createTempFile("camera_image_${System.currentTimeMillis()}", ".jpg", directory)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         cameraImageUri.value = uri
         cameraLauncher.launch(uri)
-    }
-
-    fun onAttachClipboard() {
-        val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = clipboardManager.primaryClip
-        if (clipData != null && clipData.itemCount > 0) {
-            val item = clipData.getItemAt(0)
-            val uri = item.uri
-            if (uri != null) {
-                viewModel.onAction(ChatScreenAction.AttachFile(uri))
-            } else {
-                val text = item.text?.toString()
-                if (!text.isNullOrBlank()) {
-                    viewModel.onAction(ChatScreenAction.UpdateCurrentMessage(state.currentMessage + text))
-                }
-            }
-        }
     }
 
     ObserveAsEvents(viewModel.events) { event ->
@@ -171,8 +172,8 @@ fun ChatScreenRoot(
         snackbarHostState = snackBarState,
         onAction = viewModel::onAction,
         onAttachFile = ::onAttachFile,
+        onAttachImage = ::onAttachImage,
         onAttachCamera = ::onAttachCamera,
-        onAttachClipboard = ::onAttachClipboard
     )
 }
 
@@ -184,9 +185,10 @@ private fun ChatScreen(
     snackbarHostState: SnackbarHostState,
     onAction: (ChatScreenAction) -> Unit,
     onAttachFile: () -> Unit,
+    onAttachImage: () -> Unit,
     onAttachCamera: () -> Unit,
-    onAttachClipboard: () -> Unit
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -206,12 +208,16 @@ private fun ChatScreen(
                 modifier = Modifier.navigationBarsPadding(),
                 message = state.currentMessage,
                 attachedFiles = state.attachedFiles,
+                menuExpanded = menuExpanded,
                 onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
                 onSend = { onAction(ChatScreenAction.SendMessage(it)) },
                 onAttachFile = onAttachFile,
+                onAttachImage = onAttachImage,
                 onAttachCamera = onAttachCamera,
-                onAttachClipboard = onAttachClipboard,
-                onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) }
+                onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) },
+                updateMenuExpanded = {
+                    menuExpanded = it
+                }
             )
         }
     ) { paddingValues ->
@@ -364,7 +370,6 @@ private fun MessageList(
     onAction: (ChatScreenAction) -> Unit
 ) {
     val listState = rememberLazyListState()
-
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
@@ -396,70 +401,92 @@ private fun ChatInput(
     modifier: Modifier = Modifier,
     message: String,
     attachedFiles: List<Uri>,
+    menuExpanded: Boolean,
     onMessageChange: (String) -> Unit,
     onSend: (String) -> Unit,
     onAttachFile: () -> Unit,
+    onAttachImage: () -> Unit,
     onAttachCamera: () -> Unit,
-    onAttachClipboard: () -> Unit,
-    onRemoveFile: (Uri) -> Unit
+    onRemoveFile: (Uri) -> Unit,
+    updateMenuExpanded: (Boolean) -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    val context = LocalContext.current
+
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+    ) {
         if (attachedFiles.isNotEmpty()) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(vertical = 8.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(attachedFiles) { uri ->
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .background(Color.LightGray, RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            model = uri,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                        UiIconButton(
-                            icon = Icons.Default.Close,
-                            onClick = { onRemoveFile(uri) },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(20.dp),
-                            size = 16.dp,
-                            color = Color.White,
-                            buttonColor = Color.Black.copy(alpha = 0.5f)
-                        )
-                    }
+                    AttachedFileItem(
+                        uri = uri,
+                        onRemove = { onRemoveFile(uri) },
+                        mimeType = getMimeTypeExtended(context, uri)
+                    )
                 }
             }
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(bottom = 16.dp, start = 8.dp, end = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            UiIconButton(
-                icon = Icons.Default.AttachFile,
-                onClick = onAttachFile
-            )
-            UiIconButton(
-                icon = Icons.Default.CameraAlt,
-                onClick = onAttachCamera
-            )
-            UiIconButton(
-                icon = Icons.Default.ContentPaste,
-                onClick = onAttachClipboard
-            )
+            Box {
+                UiIconButton(
+                    icon = Icons.Default.AttachFile,
+                    onClick = { updateMenuExpanded(true) }
+                )
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { updateMenuExpanded (false) }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Камера") },
+                        onClick = {
+                            updateMenuExpanded (false)
+                            onAttachCamera()
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.CameraAlt, contentDescription = null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Изображение") },
+                        onClick = {
+                            updateMenuExpanded (false)
+                            onAttachImage()
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Image, contentDescription = null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Файл") },
+                        onClick = {
+                            updateMenuExpanded (false)
+                            onAttachFile()
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.AttachFile, contentDescription = null)
+                        }
+                    )
+                }
+            }
             Spacer(modifier = Modifier.width(4.dp))
             UiTextField(
                 content = message,
                 label = stringResource(R.string.message_label),
+                maxLines = 5,
                 modifier = Modifier.weight(1f),
                 onClickContent = onMessageChange
             )
@@ -467,7 +494,82 @@ private fun ChatInput(
             UiIconButton(
                 icon = ImageVector.vectorResource(R.drawable.send_24dp),
                 onClick = { if (message.isNotBlank() || attachedFiles.isNotEmpty()) onSend(message) },
-                enabled = message.isNotBlank() || attachedFiles.isNotEmpty()
+                enabled = message.isNotBlank() || attachedFiles.isNotEmpty(),
+                color = if (message.isNotBlank() || attachedFiles.isNotEmpty()) Color(0xFF24A1DE) else Color.Gray
+            )
+        }
+    }
+}
+
+@Composable
+private fun AttachedFileItem(
+    uri: Uri,
+    mimeType: String,
+    onRemove: () -> Unit
+) {
+    val context = LocalContext.current
+    val mime = MimeTypes.convertToMimeType(mimeType)
+    Box(
+        modifier = Modifier
+            .size(72.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.LightGray.copy(alpha = 0.3f)),
+        contentAlignment = Alignment.Center
+    ) {
+        when (mime) {
+            is MimeTypes.Image -> {
+                AsyncImage(
+                    model = uri,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            is MimeTypes.MimeType -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = painterResource(id = mime.toImage()),
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.size(2.dp))
+                    Text(
+                        text = getFileName(context, uri),
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Gray
+                    )
+                }
+            }
+            else -> {
+                Icon(
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = Color.Gray
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(4.dp)
+                .size(20.dp)
+                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(10.dp))
+                .clickable { onRemove() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove",
+                tint = Color.White,
+                modifier = Modifier.size(14.dp)
             )
         }
     }
@@ -485,8 +587,8 @@ private fun Preview() {
         snackbarHostState = snackBarState,
         onAction = {},
         onAttachFile = {},
+        onAttachImage = {},
         onAttachCamera = {},
-        onAttachClipboard = {}
     )
 }
 
@@ -564,8 +666,8 @@ private fun ChatWithMessagesPreview() {
         snackbarHostState = snackBarState,
         onAction = {},
         onAttachFile = {},
+        onAttachImage = {},
         onAttachCamera = {},
-        onAttachClipboard = {}
     )
 }
 
