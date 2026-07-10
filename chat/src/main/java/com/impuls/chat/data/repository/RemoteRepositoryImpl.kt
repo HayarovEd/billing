@@ -233,6 +233,8 @@ internal class RemoteRepositoryImpl(
                     } else {
                         files.forEach { file ->
                             val fileBytes = file.readBytes()
+                            Log.d("WebSocket message received", "file $file")
+                            Log.d("WebSocket message received", "fileBytes ${fileBytes.size}")
                             parts.add("--$boundary\r\n".toByteArray())
                             parts.add("Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n".toByteArray())
                             parts.add("Content-Type: ${getMimeTypeExtended(file)}\r\n\r\n".toByteArray())

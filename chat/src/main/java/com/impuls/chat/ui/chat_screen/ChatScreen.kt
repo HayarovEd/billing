@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -102,7 +103,7 @@ fun ChatScreenRoot(
         uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
     }
 
-    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
+    val cameraImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -116,7 +117,8 @@ fun ChatScreenRoot(
     }
 
     fun onAttachCamera() {
-        val file = File(context.cacheDir, "camera_image_${System.currentTimeMillis()}.jpg")
+        val directory = context.externalCacheDir ?: context.cacheDir
+        val file = File.createTempFile("camera_image_${System.currentTimeMillis()}", ".jpg", directory)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         cameraImageUri.value = uri
         cameraLauncher.launch(uri)

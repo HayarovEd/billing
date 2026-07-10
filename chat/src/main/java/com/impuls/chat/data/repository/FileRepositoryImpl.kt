@@ -67,10 +67,10 @@ class FileRepositoryImpl(
     override suspend fun getFileFromUri(uri: Uri): File? {
         return withContext(Dispatchers.IO) {
             try {
-                val inputStream = application.contentResolver.openInputStream(uri)
+                val inputStream = application.contentResolver.openInputStream(uri) ?: return@withContext null
                 val fileName = getFileName(uri) ?: "temp_file_${System.currentTimeMillis()}"
                 val file = File(application.cacheDir, fileName)
-                inputStream?.use { input ->
+                inputStream.use { input ->
                     file.outputStream().use { output ->
                         input.copyTo(output)
                     }
