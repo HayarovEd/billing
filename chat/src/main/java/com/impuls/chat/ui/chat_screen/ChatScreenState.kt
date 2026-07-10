@@ -16,6 +16,7 @@ data class ChatScreenState(
     val tmpMessage: Message? = null,
     val token: String = "",
     val selectedFile: MessageFile? = null,
+    val attachedFiles: List<android.net.Uri> = emptyList(),
     val progressDownload: String = "",
 ) {
     val allMessages = (collectMessages(chat?.connections ?: emptyList()) + listOfNotNull(tmpMessage)).sortedBy { it.date }

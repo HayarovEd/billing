@@ -7,6 +7,7 @@ import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface RemoteChatRepository {
     suspend fun onLoginFromApp(
@@ -39,8 +40,9 @@ interface RemoteChatRepository {
 
     suspend fun sendMessage(
         accessToken: String,
-        message: String,
-        chatId: String
+        message: String?,
+        chatId: String,
+        files: List<File>?
     ): ResultWork<Unit, ChatDataError>
 
     suspend fun closeChat(

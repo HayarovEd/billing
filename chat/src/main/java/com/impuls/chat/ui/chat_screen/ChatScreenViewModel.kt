@@ -84,7 +84,8 @@ class ChatScreenViewModel(
                 loadData {
                     sendMessage(
                         accessToken = it,
-                        message = action.message
+                        message = action.message,
+                        uriFiles = _state.value.attachedFiles
                     )
                 }
 
@@ -100,6 +101,22 @@ class ChatScreenViewModel(
                 _state.update {
                     it.copy(
                         currentMessage = action.message
+                    )
+                }
+            }
+
+            is ChatScreenAction.AttachFile -> {
+                _state.update {
+                    it.copy(
+                        attachedFiles = it.attachedFiles + action.uri
+                    )
+                }
+            }
+
+            is ChatScreenAction.RemoveFile -> {
+                _state.update {
+                    it.copy(
+                        attachedFiles = it.attachedFiles - action.uri
                     )
                 }
             }
@@ -206,7 +223,8 @@ class ChatScreenViewModel(
 
     private fun sendMessage(
         accessToken: String,
-        message: String
+        message: String,
+        uriFiles: List<android.net.Uri>
     ) {
         viewModelScope.launch {
             val newMessage = Message(
@@ -221,13 +239,18 @@ class ChatScreenViewModel(
             _state.update {
                 it.copy(
                     currentMessage = "",
+                    attachedFiles = emptyList(),
                     tmpMessage = newMessage
                 )
             }
+
+            val files = uriFiles.mapNotNull { fileRepository.getFileFromUri(it) }
+
             when (val result = remoteRepository.sendMessage(
                 accessToken = accessToken,
                 chatId = routeData.chatId,
-                message = message
+                message = message,
+                files = files.ifEmpty { null }
             )) {
                 is ResultWork.Error -> {
                     eventChannel.send(OnMessage(result.error.asUiText()))

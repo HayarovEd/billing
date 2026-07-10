@@ -1,5 +1,6 @@
 package com.impuls.chat.di
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -11,6 +12,9 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
@@ -56,6 +60,14 @@ val baseChatModule = module {
                     isLenient = true
                     ignoreUnknownKeys = true
                 })
+            }
+            install(Logging) {
+                level = LogLevel.HEADERS // или LogLevel.BODY для полного лога
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Log.d("TEST KTOR", "message: $message")
+                    }
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package com.impuls.chat.domain.repository
 import android.net.Uri
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
+import java.io.File
 
 interface FileRepository {
     suspend fun saveFile(
@@ -15,4 +16,6 @@ interface FileRepository {
         fileName: String,
         token: String,
     ): ResultWork<Unit, ChatDataError.FileErrorChat>
+
+    suspend fun getFileFromUri(uri: Uri): File?
 }

@@ -1,20 +1,34 @@
 package com.impuls.chat.ui.chat_screen
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -25,6 +39,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.network.NetworkHeaders
@@ -66,6 +82,7 @@ import com.impuls.chat.ui.uikit.UiTextField
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 import kotlin.time.Clock
 
 @Composable
@@ -76,6 +93,49 @@ fun ChatScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackBarState = remember { SnackbarHostState() }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+    }
+
+    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraImageUri.value?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+        }
+    }
+
+    fun onAttachFile() {
+        filePickerLauncher.launch("*/*")
+    }
+
+    fun onAttachCamera() {
+        val file = File(context.cacheDir, "camera_image_${System.currentTimeMillis()}.jpg")
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        cameraImageUri.value = uri
+        cameraLauncher.launch(uri)
+    }
+
+    fun onAttachClipboard() {
+        val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboardManager.primaryClip
+        if (clipData != null && clipData.itemCount > 0) {
+            val item = clipData.getItemAt(0)
+            val uri = item.uri
+            if (uri != null) {
+                viewModel.onAction(ChatScreenAction.AttachFile(uri))
+            } else {
+                val text = item.text?.toString()
+                if (!text.isNullOrBlank()) {
+                    viewModel.onAction(ChatScreenAction.UpdateCurrentMessage(state.currentMessage + text))
+                }
+            }
+        }
+    }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -101,7 +161,10 @@ fun ChatScreenRoot(
     ChatScreen(
         state = state,
         snackbarHostState = snackBarState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onAttachFile = ::onAttachFile,
+        onAttachCamera = ::onAttachCamera,
+        onAttachClipboard = ::onAttachClipboard
     )
 }
 
@@ -112,6 +175,9 @@ private fun ChatScreen(
     state: ChatScreenState,
     snackbarHostState: SnackbarHostState,
     onAction: (ChatScreenAction) -> Unit,
+    onAttachFile: () -> Unit,
+    onAttachCamera: () -> Unit,
+    onAttachClipboard: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -131,8 +197,13 @@ private fun ChatScreen(
             ChatInput(
                 modifier = Modifier.navigationBarsPadding(),
                 message = state.currentMessage,
+                attachedFiles = state.attachedFiles,
                 onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
-                onSend = { onAction(ChatScreenAction.SendMessage(it)) }
+                onSend = { onAction(ChatScreenAction.SendMessage(it)) },
+                onAttachFile = onAttachFile,
+                onAttachCamera = onAttachCamera,
+                onAttachClipboard = onAttachClipboard,
+                onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) }
             )
         }
     ) { paddingValues ->
@@ -316,27 +387,81 @@ private fun MessageList(
 private fun ChatInput(
     modifier: Modifier = Modifier,
     message: String,
+    attachedFiles: List<Uri>,
     onMessageChange: (String) -> Unit,
-    onSend: (String) -> Unit
+    onSend: (String) -> Unit,
+    onAttachFile: () -> Unit,
+    onAttachCamera: () -> Unit,
+    onAttachClipboard: () -> Unit,
+    onRemoveFile: (Uri) -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        UiTextField(
-            content = message,
-            label = stringResource(R.string.message_label),
-            modifier = Modifier.weight(1f),
-            onClickContent = onMessageChange
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.send_24dp),
-            onClick = { if (message.isNotBlank()) onSend(message) },
-            enabled = message.isNotBlank()
-        )
+    Column(modifier = modifier.fillMaxWidth()) {
+        if (attachedFiles.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(attachedFiles) { uri ->
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(Color.LightGray, RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        UiIconButton(
+                            icon = Icons.Default.Close,
+                            onClick = { onRemoveFile(uri) },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(20.dp),
+                            size = 16.dp,
+                            color = Color.White,
+                            buttonColor = Color.Black.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            UiIconButton(
+                icon = Icons.Default.AttachFile,
+                onClick = onAttachFile
+            )
+            UiIconButton(
+                icon = Icons.Default.CameraAlt,
+                onClick = onAttachCamera
+            )
+            UiIconButton(
+                icon = Icons.Default.ContentPaste,
+                onClick = onAttachClipboard
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            UiTextField(
+                content = message,
+                label = stringResource(R.string.message_label),
+                modifier = Modifier.weight(1f),
+                onClickContent = onMessageChange
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            UiIconButton(
+                icon = ImageVector.vectorResource(R.drawable.send_24dp),
+                onClick = { if (message.isNotBlank() || attachedFiles.isNotEmpty()) onSend(message) },
+                enabled = message.isNotBlank() || attachedFiles.isNotEmpty()
+            )
+        }
     }
 }
 
@@ -350,7 +475,10 @@ private fun Preview() {
             chat = null
         ),
         snackbarHostState = snackBarState,
-        onAction = {}
+        onAction = {},
+        onAttachFile = {},
+        onAttachCamera = {},
+        onAttachClipboard = {}
     )
 }
 
@@ -426,7 +554,10 @@ private fun ChatWithMessagesPreview() {
             currentMessage = "Печатаю ответ..."
         ),
         snackbarHostState = snackBarState,
-        onAction = {}
+        onAction = {},
+        onAttachFile = {},
+        onAttachCamera = {},
+        onAttachClipboard = {}
     )
 }
 

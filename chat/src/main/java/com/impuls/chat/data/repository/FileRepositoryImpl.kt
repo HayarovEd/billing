@@ -63,4 +63,36 @@ class FileRepositoryImpl(
             }
         }
     }
+
+    override suspend fun getFileFromUri(uri: Uri): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = application.contentResolver.openInputStream(uri)
+                val fileName = getFileName(uri) ?: "temp_file_${System.currentTimeMillis()}"
+                val file = File(application.cacheDir, fileName)
+                inputStream?.use { input ->
+                    file.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                file
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
+
+    private fun getFileName(uri: Uri): String? {
+        var name: String? = null
+        val cursor = application.contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    name = it.getString(nameIndex)
+                }
+            }
+        }
+        return name
+    }
 }
