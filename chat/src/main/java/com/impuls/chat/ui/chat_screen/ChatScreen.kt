@@ -1,6 +1,6 @@
 package com.impuls.chat.ui.chat_screen
 
-   import android.content.Intent
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -96,9 +97,10 @@ fun ChatScreenRoot(
         uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
-        uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
-    }
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+            uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+        }
 
     val cameraImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -119,7 +121,8 @@ fun ChatScreenRoot(
 
     fun onAttachCamera() {
         val directory = context.externalCacheDir ?: context.cacheDir
-        val file = File.createTempFile("camera_image_${System.currentTimeMillis()}", ".jpg", directory)
+        val file =
+            File.createTempFile("camera_image_${System.currentTimeMillis()}", ".jpg", directory)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         cameraImageUri.value = uri
         cameraLauncher.launch(uri)
@@ -348,9 +351,37 @@ private fun MessageList(
 ) {
     val listState = rememberLazyListState()
     val monthRes = stringArrayResource(R.array.month)
-    LaunchedEffect(messages.size) {
+
+    // Ищем первое непрочитанное сообщение от поддержки
+    val allMessagesFlat = remember(messages) { messages.values.flatten() }
+    val firstUnreadSupportMsg = remember(allMessagesFlat) {
+        allMessagesFlat.find { it.isSupport && it.statusMessage != StatusMessage.READED }
+    }
+
+    LaunchedEffect(messages) {
         if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+            if (firstUnreadSupportMsg != null) {
+                var itemPosition = 0
+                run loop@{
+                    messages.forEach { (_, msgsInDate) ->
+                        itemPosition++ // заголовок даты
+                        msgsInDate.forEach { msg ->
+                            if (msg.id == firstUnreadSupportMsg.id) {
+                                // Если это то самое сообщение, скроллим к разделителю (позиция itemPosition)
+                                // или к самому сообщению (itemPosition + 1)
+                                return@loop
+                            }
+                            itemPosition++
+                        }
+                    }
+                }
+                listState.scrollToItem(itemPosition)
+            } else {
+                val totalItemsCount = messages.size + allMessagesFlat.size
+                if (totalItemsCount > 0) {
+                    listState.scrollToItem(totalItemsCount - 1)
+                }
+            }
         }
     }
 
@@ -360,12 +391,10 @@ private fun MessageList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         reverseLayout = false
     ) {
-
         messages.forEach { (date, messagesByTime) ->
             stickyHeader {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         modifier = Modifier
@@ -382,6 +411,26 @@ private fun MessageList(
                 items = messagesByTime,
                 key = { it.id }
             ) { message ->
+                if (message.id == firstUnreadSupportMsg?.id) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.unread_messages),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                }
                 MessageItem(
                     message = message,
                     token = token,

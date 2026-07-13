@@ -37,6 +37,7 @@
     <string name="write_file_error">Ошибка записи файла</string>
     <string name="read_file_error">Ошибка чтения файла</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
+    <string name="unread_messages">Непрочитанные сообщения</string>
     <string-array name="month">
         <item>января</item>
         <item>февраля</item>
