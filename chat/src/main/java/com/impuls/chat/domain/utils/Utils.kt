@@ -9,6 +9,7 @@ import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.StatusMessage
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

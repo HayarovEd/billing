@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -104,17 +105,24 @@ fun MessageItem(
                 if (message.text.isNotEmpty()) {
                     Text(text = message.text, color = textColor)
                 }
-                if (!message.isSupport) {
-                    StatusIndicator(status = message.statusMessage)
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (!message.isSupport) {
+                        StatusIndicator(status = message.statusMessage)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = message.date.toString().substring(11, 16),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
                 }
+
             }
         }
-        Text(
-            text = message.date.toString().substring(11, 16),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(top = 2.dp)
-        )
     }
 }
 

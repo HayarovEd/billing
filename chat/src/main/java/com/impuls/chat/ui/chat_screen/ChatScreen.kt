@@ -1,6 +1,6 @@
 package com.impuls.chat.ui.chat_screen
 
-import android.content.Intent
+   import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -33,13 +35,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
@@ -68,7 +73,9 @@ import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
 import com.impuls.chat.ui.uikit.UiIconButton
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
@@ -334,12 +341,13 @@ private fun MediaDialog(
 
 @Composable
 private fun MessageList(
-    messages: List<BaseMessage>,
+    messages: Map<LocalDate, List<BaseMessage>>,
     token: String,
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit
 ) {
     val listState = rememberLazyListState()
+    val monthRes = stringArrayResource(R.array.month)
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
@@ -352,15 +360,34 @@ private fun MessageList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         reverseLayout = false
     ) {
-        items(
-            items = messages,
-            key = { it.id }
-        ) { message ->
-            MessageItem(
-                message = message,
-                token = token,
-                onAction = onAction
-            )
+
+        messages.forEach { (date, messagesByTime) ->
+            stickyHeader {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clip(shape = RoundedCornerShape(20.dp))
+                            .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+                            .padding(3.dp),
+                        text = "${date.day} ${monthRes[date.month.number - 1]}",
+                        fontSize = 20.sp,
+                    )
+                }
+            }
+            items(
+                items = messagesByTime,
+                key = { it.id }
+            ) { message ->
+                MessageItem(
+                    message = message,
+                    token = token,
+                    onAction = onAction
+                )
+            }
         }
     }
 }
