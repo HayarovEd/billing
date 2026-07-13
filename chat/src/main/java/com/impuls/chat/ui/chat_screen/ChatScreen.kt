@@ -7,6 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -232,6 +234,8 @@ private fun ChatScreen(
             AnimatedVisibility(
                 modifier = Modifier
                     .align(alignment = Alignment.CenterEnd),
+                enter = fadeIn(),
+                exit = fadeOut(),
                 visible = isShowScrollArrow
             ) {
                 UiIconButton(

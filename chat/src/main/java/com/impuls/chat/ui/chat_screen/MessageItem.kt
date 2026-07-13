@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,9 +77,10 @@ fun MessageItem(
                     )
                 )
                 .background(backgroundColor)
-                .padding(12.dp)
         ) {
-            Column {
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
                 if (message is Message) {
                     if (message.files.isNotEmpty()) {
                         MessageFiles(
@@ -106,7 +109,8 @@ fun MessageItem(
                     Text(text = message.text, color = textColor)
                 }
                 Row(
-                    modifier = Modifier.align(Alignment.End),
+                    modifier = Modifier
+                        .align(Alignment.End),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (!message.isSupport) {
@@ -139,23 +143,39 @@ private fun MessageFiles(
         maxItemsInEachRow = 3
     ) {
         files.forEach { file ->
-            Row(
-                verticalAlignment = Alignment.Bottom
+            Box(
+                modifier = Modifier.clip(RoundedCornerShape(8.dp))
             ) {
                 FileItem(
                     file = file,
                     token = token,
                     onAction = onAction
                 )
-                UiIconButton(
-                    onClick = { onAction(ChatScreenAction.SaveFileLocal(
-                        fileName = file.fileUrl,
-                        originalName = file.originalName
-                    )) },
-                    icon = ImageVector.vectorResource(R.drawable.download_24dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(bottomStart = 36.dp)
+                        )
+                        .padding(start = 4.dp, bottom = 4.dp)
+                ) {
+                    UiIconButton(
+                        modifier = Modifier.size(36.dp),
+                        onClick = {
+                            onAction(
+                                ChatScreenAction.SaveFileLocal(
+                                    fileName = file.fileUrl,
+                                    originalName = file.originalName
+                                )
+                            )
+                        },
+                        icon = ImageVector.vectorResource(R.drawable.download_24dp),
+                        size = 24.dp,
+                        color = Color.White
+                    )
+                }
             }
-
         }
     }
 }
