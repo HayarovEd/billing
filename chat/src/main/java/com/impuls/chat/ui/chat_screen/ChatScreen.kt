@@ -6,15 +6,17 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,14 +33,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -46,34 +47,21 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.network.NetworkHeaders
-import coil3.network.httpHeaders
-import coil3.request.ImageRequest
-import coil3.svg.SvgDecoder
-import com.bhuvaneshw.pdf.compose.PdfSource
-import com.bhuvaneshw.pdf.compose.PdfViewer
-import com.bhuvaneshw.pdf.compose.rememberPdfState
-import com.bhuvaneshw.pdf.resource.DefaultNetworkResourceHandler
 import com.impuls.chat.R
 import com.impuls.chat.domain.model.BaseMessage
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Message
-import com.impuls.chat.domain.model.MessageFile
-import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.User
-import com.impuls.chat.domain.utils.BASE_CHAT_URL
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
 import com.impuls.chat.ui.uikit.UiIconButton
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
@@ -110,6 +98,8 @@ fun ChatScreenRoot(
             cameraImageUri.value?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
         }
     }
+
+    var isShowScrollArrow by remember { mutableStateOf(false) }
 
     fun onAttachFile() {
         filePickerLauncher.launch("*/*")
@@ -156,10 +146,14 @@ fun ChatScreenRoot(
     ChatScreen(
         state = state,
         snackbarHostState = snackBarState,
+        isShowScrollArrow = isShowScrollArrow,
         onAction = viewModel::onAction,
         onAttachFile = ::onAttachFile,
         onAttachImage = ::onAttachImage,
         onAttachCamera = ::onAttachCamera,
+        updateShowScrollArrow = {
+            isShowScrollArrow = it
+        }
     )
 }
 
@@ -168,13 +162,25 @@ fun ChatScreenRoot(
 private fun ChatScreen(
     modifier: Modifier = Modifier,
     state: ChatScreenState,
+    isShowScrollArrow: Boolean,
     snackbarHostState: SnackbarHostState,
     onAction: (ChatScreenAction) -> Unit,
     onAttachFile: () -> Unit,
     onAttachImage: () -> Unit,
     onAttachCamera: () -> Unit,
+    updateShowScrollArrow: (Boolean) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+
+    val listState = rememberLazyListState()
+    val allMessagesFlat = remember(state.allMessages) { state.allMessages.values.flatten() }
+    val firstUnreadSupportMsg = remember(allMessagesFlat) {
+        allMessagesFlat.find { it.isSupport && it.statusMessage != StatusMessage.READED }
+    }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(listState.canScrollForward) {
+        updateShowScrollArrow(listState.canScrollForward)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -208,18 +214,39 @@ private fun ChatScreen(
         }
     ) { paddingValues ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
             MessageList(
                 messages = state.allMessages,
                 token = state.token,
+                listState = listState,
+                allMessagesFlat = allMessagesFlat,
+                firstUnreadSupportMsg = firstUnreadSupportMsg,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .fillMaxWidth(),
                 onAction = onAction
             )
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterEnd),
+                visible = isShowScrollArrow
+            ) {
+                UiIconButton(
+                    modifier = Modifier
+                        .size(48.dp),
+                    buttonColor = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                    icon = ImageVector.vectorResource(R.drawable.arrow_circle_down_48dp),
+                    size = 48.dp,
+                    onClick = {
+                        scope.launch {
+                            listState.scrollToItem(state.allMessages.size+allMessagesFlat.size)
+                        }
+                    }
+                )
+            }
 
             if (state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -237,126 +264,20 @@ private fun ChatScreen(
 }
 
 @Composable
-private fun MediaDialog(
-    file: MessageFile,
-    token: String,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val url = remember(file.fileUrl) { BASE_CHAT_URL + "files/" + file.fileUrl }
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .clickable { onDismiss() },
-            contentAlignment = Alignment.Center
-        ) {
-            when (val mime = file.mimeType) {
-                is MimeTypes.Image -> {
-                    val imageRequest = remember(url, token, mime) {
-                        val headers = NetworkHeaders.Builder()
-                            .set("Authorization", "Bearer $token")
-                            .set("Content-Type", mime.mimeType)
-                            .build()
-
-                        ImageRequest.Builder(context)
-                            .data(url)
-                            .apply {
-                                if (mime == MimeTypes.Image.SVG_XML) {
-                                    decoderFactory(SvgDecoder.Factory())
-                                }
-                            }
-                            .httpHeaders(headers)
-                            .build()
-                    }
-
-                    AsyncImage(
-                        model = imageRequest,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
-                    )
-                }
-
-                is MimeTypes.Video -> {
-                    VideoPlayer(
-                        url = url,
-                        token = token,
-                        isUseController = true,
-                        isPlayWhenReady = false,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                is MimeTypes.MimeType -> {
-                    if (mime == MimeTypes.MimeType.PDF) {
-                        val pdfState = rememberPdfState(
-                            PdfSource.Url(url)
-                        )
-                        val networkResourceHandler = remember(token) {
-                            DefaultNetworkResourceHandler(
-                                beforeConnect = {
-                                    setRequestProperty("Authorization", "Bearer $token")
-                                }
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White)
-                                .clickable(enabled = false) {}
-                        ) {
-                            PdfViewer(
-                                pdfState = pdfState,
-                                modifier = Modifier.fillMaxSize(),
-                                onCreateViewer = {
-                                    this.networkResourceHandler = networkResourceHandler
-                                    this.onReady {
-                                        this.ui.toolbarEnabled = true
-                                        this.ui.viewerScrollbar = true
-                                        this.zoomTo(com.bhuvaneshw.pdf.PdfViewer.Zoom.PAGE_FIT)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            UiIconButton(
-                icon = ImageVector.vectorResource(R.drawable.close_24dp),
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp),
-                color = Color.White
-            )
-        }
-    }
-}
-
-@Composable
 private fun MessageList(
     messages: Map<LocalDate, List<BaseMessage>>,
     token: String,
+    allMessagesFlat: List<BaseMessage>,
+    firstUnreadSupportMsg: BaseMessage?,
+    listState: LazyListState,
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit
 ) {
-    val listState = rememberLazyListState()
+
     val monthRes = stringArrayResource(R.array.month)
 
     // Ищем первое непрочитанное сообщение от поддержки
-    val allMessagesFlat = remember(messages) { messages.values.flatten() }
-    val firstUnreadSupportMsg = remember(allMessagesFlat) {
-        allMessagesFlat.find { it.isSupport && it.statusMessage != StatusMessage.READED }
-    }
+
 
     LaunchedEffect(messages) {
         if (messages.isNotEmpty()) {
@@ -452,10 +373,12 @@ private fun Preview() {
             chat = null
         ),
         snackbarHostState = snackBarState,
+        isShowScrollArrow = true,
         onAction = {},
         onAttachFile = {},
         onAttachImage = {},
         onAttachCamera = {},
+        updateShowScrollArrow = {}
     )
 }
 
@@ -535,6 +458,8 @@ private fun ChatWithMessagesPreview() {
         onAttachFile = {},
         onAttachImage = {},
         onAttachCamera = {},
+        updateShowScrollArrow = {},
+        isShowScrollArrow = false
     )
 }
 
