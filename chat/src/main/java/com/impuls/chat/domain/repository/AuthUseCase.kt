@@ -16,7 +16,8 @@ class AuthUseCase(
         name: String,
         username: String,
         email: String,
-        password: String
+        password: String,
+        billingToken: String,
     ) {
         val token = dataStoreRepository.getStateToken()
         if (token == null) {
@@ -24,7 +25,8 @@ class AuthUseCase(
                 name = name,
                 username = username,
                 email = email,
-                password = password
+                password = password,
+                token = billingToken,
             )) {
                 is ResultWork.Error -> {
                     onError(resultLogin.error)
@@ -48,7 +50,8 @@ class AuthUseCase(
                             name = name,
                             username = username,
                             email = email,
-                            password = password
+                            password = password,
+                            token = billingToken,
                         )) {
                             is ResultWork.Error -> {
                                 onError(resultLogin.error)

@@ -54,7 +54,8 @@ internal class RemoteRepositoryImpl(
         name: String,
         username: String,
         email: String,
-        password: String
+        password: String,
+        token: String
     ): ResultWork<Token, ChatDataError> {
         return withContext(Dispatchers.IO) {
             Log.d("TAG", "onLoginFromApp: name=$name, username=$username")
@@ -67,7 +68,8 @@ internal class RemoteRepositoryImpl(
                                 name = name,
                                 username = username,
                                 email = email,
-                                password = password
+                                password = password,
+                                token = token
                             )
                         )
                     }

@@ -121,14 +121,15 @@ fun NavController(
                         )
                     )
                 },
-                onNavigateToMainChat = { name, login, password, email, groupName ->
+                onNavigateToMainChat = { name, login, password, email, groupName, token ->
                     navController.navigate(
                         NavigationChatRoute.MainRoute(
                             name = name,
                             login = login,
                             password = password,
                             email = email,
-                            operId = groupName
+                            operId = groupName,
+                            billingToken = token
                         )
                     )
                 }
@@ -209,14 +210,15 @@ fun NavController(
         //chat
         composable<NavigationChatRoute.MainRoute> {
             MainScreenRoot(
-                onNavigateToChat = { chatId, name, login, password, email ->
+                onNavigateToChat = { chatId, name, login, password, email, token ->
                     navController.navigate(
                         NavigationChatRoute.ChatRoute(
                             chatId = chatId,
                             name = name,
                             login = login,
                             password = password,
-                            email = email
+                            email = email,
+                            billingToken = token
                         )
                     )
                 }

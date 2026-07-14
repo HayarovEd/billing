@@ -14,7 +14,8 @@ interface RemoteChatRepository {
         name: String,
         username: String,
         email: String,
-        password: String
+        password: String,
+        token: String,
     ): ResultWork<Token, ChatDataError>
 
     suspend fun onRefresh(refresh: String): ResultWork<Token, ChatDataError>

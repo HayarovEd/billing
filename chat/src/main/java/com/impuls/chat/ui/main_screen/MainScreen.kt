@@ -42,7 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MainScreenRoot (
     viewModel: MainScreenViewModel = koinViewModel (),
-    onNavigateToChat: (String, String, String, String, String) -> Unit
+    onNavigateToChat: (String, String, String, String, String, String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -55,7 +55,7 @@ fun MainScreenRoot (
                     event.messageEvent.asText().asString(context)
                 )
             }
-            is MainScreenEvent.NavigateEvent -> onNavigateToChat(event.chatId, state.name, state.login, state.password, state.email)
+            is MainScreenEvent.NavigateEvent -> onNavigateToChat(event.chatId, state.name, state.login, state.password, state.email, state.billingToken)
             is MainScreenEvent.OnMessage -> {
                 snackBarState.showSnackbar(
                     event.message.asString(

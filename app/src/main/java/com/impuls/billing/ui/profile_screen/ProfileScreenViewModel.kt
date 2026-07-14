@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 
 class ProfileScreenViewModel(
     private val accountRepository: AccountRepository,
@@ -332,7 +333,7 @@ class ProfileScreenViewModel(
                     count = i
                 )
                     .updateState()
-                delay(1000)
+                delay(1000.milliseconds)
             }
         }
     }
@@ -351,6 +352,10 @@ class ProfileScreenViewModel(
                             dataStoreRepository.removeBearer()
                             navigate()
                         } else {
+                            _state.value.copy(
+                                token = token
+                            )
+                                .updateState()
                             action(token)
                         }
                     }
@@ -388,10 +393,12 @@ class ProfileScreenViewModel(
                     )
                         .updateState()
                     if (result.data.isNotEmpty()) {
-                        val deferredUsbBoxes = async {  loadUsbBoxes(
-                            token = token,
-                            vgId = result.data.first().vgId
-                        )}
+                        val deferredUsbBoxes = async {
+                            loadUsbBoxes(
+                                token = token,
+                                vgId = result.data.first().vgId
+                            )
+                        }
                         val deferredVgroupPassword = async {
                             loadVgroupPassword(
                                 token = token,
@@ -458,6 +465,7 @@ class ProfileScreenViewModel(
                 is ResultWork.Error -> {
                     eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
                 }
+
                 is ResultWork.Success -> {
                     _state.value.copy(
                         sharedPosts = result.data,

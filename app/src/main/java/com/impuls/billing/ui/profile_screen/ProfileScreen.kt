@@ -59,7 +59,7 @@ fun ProfileScreenRoot(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
-    onNavigateToMainChat: (String, String, String, String, Long) -> Unit
+    onNavigateToMainChat: (String, String, String, String, Long, String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -118,7 +118,8 @@ private fun ProfileScreenScreen(
         login: String,
         password: String,
         email: String,
-        operId: Long
+        operId: Long,
+        token: String
     ) -> Unit
 ) {
 
@@ -162,7 +163,8 @@ private fun ProfileScreenScreen(
                                 acc.account.login,
                                 acc.account.password,
                                 acc.account.email,
-                                acc.agreements.first().operId
+                                acc.agreements.first().operId,
+                                state.token
                             )
                         }
                     }
@@ -371,7 +373,7 @@ private fun Preview() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _, _, _ -> },
         )
     }
 }
@@ -495,7 +497,7 @@ private fun Preview1() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _, _, _ -> },
         )
     }
 }
@@ -598,7 +600,7 @@ private fun Preview1_1() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _, _, _ -> },
         )
     }
 }
@@ -625,7 +627,7 @@ private fun Preview2() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _, _, _ -> },
         )
     }
 }

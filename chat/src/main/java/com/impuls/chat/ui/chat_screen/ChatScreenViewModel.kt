@@ -53,6 +53,7 @@ class ChatScreenViewModel(
             login = routeData.login,
             password = routeData.password,
             email = routeData.email,
+            billingToken = routeData.billingToken,
         )
     )
     val state = _state
@@ -191,6 +192,7 @@ class ChatScreenViewModel(
                 username = currentState.login,
                 email = currentState.email,
                 password = currentState.password,
+                billingToken = currentState.billingToken
             )
             _state.update { it.copy(isLoading = false) }
         }

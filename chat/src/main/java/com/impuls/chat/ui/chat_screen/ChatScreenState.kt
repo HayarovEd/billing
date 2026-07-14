@@ -11,6 +11,7 @@ data class ChatScreenState(
     val login: String = "",
     val password: String = "",
     val email: String = "",
+    val billingToken: String = "",
     val chat: Chat? = null,
     val isLoading: Boolean = false,
     val currentMessage: String = "",

@@ -11,6 +11,7 @@ sealed class NavigationChatRoute {
         val password: String,
         val email: String,
         val operId: Long,
+        val billingToken: String,
     ): NavigationChatRoute()
     @Serializable
     data class ChatRoute(
@@ -19,5 +20,6 @@ sealed class NavigationChatRoute {
         val login:String,
         val password: String,
         val email: String,
+        val billingToken: String,
     ): NavigationChatRoute()
 }
