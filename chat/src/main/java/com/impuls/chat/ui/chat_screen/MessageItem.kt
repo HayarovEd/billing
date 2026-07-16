@@ -21,7 +21,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,20 +68,48 @@ fun MessageItem(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalAlignment = alignment
     ) {
         Box(
             modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = if (message.isSupport) 0.dp else 16.dp,
-                        bottomEnd = if (message.isSupport) 16.dp else 0.dp
-                    )
-                )
-                .background(backgroundColor)
+                .drawBehind {
+                    val cornerRadius = 16.dp.toPx()
+                    val tailSize = 8.dp.toPx()
+                    val path = Path().apply {
+                        if (message.isSupport) {
+                            // Хвостик слева внизу
+                            moveTo(cornerRadius, 0f)
+                            lineTo(size.width - cornerRadius, 0f)
+                            arcTo(Rect(size.width - 2 * cornerRadius, 0f, size.width, 2 * cornerRadius), 270f, 90f, false)
+                            lineTo(size.width, size.height - cornerRadius)
+                            arcTo(Rect(size.width - 2 * cornerRadius, size.height - 2 * cornerRadius, size.width, size.height), 0f, 90f, false)
+                            lineTo(cornerRadius, size.height)
+                            // Рисуем хвостик
+                            lineTo(-tailSize, size.height)
+                            lineTo(0f, size.height - tailSize)
+                            lineTo(0f, cornerRadius)
+                            arcTo(Rect(0f, 0f, 2 * cornerRadius, 2 * cornerRadius), 180f, 90f, false)
+                        } else {
+                            // Хвостик справа внизу
+                            moveTo(cornerRadius, 0f)
+                            lineTo(size.width - cornerRadius, 0f)
+                            arcTo(Rect(size.width - 2 * cornerRadius, 0f, size.width, 2 * cornerRadius), 270f, 90f, false)
+                            // Рисуем хвостик
+                            lineTo(size.width, size.height - tailSize)
+                            lineTo(size.width + tailSize, size.height)
+                            lineTo(size.width - cornerRadius, size.height)
+                            lineTo(cornerRadius, size.height)
+                            arcTo(Rect(0f, size.height - 2 * cornerRadius, 2 * cornerRadius, size.height), 90f, 90f, false)
+                            lineTo(0f, cornerRadius)
+                            arcTo(Rect(0f, 0f, 2 * cornerRadius, 2 * cornerRadius), 180f, 90f, false)
+                        }
+                        close()
+                    }
+                    drawPath(path, color = backgroundColor)
+                }
         ) {
             Column(
                 modifier = Modifier.padding(12.dp)
