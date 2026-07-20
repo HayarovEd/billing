@@ -1,5 +1,6 @@
 package com.impuls.chat.ui.main_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -127,6 +128,7 @@ class MainScreenViewModel(
                     action(it)
                 },
                 onError = {
+                    Log.e("TAG222", "loadData: $it")
                     eventChannel.send(MainScreenEvent.OnMessage(it.asUiText()))
                 },
                 name = currentState.name,
@@ -147,6 +149,7 @@ class MainScreenViewModel(
                 operId = oi
             )) {
                 is ResultWork.Error -> {
+                    Log.e("TAG222", "getThemes: ${result.error}")
                     eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                     false
                 }
@@ -168,6 +171,7 @@ class MainScreenViewModel(
             login = _state.value.login
         )) {
             is ResultWork.Error -> {
+                Log.e("TAG222", "getUserChats: ${result.error}")
                 eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 false
             }
@@ -213,7 +217,7 @@ class MainScreenViewModel(
                 login = _state.value.login
             )) {
                 is ResultWork.Error -> {
-                   // eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                    eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 }
                 is ResultWork.Success -> {
                     _state.update { st ->

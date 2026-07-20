@@ -1,5 +1,6 @@
 package com.impuls.chat.domain.repository
 
+import android.util.Log
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.JwtRepository
 import com.impuls.chat.domain.utils.ResultWork
@@ -29,6 +30,7 @@ class AuthUseCase(
                 token = billingToken,
             )) {
                 is ResultWork.Error -> {
+                    Log.e("TAG222", "empty token: ${resultLogin.error}")
                     onError(resultLogin.error)
                 }
 
@@ -44,6 +46,7 @@ class AuthUseCase(
             } else {
                 when (val resultRefresh = repository.onRefresh(token.refresh)) {
                     is ResultWork.Error -> {
+                        Log.e("TAG222", "refresh token: ${resultRefresh.error}")
                         onError(resultRefresh.error)
                         dataStoreRepository.removeToken()
                         when (val resultLogin = repository.onLoginFromApp(
@@ -54,6 +57,7 @@ class AuthUseCase(
                             token = billingToken,
                         )) {
                             is ResultWork.Error -> {
+                                Log.e("TAG222", "error token: ${resultLogin.error}")
                                 onError(resultLogin.error)
                             }
 

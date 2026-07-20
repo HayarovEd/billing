@@ -58,7 +58,6 @@ internal class RemoteRepositoryImpl(
         token: String
     ): ResultWork<Token, ChatDataError> {
         return withContext(Dispatchers.IO) {
-            Log.d("TAG", "onLoginFromApp: name=$name, username=$username")
             handleResponse(
                 request = {
                     client.post("${BASE_CHAT_URL}auth/login_from_app") {

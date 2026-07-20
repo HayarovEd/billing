@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.network.NetworkHeaders
@@ -245,5 +246,56 @@ fun TmpFileItem(
         null -> {
             // Unknown file type
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FileItemImagePreview() {
+    MaterialTheme {
+        FileItem(
+            file = MessageFile(
+                fileSize = 1024,
+                fileUrl = "example.jpg",
+                originalName = "image.jpg",
+                mimeType = MimeTypes.Image.JPEG
+            ),
+            token = "",
+            onAction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FileItemPdfPreview() {
+    MaterialTheme {
+        FileItem(
+            file = MessageFile(
+                fileSize = 1024,
+                fileUrl = "example.pdf",
+                originalName = "document.pdf",
+                mimeType = MimeTypes.MimeType.PDF
+            ),
+            token = "",
+            onAction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FileItemDocPreview() {
+    MaterialTheme {
+        FileItem(
+            file = MessageFile(
+                fileSize = 1024,
+                fileUrl = "example.docx",
+                originalName = "document.docx",
+                mimeType = MimeTypes.MimeType.MS_WORD_OPEN_XML
+            ),
+            token = "",
+            onAction = {}
+        )
     }
 }

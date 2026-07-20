@@ -1,0 +1,7 @@
+- `[x]` Refactor `ChatScreenViewModel` for better concurrency and state management
+    - `[x]` Simplify `state` flow and remove side-effects from `onStart`
+    - `[x]` Refactor `loadData` into a suspend helper function
+    - `[x]` Convert repository-interacting methods to `suspend`
+    - `[x]` Update `onAction` to handle coroutines explicitly
+    - `[x]` Fix WebSocket lifecycle and duplicate connection issues
+- `[x]` Verify build and functionality
