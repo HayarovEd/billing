@@ -1,32 +1,27 @@
-# Walkthrough - ChatScreenViewModel Optimization
+# Walkthrough - FCMService Implementation
 
-I have optimized the `ChatScreenViewModel` to improve concurrency, reduce redundant network calls, and fix potential WebSocket connection issues.
+I have implemented the `FCMService` to handle push notifications for the chat module. This includes saving the FCM token and displaying notifications when messages are received.
 
 ## Changes Made
 
-### 1. Concurrency & Structured Concurrency
-- **Suspend Helper**: Introduced `withAuth` suspend function to handle authentication and loading state in a centralized way.
-- **Suspend Methods**: Converted all data-fetching and action-performing methods to `suspend` functions. This ensures they can be composed naturally and run within the `viewModelScope` without creating separate coroutine bubbles for each sub-step.
-- **Removed Hardcoded Delays**: The `delay(500.milliseconds)` in `loadData` was removed in favor of proper initialization logic.
+### 1. Data Persistence
+- **[DataStoreChatRepository](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/domain/repository/DataStoreChatRepository.kt)**: Added `saveFcmToken` and `getFcmToken` methods.
+- **[DataStoreRepositoryImpl](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/DataStoreRepositoryImpl.kt)**: Implemented these methods using Jetpack DataStore to persistently store the Firebase token.
 
-### 2. State Management
-- **Initialization**: Refactored `onStart` to call a single `initializeData()` method. This ensures that the chat data is fetched first, and only then the WebSocket connection is established using the same authenticated context.
-- **Single Source of Truth**: The `_state.update` blocks are now more consistent, and loading states are handled more predictably within `withAuth`.
+### 2. Service Registration
+- **[AndroidManifest.xml](file:///D:/studio_progects/billing/chat/src/main/AndroidManifest.xml)**: Registered `FCMService` in the `chat` module so the system can deliver FCM events to the app.
 
-### 3. WebSocket Lifecycle
-- **Job Management**: Added `webSocketJob: Job?` to track the live chat connection.
-- **Avoid Duplicates**: `startWebSocket` now cancels any existing connection before starting a new one, preventing duplicate message processing.
-- **Cleanup**: Ensured `webSocketJob` is cancelled in `onCleared`.
-
-### 4. Code Cleanup
-- Improved logging and error reporting by using a consistent tag (`ChatScreenVM`).
-- Simplified `onAction` by grouping logic and using a single `viewModelScope.launch` per user interaction.
+### 3. Service Logic
+- **[FCMService](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)**:
+    - **onNewToken**: Automatically saves the new FCM token to `DataStore` whenever it's updated by Google Play Services.
+    - **onMessageReceived**: Handles incoming data and notification messages. It extracts the `title`, `body`, and optional `chatId` to show a system notification via the `NotificationRepository`.
+    - **Koin Integration**: Uses `KoinComponent` to inject required repositories into the service.
 
 ## Verification Results
 
-### Code Integrity
-- All repository methods are now called correctly using structured concurrency.
-- The `AuthUseCase` is utilized properly to ensure valid tokens are present for all operations.
+### Code Structure
+- The service is correctly decoupled from the UI and uses the existing repository layer for notifications and data storage.
+- It handles both `RemoteMessage.Notification` and custom `data` payloads for maximum flexibility.
 
-> [!TIP]
-> The optimization significantly reduces the number of coroutines created during typical usage, which should lead to better performance and fewer edge-case crashes related to initialization race conditions.
+> [!NOTE]
+> To test this, you'll need to send a push message from the Firebase Console or your backend. Ensure the payload contains `title` and `body` (or use the corresponding keys in the `data` object).

@@ -8,4 +8,6 @@ interface DataStoreChatRepository {
     suspend fun getToken(): Flow<Token?>
     suspend fun removeToken()
     suspend fun getStateToken(): Token?
+    suspend fun saveFcmToken(token: String)
+    suspend fun getFcmToken(): String?
 }

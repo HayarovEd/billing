@@ -1,22 +1,34 @@
-# Implementation Plan - Chat Bubble with Outward Tail
+# Implementation Plan - Implement FCMService
 
-The goal is to modify the `MessageItem` background to have a tail sticking out of the bottom-right corner, making it look like a classic chat bubble.
+This plan outlines the steps to implement `FCMService` in the `chat` module to handle Firebase Cloud Messaging notifications for the chat system.
 
 ## Proposed Changes
 
-### [chat](file:///D:/studio_progects/billing/chat)
+### [chat module]
 
-#### [MODIFY] [MessageItem.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/chat_screen/MessageItem.kt)
-- Add horizontal padding to the root `Column` to ensure the "outward" tail doesn't hit the screen edge.
-- Replace the simple `drawRoundRect` with a `drawPath` call.
-- Implement a `Path` that:
-    - Draws a rounded rectangle for most of the bubble.
-    - Adds an "outward" tail at the bottom-right corner for user messages (`!message.isSupport`).
-    - (Optional/Consistent) Adds an "outward" tail at the bottom-left corner for support messages (`message.isSupport`). *The user specifically mentioned the right corner, so I will prioritize that.*
+#### [MODIFY] [DataStoreChatRepository.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/domain/repository/DataStoreChatRepository.kt)
+- Add `suspend fun saveFcmToken(token: String)`
+- Add `suspend fun getFcmToken(): String?`
+
+#### [MODIFY] [DataStoreRepositoryImpl.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/DataStoreRepositoryImpl.kt)
+- Implement `saveFcmToken` and `getFcmToken` using DataStore preferences.
+- Define `FCM_TOKEN` key.
+
+#### [MODIFY] [AndroidManifest.xml](file:///D:/studio_progects/billing/chat/src/main/AndroidManifest.xml)
+- Register `FCMService` as a service with the `com.google.firebase.MESSAGING_EVENT` intent filter.
+
+#### [MODIFY] [FCMService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)
+- Implement `onNewToken` to save the received FCM token using `DataStoreChatRepository`.
+- Implement `onMessageReceived` to:
+    - Extract notification data (title, body, chatId).
+    - Use `NotificationRepository` to display a system notification.
+- Use Koin's `KoinComponent` to inject dependencies.
 
 ## Verification Plan
 
+### Automated Tests
+- N/A (FCM requires device/emulator with Google Play Services).
+
 ### Manual Verification
-- Render the `MessageItem` in a preview or run the app to verify the tail shape and alignment.
-- Ensure the tail does not overlap with message text or status indicators.
-- Ensure the tail is not clipped by the screen edges.
+1. **Token Retrieval**: Add a log statement in `onNewToken` and verify it prints a token when the app starts or data is cleared.
+2. **Notification Display**: Send a data message via Firebase console (e.g., with keys `title`, `body`, and `chatId`) and verify the notification appears in the system tray.

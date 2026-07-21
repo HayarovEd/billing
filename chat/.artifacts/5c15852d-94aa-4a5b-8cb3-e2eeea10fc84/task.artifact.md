@@ -1,7 +1,7 @@
-- `[x]` Refactor `ChatScreenViewModel` for better concurrency and state management
-    - `[x]` Simplify `state` flow and remove side-effects from `onStart`
-    - `[x]` Refactor `loadData` into a suspend helper function
-    - `[x]` Convert repository-interacting methods to `suspend`
-    - `[x]` Update `onAction` to handle coroutines explicitly
-    - `[x]` Fix WebSocket lifecycle and duplicate connection issues
-- `[x]` Verify build and functionality
+- `[x]` Update `DataStoreChatRepository` and its implementation
+    - `[x]` Add `saveFcmToken` and `getFcmToken` to interface
+    - `[x]` Implement methods in `DataStoreRepositoryImpl`
+- `[x]` Register `FCMService` in `AndroidManifest.xml`
+- `[x]` Implement `FCMService` logic
+    - `[x]` Handle `onNewToken`
+    - `[x]` Handle `onMessageReceived`

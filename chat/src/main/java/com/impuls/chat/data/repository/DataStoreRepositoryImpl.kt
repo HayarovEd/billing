@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 
 private const val ACCESS_TOKEN = "access_token"
 private const val REFRESH_TOKEN = "refresh_token"
+private const val FCM_TOKEN = "fcm_token"
 
 
 internal class DataStoreRepositoryImpl(
@@ -26,6 +27,17 @@ internal class DataStoreRepositoryImpl(
             preferences[FIELD_ACCESS_TOKEN] = token.access
             preferences[FIELD_REFRESH_TOKEN] = token.refresh
         }
+    }
+
+    override suspend fun saveFcmToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[FIELD_FCM_TOKEN] = token
+        }
+    }
+
+    override suspend fun getFcmToken(): String? {
+        val ds = dataStore.data.first()
+        return ds[FIELD_FCM_TOKEN]
     }
 
 
@@ -67,5 +79,6 @@ internal class DataStoreRepositoryImpl(
     companion object {
         val FIELD_ACCESS_TOKEN = stringPreferencesKey(ACCESS_TOKEN)
         val FIELD_REFRESH_TOKEN = stringPreferencesKey(REFRESH_TOKEN)
+        val FIELD_FCM_TOKEN = stringPreferencesKey(FCM_TOKEN)
     }
 }
