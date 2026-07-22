@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
+import com.impuls.chat.service.FCMNotificationHandler
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -77,6 +79,13 @@ fun ProfileScreenRoot(
             ProfileScreenEvent.NavigateEvent -> {
                 onNavigateToLogin()
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = context.intent
+        if (intent != null) {
+            FCMNotificationHandler.handleNotification(intent)
         }
     }
 

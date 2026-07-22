@@ -4,6 +4,8 @@ import android.util.Log
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.JwtRepository
 import com.impuls.chat.domain.utils.ResultWork
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
 
@@ -36,13 +38,15 @@ class AuthUseCase(
 
                 is ResultWork.Success -> {
                     dataStoreRepository.saveTokens(resultLogin.data)
-                    function(resultLogin.data.access)
+                    withContext(Dispatchers.IO) { function(resultLogin.data.access) }
+                    withContext(Dispatchers.IO) { sendFCMToken(resultLogin.data.access) }
                 }
             }
         } else {
             val access = JwtRepository.decodeJwt(token.access)
             if (access != null && access.expired > Clock.System.now().epochSeconds) {
-                function(token.access)
+                withContext(Dispatchers.IO) { function(token.access) }
+                withContext(Dispatchers.IO) { sendFCMToken(token.access) }
             } else {
                 when (val resultRefresh = repository.onRefresh(token.refresh)) {
                     is ResultWork.Error -> {
@@ -67,12 +71,37 @@ class AuthUseCase(
                             }
                         }
                     }
+
                     is ResultWork.Success -> {
                         dataStoreRepository.saveTokens(resultRefresh.data)
-                        function(resultRefresh.data.access)
+                        withContext(Dispatchers.IO) { function(resultRefresh.data.access) }
+                        withContext(Dispatchers.IO) { sendFCMToken(resultRefresh.data.access) }
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun sendFCMToken(
+        accessToken: String,
+    ) {
+        if (!dataStoreRepository.getSentFcmToken()) {
+            val fcmToken = dataStoreRepository.getFcmToken()
+            fcmToken?.let {
+                when (repository.registerFCMToken(
+                    fcmToken = it,
+                    accessToken = accessToken
+                )) {
+                    is ResultWork.Error -> {
+                        ///
+                    }
+
+                    is ResultWork.Success -> {
+                        dataStoreRepository.isSentFcmToken(true)
+                    }
+                }
+            }
+
         }
     }
 }

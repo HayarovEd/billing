@@ -10,4 +10,6 @@ interface DataStoreChatRepository {
     suspend fun getStateToken(): Token?
     suspend fun saveFcmToken(token: String)
     suspend fun getFcmToken(): String?
+    suspend fun isSentFcmToken(isSend: Boolean)
+    suspend fun getSentFcmToken(): Boolean
 }

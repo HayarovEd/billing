@@ -2,6 +2,7 @@ package com.impuls.chat.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.impuls.chat.domain.model.Token
@@ -13,6 +14,8 @@ import kotlinx.coroutines.flow.map
 private const val ACCESS_TOKEN = "access_token"
 private const val REFRESH_TOKEN = "refresh_token"
 private const val FCM_TOKEN = "fcm_token"
+private const val SEND_FCM_TOKEN = "send_fcm_token"
+
 
 
 internal class DataStoreRepositoryImpl(
@@ -38,6 +41,17 @@ internal class DataStoreRepositoryImpl(
     override suspend fun getFcmToken(): String? {
         val ds = dataStore.data.first()
         return ds[FIELD_FCM_TOKEN]
+    }
+
+    override suspend fun isSentFcmToken(isSend: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[FIELD_SEND_FCM_TOKEN] = isSend
+        }
+    }
+
+    override suspend fun getSentFcmToken(): Boolean {
+        val ds = dataStore.data.first()
+        return ds[FIELD_SEND_FCM_TOKEN]?:false
     }
 
 
@@ -80,5 +94,6 @@ internal class DataStoreRepositoryImpl(
         val FIELD_ACCESS_TOKEN = stringPreferencesKey(ACCESS_TOKEN)
         val FIELD_REFRESH_TOKEN = stringPreferencesKey(REFRESH_TOKEN)
         val FIELD_FCM_TOKEN = stringPreferencesKey(FCM_TOKEN)
+        val FIELD_SEND_FCM_TOKEN = booleanPreferencesKey(SEND_FCM_TOKEN)
     }
 }

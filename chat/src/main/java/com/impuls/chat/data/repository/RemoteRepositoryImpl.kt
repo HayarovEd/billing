@@ -5,6 +5,7 @@ import com.impuls.chat.data.handler.handleResponse
 import com.impuls.chat.data.mapper.convertToChat
 import com.impuls.chat.data.mapper.convertToGroup
 import com.impuls.chat.data.remote.request.CreateChatRequest
+import com.impuls.chat.data.remote.request.FcmTokenRequest
 import com.impuls.chat.data.remote.request.LoginFromAppRequest
 import com.impuls.chat.data.remote.request.MessageRequest
 import com.impuls.chat.data.remote.response.GroupDto
@@ -315,6 +316,25 @@ internal class RemoteRepositoryImpl(
     }.catch { error ->
         error.printStackTrace()
         emit(DownloadType.Failed(error = ChatDataError.Network.DOWNLOAD_FILE_ERROR))
+    }
+
+
+    override suspend fun registerFCMToken(
+        fcmToken: String,
+        accessToken: String,
+    ): ResultWork<Unit, ChatDataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("${BASE_CHAT_URL}fcm/register-token") {
+                        contentType(ContentType.Application.Json)
+                        setBody(FcmTokenRequest(fcmToken))
+                        bearerAuth(accessToken)
+                    }
+                },
+                data = {}
+            )
+        }
     }
 
 
