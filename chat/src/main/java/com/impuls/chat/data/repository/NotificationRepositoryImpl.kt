@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import com.impuls.chat.domain.repository.NotificationRepository
 
 internal class NotificationRepositoryImpl(
@@ -42,10 +44,17 @@ internal class NotificationRepositoryImpl(
         title: String,
         message: String,
         chatId: String?,
-        data: Map<String, String>?
+        contentData: Map<String, String>?
     ) {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            data?.forEach { (key, value) ->
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            "billing://profile/".toUri(),
+            context,
+            Class.forName("com.impuls.billing.MainActivity")
+        ).apply {
+            Log.d("NotificationRepo", "Creating intent with data: ${"billing://profile/".toUri()}")
+            contentData?.forEach { (key, value) ->
+                Log.e("Test FCM", "key: $key, value: $value")
                 putExtra(key, value)
             }
             // Ensure the activity is opened even if it's already running
