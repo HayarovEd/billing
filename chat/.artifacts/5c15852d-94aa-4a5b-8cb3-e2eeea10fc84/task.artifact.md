@@ -1,7 +1,8 @@
-- `[x]` Update `DataStoreChatRepository` and its implementation
-    - `[x]` Add `saveFcmToken` and `getFcmToken` to interface
-    - `[x]` Implement methods in `DataStoreRepositoryImpl`
-- `[x]` Register `FCMService` in `AndroidManifest.xml`
-- `[x]` Implement `FCMService` logic
-    - `[x]` Handle `onNewToken`
-    - `[x]` Handle `onMessageReceived`
+- `[x]` Optimize `FCMNotificationHandler` logic
+    - `[x]` Define constants for FCM keys
+    - `[x]` Refactor `handleNotification` to use a common parsing method
+    - `[x]` Add `handleIntent` method specifically for UI components (no-notification)
+- `[x]` Update callers of `FCMNotificationHandler`
+    - `[x]` Update `FCMService.kt` to use `handleNotification`
+    - `[x]` Update `ProfileScreen.kt` to use `handleIntent`
+- `[x]` Verify no redundant notifications appear on click

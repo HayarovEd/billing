@@ -1,27 +1,29 @@
-# Walkthrough - FCMService Implementation
+# Walkthrough - FCMNotificationHandler Optimization
 
-I have implemented the `FCMService` to handle push notifications for the chat module. This includes saving the FCM token and displaying notifications when messages are received.
+I have optimized the `FCMNotificationHandler` to improve code maintainability and fix a logical issue where redundant notifications were shown when clicking on an existing notification.
 
 ## Changes Made
 
-### 1. Data Persistence
-- **[DataStoreChatRepository](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/domain/repository/DataStoreChatRepository.kt)**: Added `saveFcmToken` and `getFcmToken` methods.
-- **[DataStoreRepositoryImpl](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/DataStoreRepositoryImpl.kt)**: Implemented these methods using Jetpack DataStore to persistently store the Firebase token.
+### 1. Refactored Handler Logic
+- **Separated Parsing from Action**: Introduced a private `parseMap` method that handles the extraction of title, body, and chatId from various possible keys (`title`, `header`, `body`, `text`, `chatId`, `chat_id`).
+- **New `handleIntent` Method**: Created specifically for UI components. It extracts data from the `Intent` but **does not** trigger a system notification.
+- **Improved `handleNotification`**: Now used exclusively for background/foreground message reception, ensuring notifications are shown only when necessary.
 
-### 2. Service Registration
-- **[AndroidManifest.xml](file:///D:/studio_progects/billing/chat/src/main/AndroidManifest.xml)**: Registered `FCMService` in the `chat` module so the system can deliver FCM events to the app.
+### 2. Used Constants for Keys
+- Replaced hardcoded string keys with private constants (`KEY_TITLE`, `KEY_CHAT_ID`, etc.) to prevent typos and make the code easier to update if the backend format changes.
 
-### 3. Service Logic
-- **[FCMService](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)**:
-    - **onNewToken**: Automatically saves the new FCM token to `DataStore` whenever it's updated by Google Play Services.
-    - **onMessageReceived**: Handles incoming data and notification messages. It extracts the `title`, `body`, and optional `chatId` to show a system notification via the `NotificationRepository`.
-    - **Koin Integration**: Uses `KoinComponent` to inject required repositories into the service.
+### 3. Safer Intent Parsing
+- Replaced unsafe casts with proper `Bundle` iteration and `getString()` calls, avoiding potential crashes or type mismatches.
+
+### 4. Updated Callers
+- **[FCMService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)**: Uses `handleNotification` to show alerts for new incoming messages.
+- **[ProfileScreen.kt](file:///D:/studio_progects/billing/app/src/main/java/com/impuls/billing/ui/profile_screen/ProfileScreen.kt)**: Uses `handleIntent` to process the notification click data without creating a duplicate notification.
 
 ## Verification Results
 
-### Code Structure
-- The service is correctly decoupled from the UI and uses the existing repository layer for notifications and data storage.
-- It handles both `RemoteMessage.Notification` and custom `data` payloads for maximum flexibility.
+### Code Integrity
+- All warnings related to deprecation and unresolved symbols have been resolved.
+- Logic correctly distinguishes between "new message received" (show alert) and "notification clicked" (extract data only).
 
-> [!NOTE]
-> To test this, you'll need to send a push message from the Firebase Console or your backend. Ensure the payload contains `title` and `body` (or use the corresponding keys in the `data` object).
+> [!TIP]
+> This refactoring ensures that when a user clicks a notification, the app navigates to the chat smoothly without leaving a "ghost" notification or showing a new one in the tray.

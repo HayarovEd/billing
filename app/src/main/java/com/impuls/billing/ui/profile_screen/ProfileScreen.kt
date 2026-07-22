@@ -1,6 +1,7 @@
 package com.impuls.billing.ui.profile_screen
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,7 +62,8 @@ fun ProfileScreenRoot(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
-    onNavigateToMainChat: (String, String, String, String, Long, String) -> Unit
+    onNavigateToMainChat: (String, String, String, String, Long, String) -> Unit,
+    onNavigateToChat: (String, String, String, String, String, String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -79,13 +81,32 @@ fun ProfileScreenRoot(
             ProfileScreenEvent.NavigateEvent -> {
                 onNavigateToLogin()
             }
+
+            is ProfileScreenEvent.NavigateChat -> {
+                Log.e("Test FCM", "NavigateChat: ${event.chatId}")
+                onNavigateToChat(
+                    event.chatId,
+                    event.name,
+                    event.login,
+                    event.password,
+                    event.email,
+                    event.billingToken
+                )
+            }
         }
     }
 
     LaunchedEffect(Unit) {
         val intent = context.intent
         if (intent != null) {
-            FCMNotificationHandler.handleNotification(intent)
+            val fcmData = FCMNotificationHandler.handleIntent(
+                defaultHeader = context.resources.getString(
+                    com.impuls.chat.R.string.new_message
+                ), intent = intent
+            )
+            if (fcmData.chatId != null) {
+                viewModel.onAction(ProfileScreenAction.FcmMessage(fcmData))
+            }
         }
     }
 

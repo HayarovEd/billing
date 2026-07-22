@@ -52,4 +52,5 @@
         <item>ноября</item>
         <item>декабря</item>
     </string-array>
+    <string name="new_message">Новое сообщение</string>
 </resources>
