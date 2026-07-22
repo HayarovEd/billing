@@ -1,6 +1,7 @@
 package com.impuls.chat.domain.repository
 
 import com.impuls.chat.domain.model.Token
+import com.impuls.chat.domain.model.UserBillingData
 import kotlinx.coroutines.flow.Flow
 
 interface DataStoreChatRepository {
@@ -12,4 +13,13 @@ interface DataStoreChatRepository {
     suspend fun getFcmToken(): String?
     suspend fun isSentFcmToken(isSend: Boolean)
     suspend fun getSentFcmToken(): Boolean
+    suspend fun saveUserBillingData(
+        name: String,
+        login: String,
+        password: String,
+        email: String,
+        billingToken: String,
+    )
+
+    suspend fun getUserBillingData(): UserBillingData?
 }

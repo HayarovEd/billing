@@ -7,11 +7,6 @@ import com.impuls.chat.domain.model.TmpMessage
 import com.impuls.chat.domain.utils.Utils.collectMessages
 
 data class ChatScreenState(
-    val name: String = "",
-    val login: String = "",
-    val password: String = "",
-    val email: String = "",
-    val billingToken: String = "",
     val chat: Chat? = null,
     val isLoading: Boolean = false,
     val currentMessage: String = "",

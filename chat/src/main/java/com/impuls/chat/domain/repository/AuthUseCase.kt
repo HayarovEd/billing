@@ -1,6 +1,7 @@
 package com.impuls.chat.domain.repository
 
 import android.util.Log
+import com.impuls.chat.domain.model.UserBillingData
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.JwtRepository
 import com.impuls.chat.domain.utils.ResultWork
@@ -16,18 +17,21 @@ class AuthUseCase(
     suspend operator fun <T> invoke(
         function: suspend (accessToken: String) -> T,
         onError: suspend (error: ChatDataError) -> Unit,
-        name: String,
-        username: String,
-        email: String,
-        password: String,
-        billingToken: String,
+        currentName: String? = null,
+        currentEmail: String? = null,
     ) {
         val token = dataStoreRepository.getStateToken()
         if (token == null) {
+            val userBillingData = getUserBillingData()
+            if (userBillingData == null) {
+                onError(ChatDataError.Network.UNKNOWN)
+                return
+            }
+            val (name, username, password, email, billingToken) = userBillingData
             when (val resultLogin = repository.onLoginFromApp(
-                name = name,
+                name = currentName ?: name,
                 username = username,
-                email = email,
+                email = currentEmail ?: email,
                 password = password,
                 token = billingToken,
             )) {
@@ -53,10 +57,16 @@ class AuthUseCase(
                         Log.e("TAG222", "refresh token: ${resultRefresh.error}")
                         onError(resultRefresh.error)
                         dataStoreRepository.removeToken()
+                        val userBillingData = getUserBillingData()
+                        if (userBillingData == null) {
+                            onError(ChatDataError.Network.UNKNOWN)
+                            return
+                        }
+                        val (name, username, password, email, billingToken) = userBillingData
                         when (val resultLogin = repository.onLoginFromApp(
-                            name = name,
+                            name = currentName ?: name,
                             username = username,
-                            email = email,
+                            email = currentEmail ?: email,
                             password = password,
                             token = billingToken,
                         )) {
@@ -103,5 +113,9 @@ class AuthUseCase(
             }
 
         }
+    }
+
+    private suspend fun getUserBillingData(): UserBillingData? {
+        return dataStoreRepository.getUserBillingData()
     }
 }

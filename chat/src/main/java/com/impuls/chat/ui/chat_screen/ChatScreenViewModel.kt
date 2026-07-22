@@ -15,7 +15,6 @@ import com.impuls.chat.domain.repository.AuthUseCase
 import com.impuls.chat.domain.repository.DataStoreChatRepository
 import com.impuls.chat.domain.repository.DownloadAnsSaveUseCase
 import com.impuls.chat.domain.repository.FileRepository
-import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
 import com.impuls.chat.domain.utils.ResultWork
@@ -41,7 +40,6 @@ class ChatScreenViewModel(
     private val remoteRepository: RemoteChatRepository,
     private val authUseCase: AuthUseCase,
     private val webSocketChatRepository: WebSocketChatRepository,
-    private val notificationRepository: NotificationRepository,
     private val dataStoreRepository: DataStoreChatRepository,
     private val downloadAnsSaveUseCase: DownloadAnsSaveUseCase,
     private val fileRepository: FileRepository,
@@ -50,13 +48,7 @@ class ChatScreenViewModel(
     private val routeData = savedStateHandle.toRoute<NavigationChatRoute.ChatRoute>()
 
     private val _state = MutableStateFlow(
-        ChatScreenState(
-            name = routeData.name,
-            login = routeData.login,
-            password = routeData.password,
-            email = routeData.email,
-            billingToken = routeData.billingToken,
-        )
+        ChatScreenState()
     )
     val state = _state
         .onStart {
@@ -166,7 +158,6 @@ class ChatScreenViewModel(
     private suspend fun withAuth(
         action: suspend (String) -> Unit,
     ) {
-        val currentState = _state.value
         _state.update { it.copy(isLoading = true) }
         authUseCase.invoke(
             function = {
@@ -176,11 +167,6 @@ class ChatScreenViewModel(
                 Log.e("ChatScreenVM", "Auth error: $it")
                 eventChannel.send(OnMessage(it.asUiText()))
             },
-            name = currentState.name,
-            username = currentState.login,
-            email = currentState.email,
-            password = currentState.password,
-            billingToken = currentState.billingToken
         )
         _state.update { it.copy(isLoading = false) }
     }
@@ -274,7 +260,7 @@ class ChatScreenViewModel(
         }
     }
 
-    private suspend fun handleChatUpdate(data: WebSocketChatMessage.UpdateChatMessage) {
+    private fun handleChatUpdate(data: WebSocketChatMessage.UpdateChatMessage) {
     //    var newMsgs = listOf<Message>()
         _state.update { state ->
             val mergeResult = state.chat?.let { existingChat ->

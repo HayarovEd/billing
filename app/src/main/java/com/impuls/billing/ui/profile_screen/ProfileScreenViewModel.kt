@@ -8,6 +8,7 @@ import com.impuls.billing.domain.repository.HomeRepository
 import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
+import com.impuls.chat.domain.repository.DataStoreChatRepository
 import com.impuls.chat.service.FcmMessageData
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ class ProfileScreenViewModel(
     private val dataStoreRepository: DataStoreRepository,
     private val jwtRepository: JwtRepository,
     private val homeRepository: HomeRepository,
+    private val dataStoreChatRepository: DataStoreChatRepository
 ) : ViewModel() {
 
 
@@ -186,6 +188,13 @@ class ProfileScreenViewModel(
                     account = result.data
                 )
                     .updateState()
+                dataStoreChatRepository.saveUserBillingData(
+                    name = result.data.account.name,
+                    login = result.data.account.login,
+                    password = result.data.account.password,
+                    email = result.data.account.email,
+                    billingToken = _state.value.token
+                )
                 if (result.data.agreements.isNotEmpty()) {
                     loadVGroups(
                         token = token,
@@ -491,18 +500,11 @@ class ProfileScreenViewModel(
             )
                 .updateState()
             fcmMessageData.chatId?.let { chatId ->
-                _state.value.account?.let { acc ->
-                    eventChannel.send(
-                        ProfileScreenEvent.NavigateChat(
-                            chatId = chatId,
-                            name = acc.account.name,
-                            login = acc.account.login,
-                            password = acc.account.password,
-                            email = acc.account.email,
-                            billingToken = _state.value.token
-                        )
+                eventChannel.send(
+                    ProfileScreenEvent.NavigateChat(
+                        chatId = chatId,
                     )
-                }
+                )
             }
         }
     }

@@ -37,10 +37,8 @@ class MainScreenViewModel(
         MainScreenState(
             name = routeData.name,
             login = routeData.login,
-            password = routeData.password,
             email = routeData.email,
             operId = routeData.operId,
-            billingToken = routeData.billingToken,
         )
     )
     val state = _state
@@ -108,11 +106,6 @@ class MainScreenViewModel(
                     createChat(it)
                 }
             }
-          /*  is MainScreenAction.OnChatClick -> {
-                viewModelScope.launch {
-                    eventChannel.send(MainScreenEvent.NavigateEvent(action.chatId))
-                }
-            }*/
         }
     }
 
@@ -122,22 +115,16 @@ class MainScreenViewModel(
         viewModelScope.launch {
             delay(500.milliseconds)
             val currentState = _state.value
-           // _state.update { it.copy(isLoading = true) }
             authUseCase.invoke(
                 function = {
                     action(it)
                 },
                 onError = {
-                    Log.e("TAG222", "loadData: $it")
                     eventChannel.send(MainScreenEvent.OnMessage(it.asUiText()))
                 },
-                name = currentState.name,
-                username = currentState.login,
-                email = currentState.email,
-                password = currentState.password,
-                billingToken = currentState.billingToken
+                currentName = currentState.name,
+                currentEmail = currentState.email,
             )
-            //_state.update { it.copy(isLoading = false) }
         }
     }
 

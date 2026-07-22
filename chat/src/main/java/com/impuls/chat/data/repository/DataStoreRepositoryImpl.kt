@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.impuls.chat.domain.model.Token
+import com.impuls.chat.domain.model.UserBillingData
 import com.impuls.chat.domain.repository.DataStoreChatRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -15,7 +16,11 @@ private const val ACCESS_TOKEN = "access_token"
 private const val REFRESH_TOKEN = "refresh_token"
 private const val FCM_TOKEN = "fcm_token"
 private const val SEND_FCM_TOKEN = "send_fcm_token"
-
+private const val BILLING_NAME = "billing_name"
+private const val BILLING_LOGIN = "billing_login"
+private const val BILLING_PASSWORD = "billing_password"
+private const val BILLING_EMAIL = "billing_email"
+private const val BILLING_TOKEN = "billing_token"
 
 
 internal class DataStoreRepositoryImpl(
@@ -51,7 +56,7 @@ internal class DataStoreRepositoryImpl(
 
     override suspend fun getSentFcmToken(): Boolean {
         val ds = dataStore.data.first()
-        return ds[FIELD_SEND_FCM_TOKEN]?:false
+        return ds[FIELD_SEND_FCM_TOKEN] ?: false
     }
 
 
@@ -82,6 +87,45 @@ internal class DataStoreRepositoryImpl(
         } else null
     }
 
+    override suspend fun saveUserBillingData(
+        name: String,
+        login: String,
+        password: String,
+        email: String,
+        billingToken: String,
+    ) {
+        dataStore.edit { preferences ->
+            preferences[FIELD_BILLING_NAME] = name
+            preferences[FIELD_BILLING_LOGIN] = login
+            preferences[FIELD_BILLING_PASSWORD] = password
+            preferences[FIELD_BILLING_EMAIL] = email
+            preferences[FIELD_BILLING_TOKEN] = billingToken
+        }
+    }
+
+    override suspend fun getUserBillingData(): UserBillingData? {
+        val ds = dataStore.data.first()
+        val billingName = ds[FIELD_BILLING_NAME]
+        val billingLogin = ds[FIELD_BILLING_LOGIN]
+        val billingPassword = ds[FIELD_BILLING_PASSWORD]
+        val billingEmail = ds[FIELD_BILLING_EMAIL]
+        val billingToken = ds[FIELD_BILLING_TOKEN]
+        return if (billingName != null
+            && billingLogin != null
+            && billingPassword != null
+            && billingEmail != null
+            && billingToken != null
+        ) {
+            UserBillingData(
+                name = billingName,
+                login = billingLogin,
+                password = billingPassword,
+                email = billingEmail,
+                billingToken = billingToken,
+            )
+        } else null
+    }
+
     override suspend fun removeToken() {
         dataStore.edit { preferences ->
             preferences.remove(FIELD_ACCESS_TOKEN)
@@ -95,5 +139,10 @@ internal class DataStoreRepositoryImpl(
         val FIELD_REFRESH_TOKEN = stringPreferencesKey(REFRESH_TOKEN)
         val FIELD_FCM_TOKEN = stringPreferencesKey(FCM_TOKEN)
         val FIELD_SEND_FCM_TOKEN = booleanPreferencesKey(SEND_FCM_TOKEN)
+        val FIELD_BILLING_NAME = stringPreferencesKey(BILLING_NAME)
+        val FIELD_BILLING_LOGIN = stringPreferencesKey(BILLING_LOGIN)
+        val FIELD_BILLING_PASSWORD = stringPreferencesKey(BILLING_PASSWORD)
+        val FIELD_BILLING_EMAIL = stringPreferencesKey(BILLING_EMAIL)
+        val FIELD_BILLING_TOKEN = stringPreferencesKey(BILLING_TOKEN)
     }
 }
