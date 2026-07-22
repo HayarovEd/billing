@@ -20,14 +20,21 @@ object FCMNotificationHandler : KoinComponent {
      * Parses data and shows a system notification.
      * Used when a new message is received in [FCMService].
      */
-    fun handleNotification(defaultHeader: String, data: Map<String, String>): FcmMessageData {
+    fun handleNotification(
+        defaultHeader: String,
+
+        data: Map<String, String>,
+        title: String,
+        body: String
+    ): FcmMessageData {
         val parsedData = parseMap(data, defaultHeader)
         
         if (parsedData.chatId != null) {
             notificationRepository.showNotification(
-                title = parsedData.title,
-                message = parsedData.body,
-                chatId = parsedData.chatId
+                title = title,
+                message = body,
+                chatId = parsedData.chatId,
+                data = data
             )
         }
         

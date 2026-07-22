@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.impuls.chat.domain.model.DownloadTypeFromUseCase
-import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.MimeTypes
 import com.impuls.chat.domain.model.StatusMessage
 import com.impuls.chat.domain.model.TmpMessage
@@ -276,13 +275,13 @@ class ChatScreenViewModel(
     }
 
     private suspend fun handleChatUpdate(data: WebSocketChatMessage.UpdateChatMessage) {
-        var newMsgs = listOf<Message>()
+    //    var newMsgs = listOf<Message>()
         _state.update { state ->
             val mergeResult = state.chat?.let { existingChat ->
                 Utils.mergeChatUpdates(existingChat, data.chat)
             } ?: (data.chat to emptyList())
 
-            newMsgs = mergeResult.second
+                //   newMsgs = mergeResult.second
 
             state.copy(
                 tmpMessage = null,
@@ -290,13 +289,14 @@ class ChatScreenViewModel(
             )
         }
 
-        newMsgs.forEach { message ->
+       /* newMsgs.forEach { message ->
             notificationRepository.showNotification(
                 title = data.chat.group.name,
                 message = message.text,
-                chatId = data.chat.id
+                chatId = data.chat.id,
+                data = mapOf("chatId" to data.chat.id)
             )
-        }
+        }*/
     }
 
     private suspend fun markMessageAsRead(

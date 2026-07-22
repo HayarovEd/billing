@@ -1,36 +1,39 @@
-# Implementation Plan - FCMNotificationHandler Optimization
+# Implementation Plan - Fix Notification Click Action
 
-The current `FCMNotificationHandler` implementation has a logic flaw where it triggers a redundant notification when parsing an `Intent` (usually from a notification click). It also uses hardcoded strings and unsafe casts.
+The application does not open on notification click because `FCMService` is trying to pass an `Activity` object to the notification builder, but a background service cannot reliably obtain an `Activity` reference. We will revert to using `Intent` extras and `getLaunchIntentForPackage`.
 
 ## User Review Required
 
-> [!WARNING]
-> I am changing the behavior of `handleNotification(intent)`. It will now **only extract data** and **not show** a new notification. This is because this method is typically called when the user has already clicked a notification, so showing a second one is redundant and confusing.
+> [!IMPORTANT]
+> I will be removing the `Activity` parameter from `NotificationRepository.showNotification` as it is not the correct way to handle notifications from a `Service`. Instead, I will use the app's launch intent.
 
 ## Proposed Changes
 
-### [chat](file:///D:/studio_progects/billing/chat)
+### [chat module]
+
+#### [MODIFY] [NotificationRepository.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/domain/repository/NotificationRepository.kt)
+- Remove `activity: Activity?` parameter.
+- Add `data: Map<String, String>? = null` parameter to pass FCM payload for routing.
+
+#### [MODIFY] [NotificationRepositoryImpl.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/NotificationRepositoryImpl.kt)
+- Update `showNotification` implementation:
+    - Use `context.packageManager.getLaunchIntentForPackage(context.packageName)` to get the main entry point of the app.
+    - Loop through the `data` map and add each entry as an extra to the intent.
+    - Set up a `PendingIntent` with the correct flags for the notification.
 
 #### [MODIFY] [FCMNotificationHandler.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMNotificationHandler.kt)
-- Extract all FCM keys into private constants to avoid typos and improve maintainability.
-- Add a helper data class `ParsedFcmData` (internal) to carry title, body, and chatId.
-- Refactor logic into a unified `parseMap(data: Map<String, String?>, defaultHeader: String)` method.
-- **`handleNotification(data)`**: Uses `parseMap` and then calls `notificationRepository.showNotification`. Used in `FCMService` for incoming messages.
-- **`handleIntent(intent)`** (formerly `handleNotification(intent)`): Uses `parseMap` but **does not** call `showNotification`. Used in UI components to react to notification clicks.
+- Update `handleNotification` signature and call to `notificationRepository.showNotification`.
 
 #### [MODIFY] [FCMService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)
-- Ensure it uses the explicit `handleNotification` method.
+- Remove the `getActivity` helper.
+- Update `onMessageReceived` to pass `message.data` to the handler.
 
-### [app](file:///D:/studio_progects/billing/app)
-
-#### [MODIFY] [ProfileScreen.kt](file:///D:/studio_progects/billing/app/src/main/java/com/impuls/billing/ui/profile_screen/ProfileScreen.kt)
-- Update to use the new `handleIntent` method name.
+#### [MODIFY] [ChatScreenViewModel.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/chat_screen/ChatScreenViewModel.kt)
+- Update the notification logic to match the new `NotificationRepository` signature.
 
 ## Verification Plan
 
-### Automated Tests
-- N/A (FCM logic depends on Android system services and Koin).
-
 ### Manual Verification
-1. **Incoming Message**: Send a message while the app is in foreground/background. Verify a notification appears.
-2. **Notification Click**: Click the notification. Verify that `ProfileScreen` receives the `chatId` and navigates to the chat, **without** showing a second notification.
+1. **Trigger Notification**: Send a push message (or trigger via WebSocket).
+2. **Verify Click**: Click the notification. The app should open.
+3. **Verify Routing**: Ensure that the `chatId` is passed correctly and the app navigates to the chat screen (handled by `ProfileScreen.kt`).

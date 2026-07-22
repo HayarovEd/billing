@@ -6,3 +6,9 @@
     - `[x]` Update `FCMService.kt` to use `handleNotification`
     - `[x]` Update `ProfileScreen.kt` to use `handleIntent`
 - `[x]` Verify no redundant notifications appear on click
+- `[x]` Fix notification click action
+    - `[x]` Update `NotificationRepository` interface
+    - `[x]` Implement `PendingIntent` with launch intent in `NotificationRepositoryImpl`
+    - `[x]` Update `FCMNotificationHandler` to pass data map
+    - `[x]` Clean up `FCMService` (remove activity retrieval)
+    - `[x]` Restore/Update `ChatScreenViewModel` notification logic

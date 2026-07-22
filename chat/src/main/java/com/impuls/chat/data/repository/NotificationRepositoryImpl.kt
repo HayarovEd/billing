@@ -2,7 +2,9 @@ package com.impuls.chat.data.repository
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.impuls.chat.domain.repository.NotificationRepository
@@ -36,13 +38,36 @@ internal class NotificationRepositoryImpl(
         }
     }
 
-    override fun showNotification(title: String, message: String, chatId: String?) {
+    override fun showNotification(
+        title: String,
+        message: String,
+        chatId: String?,
+        data: Map<String, String>?
+    ) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            data?.forEach { (key, value) ->
+                putExtra(key, value)
+            }
+            // Ensure the activity is opened even if it's already running
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
+        val pendingIntent = if (intent != null) {
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            PendingIntent.getActivity(context, chatId?.hashCode() ?: 0, intent, flags)
+        } else null
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(context.applicationInfo.icon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
             .build()
 
         val notificationId = chatId?.hashCode() ?: System.currentTimeMillis().toInt()

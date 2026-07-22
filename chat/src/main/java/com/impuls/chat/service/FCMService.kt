@@ -19,7 +19,6 @@ class FCMService : FirebaseMessagingService(), KoinComponent {
     @Deprecated("Deprecated in Java", ReplaceWith("onNewToken(token)"))
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onNewToken(token: String) {
-        Log.d("FCMService", "onNewToken: $token")
         serviceScope.launch {
             dataStoreRepository.saveFcmToken(token)
             dataStoreRepository.isSentFcmToken(false)
@@ -33,8 +32,11 @@ class FCMService : FirebaseMessagingService(), KoinComponent {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+        
         FCMNotificationHandler.handleNotification(
             defaultHeader = resources.getString(com.impuls.chat.R.string.new_message),
+            title = message.notification?.title ?: "",
+            body = message.notification?.body ?: "",
             data = message.data
         )
     }

@@ -1,29 +1,32 @@
-# Walkthrough - FCMNotificationHandler Optimization
+# Walkthrough - FCM Optimization and Fixes
 
-I have optimized the `FCMNotificationHandler` to improve code maintainability and fix a logical issue where redundant notifications were shown when clicking on an existing notification.
+I have optimized the `FCMNotificationHandler` and fixed the notification click behavior to ensure the app opens and navigates correctly.
 
 ## Changes Made
 
-### 1. Refactored Handler Logic
+### 1. FCMNotificationHandler Optimization
 - **Separated Parsing from Action**: Introduced a private `parseMap` method that handles the extraction of title, body, and chatId from various possible keys (`title`, `header`, `body`, `text`, `chatId`, `chat_id`).
 - **New `handleIntent` Method**: Created specifically for UI components. It extracts data from the `Intent` but **does not** trigger a system notification.
 - **Improved `handleNotification`**: Now used exclusively for background/foreground message reception, ensuring notifications are shown only when necessary.
+- **Constants for Keys**: Replaced hardcoded string keys with private constants (`KEY_TITLE`, `KEY_CHAT_ID`, etc.) to prevent typos.
 
-### 2. Used Constants for Keys
-- Replaced hardcoded string keys with private constants (`KEY_TITLE`, `KEY_CHAT_ID`, etc.) to prevent typos and make the code easier to update if the backend format changes.
+### 2. Fixed Notification Click Action
+- **Reliable Launch Logic**: Updated `NotificationRepositoryImpl` to use `context.packageManager.getLaunchIntentForPackage`. This is the standard way to open the app from a background `Service`, replacing the unreliable attempt to obtain an `Activity` reference.
+- **Data Transfer**: All FCM data (like `chatId`) is now added to the launch intent as extras.
+- **Intent Flags**: Configured `FLAG_ACTIVITY_SINGLE_TOP` and `FLAG_ACTIVITY_CLEAR_TOP` to ensure the app opens smoothly without restarting if it's already running.
 
-### 3. Safer Intent Parsing
-- Replaced unsafe casts with proper `Bundle` iteration and `getString()` calls, avoiding potential crashes or type mismatches.
+### 3. API Refinement & Cleanup
+- **Decoupled Repositories**: Updated `NotificationRepository` to accept a `data: Map<String, String>?` instead of an `Activity?`, making the API cleaner and more suitable for background services.
+- **Service Cleanup**: Removed the `getActivity` helper from `FCMService`, making it more robust.
+- **Restored Notifications**: Re-enabled and updated the WebSocket notification logic in `ChatScreenViewModel`.
 
-### 4. Updated Callers
-- **[FCMService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)**: Uses `handleNotification` to show alerts for new incoming messages.
-- **[ProfileScreen.kt](file:///D:/studio_progects/billing/app/src/main/java/com/impuls/billing/ui/profile_screen/ProfileScreen.kt)**: Uses `handleIntent` to process the notification click data without creating a duplicate notification.
+## Logic Flow
 
-## Verification Results
-
-### Code Integrity
-- All warnings related to deprecation and unresolved symbols have been resolved.
-- Logic correctly distinguishes between "new message received" (show alert) and "notification clicked" (extract data only).
+1.  **Message Received**: FCM or WebSocket detects a new message.
+2.  **Notification Created**: `NotificationRepositoryImpl` creates a notification with a `PendingIntent`. This intent points to the app's main entry point and carries the message data.
+3.  **User Clicks**: The user taps the notification.
+4.  **App Opens**: Android launches the app using the `PendingIntent`.
+5.  **Navigation**: `ProfileScreen` reads the `chatId` from the intent extras and navigates the user directly to the chat.
 
 > [!TIP]
-> This refactoring ensures that when a user clicks a notification, the app navigates to the chat smoothly without leaving a "ghost" notification or showing a new one in the tray.
+> This approach ensures that when a user clicks a notification, the app opens reliably and navigates to the correct chat, regardless of its previous state (foreground, background, or killed).
