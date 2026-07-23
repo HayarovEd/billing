@@ -94,8 +94,6 @@ fun ProfileScreenRoot(
     LaunchedEffect(Unit) {
         val intent = context.intent
         if (intent != null) {
-            Log.e("Test FCM", "intent: $intent")
-            Log.e("Test FCM", "intent: ${intent.data}")
             val fcmData = FCMNotificationHandler.handleIntent(
                 defaultHeader = context.resources.getString(
                     com.impuls.chat.R.string.new_message

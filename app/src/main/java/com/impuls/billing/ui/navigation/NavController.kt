@@ -82,7 +82,6 @@ fun NavController(
                 navDeepLink<NavigationRoute.ProfileRoute>(basePath = "billing://profile/")
             )
         ) {
-            Log.d("Test FCM", "Navigated to ProfileRoute via deep link or normal navigation")
             ProfileScreenRoot(
                 onNavigateToPayment = { number, operId ->
                     navController.navigate(
