@@ -1,10 +1,12 @@
 package com.impuls.chat.domain.repository
 
 import com.impuls.chat.domain.model.Chat
+import com.impuls.chat.domain.model.DeviceData
 import com.impuls.chat.domain.model.DownloadType
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.utils.ChatDataError
+import com.impuls.chat.domain.utils.PLATFORM_FCM
 import com.impuls.chat.domain.utils.ResultWork
 import kotlinx.coroutines.flow.Flow
 import java.io.File
@@ -60,6 +62,8 @@ interface RemoteChatRepository {
     suspend fun downloadFile(accessToken: String, fileName: String): Flow<DownloadType>
     suspend fun registerFCMToken(
         fcmToken: String,
-        accessToken: String
+        accessToken: String,
+        deviceData: DeviceData,
+        platform: String = PLATFORM_FCM,
     ): ResultWork<Unit, ChatDataError>
 }

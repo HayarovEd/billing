@@ -13,6 +13,7 @@ import kotlin.time.Clock
 class AuthUseCase(
     private val repository: RemoteChatRepository,
     private val dataStoreRepository: DataStoreChatRepository,
+    private val serviceChatRepository: ServiceChatRepository,
 ) {
     suspend operator fun <T> invoke(
         function: suspend (accessToken: String) -> T,
@@ -100,7 +101,8 @@ class AuthUseCase(
             fcmToken?.let {
                 when (repository.registerFCMToken(
                     fcmToken = it,
-                    accessToken = accessToken
+                    accessToken = accessToken,
+                    deviceData = serviceChatRepository.getDeviceData(),
                 )) {
                     is ResultWork.Error -> {
                         ///

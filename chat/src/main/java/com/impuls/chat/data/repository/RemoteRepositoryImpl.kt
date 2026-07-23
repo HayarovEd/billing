@@ -12,6 +12,7 @@ import com.impuls.chat.data.remote.response.GroupDto
 import com.impuls.chat.data.remote.response.LoginFromAppDto
 import com.impuls.chat.data.remote.response.create_chat_dto.ChatDto
 import com.impuls.chat.domain.model.Chat
+import com.impuls.chat.domain.model.DeviceData
 import com.impuls.chat.domain.model.DownloadType
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
@@ -218,7 +219,7 @@ internal class RemoteRepositoryImpl(
                     val parts = mutableListOf<ByteArray>()
 
                     // 1. Data часть
-                    if (message!=null) {
+                    if (message != null) {
                         val jsonData = Json.encodeToString(MessageRequest(message))
                         parts.add("--$boundary\r\n".toByteArray())
                         parts.add("Content-Disposition: form-data; name=\"data\"\r\n".toByteArray())
@@ -322,13 +323,22 @@ internal class RemoteRepositoryImpl(
     override suspend fun registerFCMToken(
         fcmToken: String,
         accessToken: String,
+        deviceData: DeviceData,
+        platform: String,
     ): ResultWork<Unit, ChatDataError> {
         return withContext(Dispatchers.IO) {
             handleResponse(
                 request = {
                     client.post("${BASE_CHAT_URL}fcm/register-token") {
                         contentType(ContentType.Application.Json)
-                        setBody(FcmTokenRequest(fcmToken))
+                        setBody(
+                            FcmTokenRequest(
+                                token = fcmToken,
+                                deviceName = deviceData.deviceName,
+                                deviceId = deviceData.deviceId,
+                                platform = platform
+                            )
+                        )
                         bearerAuth(accessToken)
                     }
                 },

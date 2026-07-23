@@ -5,6 +5,7 @@ import com.impuls.chat.data.repository.DataStoreRepositoryImpl
 import com.impuls.chat.data.repository.FileRepositoryImpl
 import com.impuls.chat.data.repository.NotificationRepositoryImpl
 import com.impuls.chat.data.repository.RemoteRepositoryImpl
+import com.impuls.chat.data.repository.ServiceChatRepositoryImpl
 import com.impuls.chat.data.repository.WebSocketChatRepositoryImpl
 import com.impuls.chat.domain.repository.AuthUseCase
 import com.impuls.chat.domain.repository.DataStoreChatRepository
@@ -12,6 +13,7 @@ import com.impuls.chat.domain.repository.DownloadAnsSaveUseCase
 import com.impuls.chat.domain.repository.FileRepository
 import com.impuls.chat.domain.repository.NotificationRepository
 import com.impuls.chat.domain.repository.RemoteChatRepository
+import com.impuls.chat.domain.repository.ServiceChatRepository
 import com.impuls.chat.domain.repository.WebSocketChatRepository
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
@@ -27,4 +29,5 @@ val repoChatModule = module {
 
     factoryOf (::AuthUseCase) { bind<AuthUseCase>() }
     factoryOf (::DownloadAnsSaveUseCase) { bind<DownloadAnsSaveUseCase>() }
+    singleOf(::ServiceChatRepositoryImpl) {bind<ServiceChatRepository>()}
 }

@@ -16,3 +16,6 @@ internal const val PATH_CHAT = "/chats"
 internal const val PATH_USERS = "/users"
 internal const val PATH_GROUPS = "/groups"
 internal const val PATH_SUBGROUPS = "/subgroups"
+
+internal const val PLATFORM_FCM = "FCM"
+internal const val PLATFORM_HMS = "HMS"
