@@ -25,6 +25,7 @@ material = "1.14.0"
 kotlinxSerializationJson = "1.11.0"
 googleGmsGoogleServices = "4.5.0"
 firebaseMessaging = "25.1.1"
+playServicesBase = "18.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +78,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 pdfviewer-compose = { module = "com.github.bhuvaneshw.pdfviewer:compose", version.ref = "composeVersion" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

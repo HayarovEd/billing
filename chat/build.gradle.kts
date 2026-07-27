@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
+    id ("com.huawei.agconnect")
 }
 
 android {
@@ -29,6 +30,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.firebase.messaging)
     implementation(libs.material)
+    implementation(libs.play.services.base)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
@@ -80,4 +82,7 @@ dependencies {
 
     //pdf
     implementation(libs.pdfviewer.compose)
+
+    //hms
+    implementation("com.huawei.hms:push:6.11.0.300")
 }

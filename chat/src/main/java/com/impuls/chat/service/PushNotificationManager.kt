@@ -6,7 +6,7 @@ import com.impuls.chat.domain.repository.NotificationRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-object FCMNotificationHandler : KoinComponent {
+object PushNotificationManager : KoinComponent {
     private val notificationRepository: NotificationRepository by inject()
 
     private const val KEY_TITLE = "title"
@@ -15,6 +15,8 @@ object FCMNotificationHandler : KoinComponent {
     private const val KEY_TEXT = "text"
     private const val KEY_CHAT_ID = "chatId"
     private const val KEY_CHAT_ID_ALT = "chat_id"
+
+
 
     /**
      * Parses data and shows a system notification.

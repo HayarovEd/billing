@@ -6,6 +6,7 @@ import com.impuls.billing.di.baseModule
 import com.impuls.billing.di.downloadUpdateModule
 import com.impuls.billing.di.repoModule
 import com.impuls.billing.di.viewModelModule
+import com.impuls.chat.data.repository.PushInitializer
 import com.impuls.chat.di.repoChatModule
 import com.impuls.chat.di.viewModelChatModule
 import org.koin.android.ext.koin.androidContext
@@ -22,6 +23,7 @@ class BillingApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        PushInitializer.init(applicationContext)
         startKoin {
             androidLogger()
             androidContext(this@BillingApp)

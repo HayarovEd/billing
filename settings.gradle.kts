@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven ( "https://developer.huawei.com/repo/")
     }
 }
 plugins {
@@ -20,6 +21,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://jitpack.io")
+        maven ( "https://developer.huawei.com/repo/")
     }
 }
 

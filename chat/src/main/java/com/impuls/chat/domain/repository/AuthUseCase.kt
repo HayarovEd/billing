@@ -1,6 +1,6 @@
 package com.impuls.chat.domain.repository
 
-import android.util.Log
+import com.impuls.chat.domain.model.PushProvider
 import com.impuls.chat.domain.model.UserBillingData
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.JwtRepository
@@ -37,7 +37,6 @@ class AuthUseCase(
                 token = billingToken,
             )) {
                 is ResultWork.Error -> {
-                    Log.e("TAG222", "empty token: ${resultLogin.error}")
                     onError(resultLogin.error)
                 }
 
@@ -55,7 +54,6 @@ class AuthUseCase(
             } else {
                 when (val resultRefresh = repository.onRefresh(token.refresh)) {
                     is ResultWork.Error -> {
-                        Log.e("TAG222", "refresh token: ${resultRefresh.error}")
                         onError(resultRefresh.error)
                         dataStoreRepository.removeToken()
                         val userBillingData = getUserBillingData()
@@ -72,7 +70,6 @@ class AuthUseCase(
                             token = billingToken,
                         )) {
                             is ResultWork.Error -> {
-                                Log.e("TAG222", "error token: ${resultLogin.error}")
                                 onError(resultLogin.error)
                             }
 
@@ -98,22 +95,30 @@ class AuthUseCase(
     ) {
         if (!dataStoreRepository.getSentFcmToken()) {
             val fcmToken = dataStoreRepository.getFcmToken()
-            fcmToken?.let {
-                when (repository.registerFCMToken(
-                    fcmToken = it,
-                    accessToken = accessToken,
-                    deviceData = serviceChatRepository.getDeviceData(),
-                )) {
-                    is ResultWork.Error -> {
-                        ///
-                    }
+            val typePushProvider = dataStoreRepository.getTypePushProvider()
+            val platform = when (typePushProvider) {
+                PushProvider.FCM -> "FCM"
+                PushProvider.HMS -> "HMS"
+                PushProvider.NONE -> "NONE"
+            }
+            if (typePushProvider != PushProvider.NONE) {
+                fcmToken?.let {
+                    when (repository.registerFCMToken(
+                        fcmToken = it,
+                        accessToken = accessToken,
+                        deviceData = serviceChatRepository.getDeviceData(),
+                        platform = platform,
+                    )) {
+                        is ResultWork.Error -> {
+                            ///
+                        }
 
-                    is ResultWork.Success -> {
-                        dataStoreRepository.isSentFcmToken(true)
+                        is ResultWork.Success -> {
+                            dataStoreRepository.isSentFcmToken(true)
+                        }
                     }
                 }
             }
-
         }
     }
 

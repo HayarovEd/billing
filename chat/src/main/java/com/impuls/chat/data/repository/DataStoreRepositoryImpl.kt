@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.impuls.chat.domain.model.PushProvider
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.model.UserBillingData
 import com.impuls.chat.domain.repository.DataStoreChatRepository
@@ -21,7 +22,7 @@ private const val BILLING_LOGIN = "billing_login"
 private const val BILLING_PASSWORD = "billing_password"
 private const val BILLING_EMAIL = "billing_email"
 private const val BILLING_TOKEN = "billing_token"
-
+private const val PUSH_PROVIDER = "push_provider"
 
 internal class DataStoreRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
@@ -126,6 +127,25 @@ internal class DataStoreRepositoryImpl(
         } else null
     }
 
+    override suspend fun saveTypePushProvider(provider: PushProvider) {
+        dataStore.edit { preferences ->
+            preferences[FIELD_PUSH_PROVIDER] = when (provider) {
+                PushProvider.FCM -> "FCM"
+                PushProvider.HMS -> "HMS"
+                PushProvider.NONE -> "NONE"
+            }
+        }
+    }
+
+    override suspend fun getTypePushProvider(): PushProvider {
+        val ds = dataStore.data.first()
+        return when (ds[FIELD_PUSH_PROVIDER]) {
+            "FCM" -> PushProvider.FCM
+            "HMS" -> PushProvider.HMS
+            else -> PushProvider.NONE
+        }
+    }
+
     override suspend fun removeToken() {
         dataStore.edit { preferences ->
             preferences.remove(FIELD_ACCESS_TOKEN)
@@ -144,5 +164,6 @@ internal class DataStoreRepositoryImpl(
         val FIELD_BILLING_PASSWORD = stringPreferencesKey(BILLING_PASSWORD)
         val FIELD_BILLING_EMAIL = stringPreferencesKey(BILLING_EMAIL)
         val FIELD_BILLING_TOKEN = stringPreferencesKey(BILLING_TOKEN)
+        val FIELD_PUSH_PROVIDER = stringPreferencesKey(PUSH_PROVIDER)
     }
 }

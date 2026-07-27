@@ -49,7 +49,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
-import com.impuls.chat.service.FCMNotificationHandler
+import com.impuls.chat.service.PushNotificationManager
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -94,7 +94,7 @@ fun ProfileScreenRoot(
     LaunchedEffect(Unit) {
         val intent = context.intent
         if (intent != null) {
-            val fcmData = FCMNotificationHandler.handleIntent(
+            val fcmData = PushNotificationManager.handleIntent(
                 defaultHeader = context.resources.getString(
                     com.impuls.chat.R.string.new_message
                 ), intent = intent
