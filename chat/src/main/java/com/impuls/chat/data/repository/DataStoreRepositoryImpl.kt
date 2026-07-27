@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.map
 
 private const val ACCESS_TOKEN = "access_token"
 private const val REFRESH_TOKEN = "refresh_token"
-private const val FCM_TOKEN = "fcm_token"
-private const val SEND_FCM_TOKEN = "send_fcm_token"
+private const val PUSH_TOKEN = "fcm_token" // Keeping key "fcm_token" for backward compatibility
+private const val SEND_PUSH_TOKEN = "send_fcm_token"
 private const val BILLING_NAME = "billing_name"
 private const val BILLING_LOGIN = "billing_login"
 private const val BILLING_PASSWORD = "billing_password"
@@ -38,26 +38,26 @@ internal class DataStoreRepositoryImpl(
         }
     }
 
-    override suspend fun saveFcmToken(token: String) {
+    override suspend fun savePushToken(token: String) {
         dataStore.edit { preferences ->
-            preferences[FIELD_FCM_TOKEN] = token
+            preferences[FIELD_PUSH_TOKEN] = token
         }
     }
 
-    override suspend fun getFcmToken(): String? {
+    override suspend fun getPushToken(): String? {
         val ds = dataStore.data.first()
-        return ds[FIELD_FCM_TOKEN]
+        return ds[FIELD_PUSH_TOKEN]
     }
 
-    override suspend fun isSentFcmToken(isSend: Boolean) {
+    override suspend fun isSentPushToken(isSend: Boolean) {
         dataStore.edit { preferences ->
-            preferences[FIELD_SEND_FCM_TOKEN] = isSend
+            preferences[FIELD_SEND_PUSH_TOKEN] = isSend
         }
     }
 
-    override suspend fun getSentFcmToken(): Boolean {
+    override suspend fun getSentPushToken(): Boolean {
         val ds = dataStore.data.first()
-        return ds[FIELD_SEND_FCM_TOKEN] ?: false
+        return ds[FIELD_SEND_PUSH_TOKEN] ?: false
     }
 
 
@@ -157,8 +157,8 @@ internal class DataStoreRepositoryImpl(
     companion object {
         val FIELD_ACCESS_TOKEN = stringPreferencesKey(ACCESS_TOKEN)
         val FIELD_REFRESH_TOKEN = stringPreferencesKey(REFRESH_TOKEN)
-        val FIELD_FCM_TOKEN = stringPreferencesKey(FCM_TOKEN)
-        val FIELD_SEND_FCM_TOKEN = booleanPreferencesKey(SEND_FCM_TOKEN)
+        val FIELD_PUSH_TOKEN = stringPreferencesKey(PUSH_TOKEN)
+        val FIELD_SEND_PUSH_TOKEN = booleanPreferencesKey(SEND_PUSH_TOKEN)
         val FIELD_BILLING_NAME = stringPreferencesKey(BILLING_NAME)
         val FIELD_BILLING_LOGIN = stringPreferencesKey(BILLING_LOGIN)
         val FIELD_BILLING_PASSWORD = stringPreferencesKey(BILLING_PASSWORD)

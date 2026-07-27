@@ -7,6 +7,7 @@ import com.impuls.chat.domain.repository.DataStoreChatRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,9 +21,15 @@ class FCMService : FirebaseMessagingService(), KoinComponent {
     @Suppress("OVERRIDE_DEPRECATION")
     override fun onNewToken(token: String) {
         serviceScope.launch {
-            dataStoreRepository.saveFcmToken(token)
-            dataStoreRepository.isSentFcmToken(false)
+            dataStoreRepository.savePushToken(token)
+            dataStoreRepository.saveTypePushProvider(com.impuls.chat.domain.model.PushProvider.FCM)
+            dataStoreRepository.isSentPushToken(false)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
     }
 
     override fun onRegistered(installationId: String) {

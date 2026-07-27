@@ -94,13 +94,13 @@ fun ProfileScreenRoot(
     LaunchedEffect(Unit) {
         val intent = context.intent
         if (intent != null) {
-            val fcmData = PushNotificationManager.handleIntent(
+            val pushData = PushNotificationManager.handleIntent(
                 defaultHeader = context.resources.getString(
                     com.impuls.chat.R.string.new_message
                 ), intent = intent
             )
-            if (fcmData.chatId != null) {
-                viewModel.onAction(ProfileScreenAction.FcmMessage(fcmData))
+            if (pushData.chatId != null) {
+                viewModel.onAction(ProfileScreenAction.FcmMessage(pushData))
             }
         }
     }

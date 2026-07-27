@@ -9,7 +9,7 @@ import com.impuls.billing.domain.repository.JwtRepository
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.chat.domain.repository.DataStoreChatRepository
-import com.impuls.chat.service.FcmMessageData
+import com.impuls.chat.service.PushMessageData
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -479,7 +479,7 @@ class ProfileScreenViewModel(
         }
     }
 
-    fun handleIntent(fcmMessageData: FcmMessageData) {
+    fun handleIntent(pushMessageData: PushMessageData) {
         viewModelScope.launch {
             _state.value.copy(
                 isLoading = true,
@@ -499,7 +499,7 @@ class ProfileScreenViewModel(
                 isLoading = false,
             )
                 .updateState()
-            fcmMessageData.chatId?.let { chatId ->
+            pushMessageData.chatId?.let { chatId ->
                 eventChannel.send(
                     ProfileScreenEvent.NavigateChat(
                         chatId = chatId,

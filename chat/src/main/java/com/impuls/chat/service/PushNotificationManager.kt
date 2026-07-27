@@ -24,46 +24,49 @@ object PushNotificationManager : KoinComponent {
      */
     fun handleNotification(
         defaultHeader: String,
-
         data: Map<String, String>,
         title: String,
         body: String
-    ): FcmMessageData {
+    ): PushMessageData {
         val parsedData = parseMap(data, defaultHeader)
+        
+        // Fallback for Data Messages if title/body are empty
+        val finalTitle = title.ifEmpty { parsedData.title }
+        val finalBody = body.ifEmpty { parsedData.body }
         
         if (parsedData.chatId != null) {
             notificationRepository.showNotification(
-                title = title,
-                message = body,
+                title = finalTitle,
+                message = finalBody,
                 chatId = parsedData.chatId,
                 data = data
             )
         }
         
-        return FcmMessageData(chatId = parsedData.chatId)
+        return PushMessageData(chatId = parsedData.chatId)
     }
 
     /**
      * Parses data from an Intent without showing a notification.
      * Used in UI components to react to a notification click.
      */
-    fun handleIntent(defaultHeader: String, intent: Intent?): FcmMessageData {
+    fun handleIntent(defaultHeader: String, intent: Intent?): PushMessageData {
         val bundle = intent?.extras ?: Bundle.EMPTY
         val data = bundle.keySet().associateWith { bundle.getString(it) }
         
         val parsedData = parseMap(data, defaultHeader)
-        return FcmMessageData(chatId = parsedData.chatId)
+        return PushMessageData(chatId = parsedData.chatId)
     }
 
-    private fun parseMap(data: Map<String, String?>, defaultHeader: String): ParsedFcmData {
+    private fun parseMap(data: Map<String, String?>, defaultHeader: String): ParsedPushData {
         val title = data[KEY_TITLE] ?: data[KEY_HEADER] ?: defaultHeader
         val body = data[KEY_BODY] ?: data[KEY_TEXT] ?: ""
         val chatId = data[KEY_CHAT_ID] ?: data[KEY_CHAT_ID_ALT]
         
-        return ParsedFcmData(title, body, chatId)
+        return ParsedPushData(title, body, chatId)
     }
 
-    private data class ParsedFcmData(
+    private data class ParsedPushData(
         val title: String,
         val body: String,
         val chatId: String?

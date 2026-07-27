@@ -59,8 +59,8 @@ interface RemoteChatRepository {
     ): ResultWork<Unit, ChatDataError>
 
     suspend fun downloadFile(accessToken: String, fileName: String): Flow<DownloadType>
-    suspend fun registerFCMToken(
-        fcmToken: String,
+    suspend fun registerPushToken(
+        pushToken: String,
         accessToken: String,
         deviceData: DeviceData,
         platform: String,

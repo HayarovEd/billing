@@ -43,14 +43,14 @@ class AuthUseCase(
                 is ResultWork.Success -> {
                     dataStoreRepository.saveTokens(resultLogin.data)
                     withContext(Dispatchers.IO) { function(resultLogin.data.access) }
-                    withContext(Dispatchers.IO) { sendFCMToken(resultLogin.data.access) }
+                    withContext(Dispatchers.IO) { sendPushToken(resultLogin.data.access) }
                 }
             }
         } else {
             val access = JwtRepository.decodeJwt(token.access)
             if (access != null && access.expired > Clock.System.now().epochSeconds) {
                 withContext(Dispatchers.IO) { function(token.access) }
-                withContext(Dispatchers.IO) { sendFCMToken(token.access) }
+                withContext(Dispatchers.IO) { sendPushToken(token.access) }
             } else {
                 when (val resultRefresh = repository.onRefresh(token.refresh)) {
                     is ResultWork.Error -> {
@@ -83,18 +83,18 @@ class AuthUseCase(
                     is ResultWork.Success -> {
                         dataStoreRepository.saveTokens(resultRefresh.data)
                         withContext(Dispatchers.IO) { function(resultRefresh.data.access) }
-                        withContext(Dispatchers.IO) { sendFCMToken(resultRefresh.data.access) }
+                        withContext(Dispatchers.IO) { sendPushToken(resultRefresh.data.access) }
                     }
                 }
             }
         }
     }
 
-    private suspend fun sendFCMToken(
+    private suspend fun sendPushToken(
         accessToken: String,
     ) {
-        if (!dataStoreRepository.getSentFcmToken()) {
-            val fcmToken = dataStoreRepository.getFcmToken()
+        if (!dataStoreRepository.getSentPushToken()) {
+            val pushToken = dataStoreRepository.getPushToken()
             val typePushProvider = dataStoreRepository.getTypePushProvider()
             val platform = when (typePushProvider) {
                 PushProvider.FCM -> "FCM"
@@ -102,9 +102,9 @@ class AuthUseCase(
                 PushProvider.NONE -> "NONE"
             }
             if (typePushProvider != PushProvider.NONE) {
-                fcmToken?.let {
-                    when (repository.registerFCMToken(
-                        fcmToken = it,
+                pushToken?.let {
+                    when (repository.registerPushToken(
+                        pushToken = it,
                         accessToken = accessToken,
                         deviceData = serviceChatRepository.getDeviceData(),
                         platform = platform,
@@ -114,7 +114,7 @@ class AuthUseCase(
                         }
 
                         is ResultWork.Success -> {
-                            dataStoreRepository.isSentFcmToken(true)
+                            dataStoreRepository.isSentPushToken(true)
                         }
                     }
                 }

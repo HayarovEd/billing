@@ -5,7 +5,7 @@ import com.impuls.chat.data.handler.handleResponse
 import com.impuls.chat.data.mapper.convertToChat
 import com.impuls.chat.data.mapper.convertToGroup
 import com.impuls.chat.data.remote.request.CreateChatRequest
-import com.impuls.chat.data.remote.request.FcmTokenRequest
+import com.impuls.chat.data.remote.request.PushTokenRequest
 import com.impuls.chat.data.remote.request.LoginFromAppRequest
 import com.impuls.chat.data.remote.request.MessageRequest
 import com.impuls.chat.data.remote.response.GroupDto
@@ -320,8 +320,8 @@ internal class RemoteRepositoryImpl(
     }
 
 
-    override suspend fun registerFCMToken(
-        fcmToken: String,
+    override suspend fun registerPushToken(
+        pushToken: String,
         accessToken: String,
         deviceData: DeviceData,
         platform: String,
@@ -332,8 +332,8 @@ internal class RemoteRepositoryImpl(
                     client.post("${BASE_CHAT_URL}fcm/register-token") {
                         contentType(ContentType.Application.Json)
                         setBody(
-                            FcmTokenRequest(
-                                token = fcmToken,
+                            PushTokenRequest(
+                                token = pushToken,
                                 deviceName = deviceData.deviceName,
                                 deviceId = deviceData.deviceId,
                                 platform = platform

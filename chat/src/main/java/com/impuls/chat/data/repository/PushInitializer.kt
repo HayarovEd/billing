@@ -26,50 +26,45 @@ object PushInitializer : KoinComponent {
         savePushProvider(provider)
 
         when (provider) {
-            PushProvider.FCM -> requestFcmToken()
+            PushProvider.FCM -> requestPushToken()
             PushProvider.HMS -> requestHmsToken(context)
             PushProvider.NONE -> Log.e(TAG, "No push services available on this device")
         }
     }
 
-    private fun requestFcmToken() {
+    private fun requestPushToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
             val token = task.result
-            // Отправляем в наш единый обработчик (из предыдущего шага)
             saveToken(token)
         }
     }
 
     private fun requestHmsToken(context: Context) {
-        // Запрос HMS токена должен происходить в фоновом потоке
-        Thread {
+        serviceScope.launch {
             try {
-                // Получаем appId из файла agconnect-services.json автоматически через SDK
                 val appId = com.huawei.agconnect.config.AGConnectServicesConfig
                     .fromContext(context)
                     .getString("client/app_id")
 
-                // Запрашиваем токен (HCM_SCOPES указывает на работу с пушами)
                 val token = HmsInstanceId.getInstance(context).getToken(appId, "HCM")
 
                 if (!token.isNullOrEmpty()) {
-                    // Передаем токен в единый обработчик
-                    saveToken(token, )
+                    saveToken(token)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Fetching HMS registration token failed", e)
             }
-        }.start()
+        }
     }
 
     private fun saveToken(token: String) {
         serviceScope.launch {
-            dataStoreRepository.saveFcmToken(token)
-            dataStoreRepository.isSentFcmToken(false)
+            dataStoreRepository.savePushToken(token)
+            dataStoreRepository.isSentPushToken(false)
         }
     }
 

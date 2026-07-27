@@ -10,10 +10,10 @@ interface DataStoreChatRepository {
     suspend fun getToken(): Flow<Token?>
     suspend fun removeToken()
     suspend fun getStateToken(): Token?
-    suspend fun saveFcmToken(token: String)
-    suspend fun getFcmToken(): String?
-    suspend fun isSentFcmToken(isSend: Boolean)
-    suspend fun getSentFcmToken(): Boolean
+    suspend fun savePushToken(token: String)
+    suspend fun getPushToken(): String?
+    suspend fun isSentPushToken(isSend: Boolean)
+    suspend fun getSentPushToken(): Boolean
     suspend fun saveUserBillingData(
         name: String,
         login: String,
