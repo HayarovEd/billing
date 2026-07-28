@@ -12,8 +12,8 @@
       "filters": [],
       "attributes": [],
       "versionCode": 1,
-      "versionName": "0.002",
-      "outputFile": "Billing_0.002-release.apk"
+      "versionName": "0.004",
+      "outputFile": "Billing_0.004-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/Billing_0.002-release.dm"
+        "baselineProfiles/1/Billing_0.004-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/Billing_0.002-release.dm"
+        "baselineProfiles/0/Billing_0.004-release.dm"
       ]
     }
   ],

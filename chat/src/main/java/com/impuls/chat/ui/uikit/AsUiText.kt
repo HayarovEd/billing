@@ -1,7 +1,6 @@
 package com.impuls.chat.ui.uikit
 
-import com.impuls.billing.ui.uikit.UiText
-import com.impuls.billing.ui.uikit.UiText.*
+import com.impuls.chat.ui.uikit.UiText.*
 import com.impuls.chat.R
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork

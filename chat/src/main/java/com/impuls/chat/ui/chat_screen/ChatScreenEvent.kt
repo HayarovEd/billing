@@ -1,7 +1,7 @@
 package com.impuls.chat.ui.chat_screen
 
 import android.net.Uri
-import com.impuls.billing.ui.uikit.UiText
+import com.impuls.chat.ui.uikit.UiText
 import com.impuls.chat.domain.model.MimeTypes
 
 sealed interface ChatScreenEvent {

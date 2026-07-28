@@ -1,0 +1,7 @@
+- `[x]` Update package declaration in `chat/UiText.kt`
+- `[x]` Update imports in `chat/AsUiText.kt`
+- `[x]` Update imports in `chat/ChatScreenEvent.kt`
+- `[x]` Update imports in `chat/MainScreenEvent.kt`
+- `[x]` Fix unresolved references in `chat/AsUiText.kt`
+- `[x]` Update `compileSdk` in `:download_install` to 37
+- `[x]` Verify build with `./gradlew :app:assembleRelease`

@@ -1,4 +1,4 @@
-package com.impuls.billing.ui.uikit
+package com.impuls.chat.ui.uikit
 
 import android.content.Context
 import androidx.annotation.StringRes
