@@ -166,7 +166,7 @@ class ProfileScreenViewModel(
                 }
 
                 is ProfileScreenAction.FcmMessage -> {
-                    handleIntent(action.fcmMessageData)
+                    handleIntent(action.pushMessageData)
                 }
             }
         }

@@ -23,7 +23,6 @@ class BillingApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        PushInitializer.init(applicationContext)
         startKoin {
             androidLogger()
             androidContext(this@BillingApp)
@@ -37,5 +36,6 @@ class BillingApp : Application(), Configuration.Provider {
             )
             workManagerFactory()
         }
+        PushInitializer.init(applicationContext)
     }
 }
