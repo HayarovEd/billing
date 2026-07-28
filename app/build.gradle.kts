@@ -7,7 +7,7 @@ plugins {
 
 val appId = "com.impuls.billing"
 val vCode = 1
-val vName = "0.003"
+val vName = "0.004"
 
 android {
     namespace = appId
