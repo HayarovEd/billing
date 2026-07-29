@@ -1,30 +1,33 @@
-# Walkthrough - Resolved Duplicate Type Conflict
+# Walkthrough - Enhanced `download_install` Module
 
-I have resolved the DEX merging error where `UiText$DynamicString` was defined multiple times. The root cause was the `:chat` library module using the same package name as the `:app` module for the `UiText` class.
+I have significantly improved the `download_install` library module by adding storage safety checks, better permission handling, and increased resilience for background updates.
 
-## Changes Made
+## Key Improvements
 
-### `:chat` Library Module
+### Storage Safety & Cleanup
 
-#### [UiText.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/uikit/UiText.kt)
-- Changed the package declaration from `com.impuls.billing.ui.uikit` to `com.impuls.chat.ui.uikit` to match its location and avoid collisions with the `:app` module.
+#### [DownloadRepositoryImpl.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/downloader/DownloadRepositoryImpl.kt) & [DownloadUpdateWorker.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/worker/DownloadUpdateWorker.kt)
+- **Space Verification**: Added `checkAvailableSpace` which uses `StatFs` to ensure there is enough free storage (including a 20MB safety buffer) before starting a download.
+- **Artifact Cleanup**: Implemented `cleanupOldApks` to automatically delete older APK files from the cache directory, preventing storage bloat.
+- **Progress Throttling**: In-app download progress now only emits updates when the percentage integer changes, significantly reducing UI redraws.
 
-#### [AsUiText.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/uikit/AsUiText.kt)
-- Updated imports to use the local `UiText` and its nested classes (`DynamicString`, `StringResource`).
+### Installer & Permission Handling
 
-#### [ChatScreenEvent.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/chat_screen/ChatScreenEvent.kt) & [MainScreenEvent.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/main_screen/MainScreenEvent.kt)
-- Updated imports to reference the correct `UiText` class in `com.impuls.chat.ui.uikit`.
+#### [Installer.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/installer/Installer.kt) & [InstallerImpl.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/installer/InstallerImpl.kt)
+- **Modern Permission Check**: Added `canRequestPackageInstalls()` to the interface to support checking the "Install Unknown Apps" permission on Android 8.0+ (Oreo).
+- **Robust Error Handling**: Added try-catch blocks and more descriptive logging to the installation process to help debug issues with `FileProvider` or intent flags.
 
-### `:download_install` Library Module
+### Resilience & Configuration
 
-#### [build.gradle.kts](file:///D:/studio_progects/billing/download_install/build.gradle.kts)
-- Updated `compileSdk` to 37 to resolve a metadata check failure where dependencies required a newer API version than the library was targeting.
+#### [DownloadProvider.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/DownloadProvider.kt)
+- **Unified Channels**: Standardized notification channel IDs across the provider and the background worker.
+- **Safer Defaults**: The default notification builder now provides a cleaner configuration (`setOngoing(false)`, `setAutoCancel(true)`) and uses the correct localized channel name.
 
 ## Verification Results
 
 ### Automated Tests
-- Ran `./gradlew :app:assembleRelease` successfully.
-- Verified that all modules compile correctly with the new package structure.
+- Successfully compiled all modules with `:app:assembleDebug`.
+- Verified that the new logic respects the `minSdk 24` constraint.
 
-> [!NOTE]
-> The project now correctly separates UI utilities between modules, preventing future DEX conflicts when these modules are combined in the final APK.
+> [!TIP]
+> To use the new permission check in your UI, you can now call `installer.canRequestPackageInstalls()` before attempting an update to guide the user to their device settings if needed.

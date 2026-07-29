@@ -1,29 +1,48 @@
-# Implementation Plan - Fix Duplicate Type Error
+# Implementation Plan - `download_install` Module Enhancements
 
-Fix the "Type com.impuls.billing.ui.uikit.UiText$DynamicString is defined multiple times" error by correcting the package declaration in the `:chat` module and updating its internal references.
+Improve the reliability, safety, and modern Android integration of the `download_install` library module.
 
 ## Proposed Changes
 
-### `:chat` module
+### 1. Storage Safety & Cleanup
+Add checks to ensure the device has enough space and clean up old artifacts.
 
-The `UiText.kt` file in the `:chat` library currently uses the `com.impuls.billing.ui.uikit` package, which belongs to the `:app` module. Since `:app` depends on `:chat`, this causes a collision during DEX merging.
+#### [MODIFY] [DownloadRepositoryImpl.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/downloader/DownloadRepositoryImpl.kt)
+- Add `checkAvailableSpace(bytes: Long): Boolean` helper.
+- In `downloadFile`, delete existing files in the download directory before starting.
+- Implement progress throttling (e.g., only emit if percentage changed) to reduce UI overhead.
 
-#### [MODIFY] [UiText.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/uikit/UiText.kt)
-- Change package declaration from `com.impuls.billing.ui.uikit` to `com.impuls.chat.ui.uikit`.
+### 2. Installer & Permission Handling
+Improve the installation flow by handling modern Android requirements.
 
-#### [MODIFY] [AsUiText.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/uikit/AsUiText.kt)
-- Remove imports of `com.impuls.billing.ui.uikit.UiText` as it should now use the local one in the same package.
+#### [MODIFY] [Installer.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/installer/Installer.kt) & [InstallerImpl.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/installer/InstallerImpl.kt)
+- Add `canRequestPackageInstalls(): Boolean` to the interface.
+- Implement the check using `packageManager.canRequestPackageInstalls()` for API 26+.
+- Update `installAPK` to log more descriptive errors or return a result.
 
-#### [MODIFY] [ChatScreenEvent.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/chat_screen/ChatScreenEvent.kt)
-- Update import from `com.impuls.billing.ui.uikit.UiText` to `com.impuls.chat.ui.uikit.UiText`.
+### 3. Resilience & Configuration
+Improve network reliability.
 
-#### [MODIFY] [MainScreenEvent.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/main_screen/MainScreenEvent.kt)
-- Update import from `com.impuls.billing.ui.uikit.UiText` to `com.impuls.chat.ui.uikit.UiText`.
+#### [MODIFY] [DownloadProvider.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/DownloadProvider.kt)
+- Provide a default `HttpClient` configuration with timeouts (Connect/Request/Socket) and retry capabilities if not provided by the app.
+
+### 4. Code Quality & UX
+Cleanup and consistency.
+
+#### [MODIFY] [DownloadUpdateWorker.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/worker/DownloadUpdateWorker.kt)
+- Add a check for available space before starting the download.
+- Ensure `Toast` doesn't crash if the worker is cancelled.
+
+#### [MODIFY] [InstallerImpl.kt](file:///D:/studio_progects/billing/download_install/src/main/java/com/edurda77/download_install/installer/InstallerImpl.kt)
+- Use a consistent `FileProvider` authority string.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew :app:assembleRelease` to verify that the DEX merging conflict is resolved and the project builds successfully.
+- Run existing unit tests for the module.
+- Add a unit test for the `checkAvailableSpace` logic.
 
 ### Manual Verification
-- None required beyond successful build.
+- Test `in-app` update: observe smooth progress bar movement.
+- Test `background` update: verify that old APKs are deleted from cache.
+- Test on Android 10+: verify permission check works (simulated by revoking permission).

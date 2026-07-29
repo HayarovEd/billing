@@ -9,4 +9,5 @@
     <string name="unknown_version">Не удалось определить версию приложения</string>
     <string name="unknown">Неизвестная ошибка</string>
     <string name="update_downloaded">Обновление загружено</string>
+    <string name="download_finished">Загрузка окончена</string>
 </resources>

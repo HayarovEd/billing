@@ -1,6 +1,7 @@
 package com.edurda77.download_install.downloader
 
 import android.app.Application
+import android.os.StatFs
 import com.edurda77.download_install.downloader.remote.VersionResponse
 import com.edurda77.download_install.model.LastVersionApp
 import com.edurda77.download_install.utils.DownloadDataError
@@ -75,21 +76,35 @@ internal class DownloadRepositoryImpl(
         downloadedFileName: String,
     ): Flow<DownloadStatus> {
         return callbackFlow {
-            val apkFilePath =
-                application.pathToDownloadFile(downloadedFileName)
+            val apkFilePath = application.pathToDownloadFile(downloadedFileName)
+            val file = File(apkFilePath)
+            
             try {
+                cleanupOldApks(downloadedFileName)
                 send(DownloadStatus.Started)
-                val response = httpClient.get(url/*"${DOWNLOAD_URL}file"*/) {
+                
+                var lastEmittedProgress = -1
+                
+                val response = httpClient.get(url) {
                     contentType(ContentType.Application.Json)
                     onDownload { bytesSentTotal, contentLength ->
                         contentLength?.let {
-                            send(DownloadStatus.InProgress((bytesSentTotal*100/contentLength).toInt()))
+                            if (!checkAvailableSpace(contentLength)) {
+                                trySend(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
+                                // Note: We can't easily cancel the Ktor call here without more architecture
+                                return@onDownload
+                            }
+                            
+                            val progress = (bytesSentTotal * 100 / contentLength).toInt()
+                            if (progress > lastEmittedProgress) {
+                                lastEmittedProgress = progress
+                                trySend(DownloadStatus.InProgress(progress))
+                            }
                         }
                     }
                 }
+                
                 if (response.status.isSuccess()) {
-                    val file =
-                        File(apkFilePath)
                     response.bodyAsChannel().copyAndClose(file.writeChannel())
                     send(DownloadStatus.Success)
                 } else {
@@ -99,6 +114,30 @@ internal class DownloadRepositoryImpl(
             } catch (e: Exception) {
                 send(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
             }
+        }
+    }
+
+    private fun checkAvailableSpace(requiredBytes: Long): Boolean {
+        val path = application.externalCacheDir?.absolutePath ?: application.cacheDir.absolutePath
+        return try {
+            val stat = StatFs(path)
+            val availableBytes = stat.availableBlocksLong * stat.blockSizeLong
+            availableBytes > requiredBytes + (20 * 1024 * 1024) // 20MB safety buffer
+        } catch (e: Exception) {
+            true // Fallback to true if we can't check
+        }
+    }
+
+    private fun cleanupOldApks(currentFileName: String) {
+        try {
+            val dir = application.externalCacheDir ?: application.cacheDir
+            dir.listFiles()?.forEach { file ->
+                if (file.name.endsWith(".apk") && file.name != currentFileName) {
+                    file.delete()
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore cleanup errors
         }
     }
 }

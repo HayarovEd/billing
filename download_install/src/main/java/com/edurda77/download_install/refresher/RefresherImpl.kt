@@ -16,12 +16,11 @@ import com.edurda77.download_install.utils.FILE_URL
 import com.edurda77.download_install.utils.KEY_PROGRESS
 import com.edurda77.download_install.utils.ResultDownloadWork
 import com.edurda77.download_install.worker.DownloadUpdateWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 internal class RefresherImpl(
     private val application: Application,
@@ -83,12 +82,13 @@ internal class RefresherImpl(
                 .build()
             val workManager = WorkManager.getInstance(application)
             workManager.enqueueUniqueWork(
-                "UpdateDownloadWork_${System.currentTimeMillis()}",
-                ExistingWorkPolicy.KEEP,
+                "UpdateDownloadWork",
+                ExistingWorkPolicy.REPLACE,
                 workerRequest
             )
-            withContext(Dispatchers.Main) {
-                workManager.getWorkInfoByIdLiveData(workerRequest.id).observeForever {
+            
+            launch {
+                workManager.getWorkInfoByIdFlow(workerRequest.id).collect { it ->
                     when (it?.state) {
                         WorkInfo.State.RUNNING -> {
                             val progress = it.progress.getInt(KEY_PROGRESS, 0)
@@ -98,15 +98,20 @@ internal class RefresherImpl(
                         WorkInfo.State.SUCCEEDED -> {
                             installer.installAPK(downloadedFileName)
                             trySend(DownloadStatus.Success)
-                        }
-                        WorkInfo.State.FAILED -> {
-                          //  val error = it.progress.getString(KEY_ERROR)
-                            trySend(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
+                            close()
                         }
 
-                        else -> {
-                            trySend(DownloadStatus.Error(DownloadDataError.Network.UNKNOWN))
+                        WorkInfo.State.FAILED -> {
+                            trySend(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
+                            close()
                         }
+
+                        WorkInfo.State.CANCELLED -> {
+                            trySend(DownloadStatus.Error(DownloadDataError.Network.UNKNOWN))
+                            close()
+                        }
+
+                        else -> Unit
                     }
                 }
             }
