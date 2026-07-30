@@ -22,10 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +35,6 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.domain.model.payment.ResultCheck
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
-import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.openSbpUrl
 import org.koin.androidx.compose.koinViewModel
 
@@ -286,20 +283,13 @@ private fun Preview() {
                 ),
                 companyPayment = CompanyPayment(
                     amountMode = "pay_amount",
-                    bankAccount = "40702810604000000852",
-                    bic = "40702810604000000852",
-                    comissions = emptyList(),
+                    commissions = emptyList(),
                     currency = "RUB",
                     dynCom = "OFFLINE",
-                    inn = "5903061324",
-                    kpp = "590301001",
-                    logoUrl = "",
-                    maskDtos = emptyList(),
+                    masks = emptyList(),
                     multiCurrency = false,
                     name = "НПО ЦОДИТ, Телинт, Инновационный центр Верхнекамья, НПО Импульс",
                     offline = false,
-                    orgCode = 16915,
-                    orgName = "ООО НАУЧНО-ПРОИЗВОДСТВЕННОЕ ОБЪЕДИНЕНИЕ ИМПУЛЬС",
                     pfAds = "{\"success\":{\"link\":\"https://share.flocktory.com/exchange/login?ssid=5092&bid=14416\",\"logoMob\":\"floctory/flocktory_mob.svg\",\"logoWeb\":\"floctory/flocktory_web.svg\"}}",
                     readOnlyAmount = false,
                     receivingCurrency = "RUB",
