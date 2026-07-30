@@ -39,17 +39,19 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 
 class AccountRepositoryImpl(
     private val client: HttpClient,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AccountRepository {
     override suspend fun getClientAccount(
         token: String
     ): ResultWork<ClientAccount, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("account/") {
@@ -68,7 +70,7 @@ class AccountRepositoryImpl(
         uid: Long,
         phone: String
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/clientMobilePhone") {
@@ -91,7 +93,7 @@ class AccountRepositoryImpl(
 
 
     override suspend fun validateClientMobileNumber(token: String): ResultWork<Long, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/validationClientMobileNumber") {
@@ -110,7 +112,7 @@ class AccountRepositoryImpl(
         id: Long,
         code: String,
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/confirmationClientMobileNumber") {
@@ -136,7 +138,7 @@ class AccountRepositoryImpl(
         uid: Long,
         email: String
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/clientEmail") {
@@ -159,7 +161,7 @@ class AccountRepositoryImpl(
 
 
     override suspend fun validateClientEmail(token: String): ResultWork<Long, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/validationClientEmail") {
@@ -178,7 +180,7 @@ class AccountRepositoryImpl(
         id: Long,
         code: String,
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/confirmationClientEmail") {
@@ -204,7 +206,7 @@ class AccountRepositoryImpl(
         agrmId: Long?,
         vgId: Long?,
     ): ResultWork<List<ClientVroup>, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("account/vgroup") {
@@ -228,7 +230,7 @@ class AccountRepositoryImpl(
     override suspend fun getClientInfo(
         token: String
     ): ResultWork<ClientInfo, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("account/info") {
@@ -247,7 +249,7 @@ class AccountRepositoryImpl(
         token: String,
         userid: Long,
     ): ResultWork<ClientNotices, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("account/notices") {
@@ -267,7 +269,7 @@ class AccountRepositoryImpl(
         token: String,
         clientNotices: ClientNotices,
     ): ResultWork<Long, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/notices") {
@@ -303,7 +305,7 @@ class AccountRepositoryImpl(
         oldPassword: String,
         newPassword: String,
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.post("account/password") {
@@ -327,7 +329,7 @@ class AccountRepositoryImpl(
     override suspend fun logOut(
         token: String,
     ): ResultWork<Boolean, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.delete("account/logout") {
@@ -346,7 +348,7 @@ class AccountRepositoryImpl(
         token: String,
         vgId: Long,
     ): ResultWork<String, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("account/vgroupPassword") {
@@ -366,7 +368,7 @@ class AccountRepositoryImpl(
         token: String,
         dateFrom: LocalDate?,
     ): ResultWork<List<SharedPost>, DataError> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             handleResponse(
                 request = {
                     client.get("post") {
