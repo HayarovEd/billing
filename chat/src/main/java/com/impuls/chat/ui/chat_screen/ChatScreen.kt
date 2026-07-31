@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,8 +102,6 @@ fun ChatScreenRoot(
         }
     }
 
-    var isShowScrollArrow by remember { mutableStateOf(false) }
-
     fun onAttachFile() {
         filePickerLauncher.launch("*/*")
     }
@@ -148,14 +147,10 @@ fun ChatScreenRoot(
     ChatScreen(
         state = state,
         snackbarHostState = snackBarState,
-        isShowScrollArrow = isShowScrollArrow,
         onAction = viewModel::onAction,
         onAttachFile = ::onAttachFile,
         onAttachImage = ::onAttachImage,
-        onAttachCamera = ::onAttachCamera,
-        updateShowScrollArrow = {
-            isShowScrollArrow = it
-        }
+        onAttachCamera = ::onAttachCamera
     )
 }
 
@@ -164,13 +159,11 @@ fun ChatScreenRoot(
 private fun ChatScreen(
     modifier: Modifier = Modifier,
     state: ChatScreenState,
-    isShowScrollArrow: Boolean,
     snackbarHostState: SnackbarHostState,
     onAction: (ChatScreenAction) -> Unit,
     onAttachFile: () -> Unit,
     onAttachImage: () -> Unit,
     onAttachCamera: () -> Unit,
-    updateShowScrollArrow: (Boolean) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -180,9 +173,13 @@ private fun ChatScreen(
         allMessagesFlat.find { it.isSupport && it.statusMessage != StatusMessage.READED }
     }
     val scope = rememberCoroutineScope()
-    LaunchedEffect(listState.canScrollForward) {
-        updateShowScrollArrow(listState.canScrollForward)
+
+    val isShowScrollArrow by remember {
+        derivedStateOf {
+            listState.canScrollForward
+        }
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -246,7 +243,10 @@ private fun ChatScreen(
                     size = 48.dp,
                     onClick = {
                         scope.launch {
-                            listState.scrollToItem(state.allMessages.size+allMessagesFlat.size)
+                            val totalItemsCount = state.allMessages.size + allMessagesFlat.size
+                            if (totalItemsCount > 0) {
+                                listState.animateScrollToItem(totalItemsCount - 1)
+                            }
                         }
                     }
                 )
@@ -277,37 +277,49 @@ private fun MessageList(
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit
 ) {
-
     val monthRes = stringArrayResource(R.array.month)
+    var initialScrollDone by rememberSaveable { mutableStateOf(false) }
+    var lastMessageCount by remember { mutableStateOf(allMessagesFlat.size) }
 
-    // Ищем первое непрочитанное сообщение от поддержки
-
-
-    LaunchedEffect(messages) {
+    LaunchedEffect(allMessagesFlat) {
+        val newMessagesCount = allMessagesFlat.size
+        val isNewMessageAdded = newMessagesCount > lastMessageCount
+        
         if (messages.isNotEmpty()) {
-            if (firstUnreadSupportMsg != null) {
-                var itemPosition = 0
-                run loop@{
-                    messages.forEach { (_, msgsInDate) ->
-                        itemPosition++ // заголовок даты
-                        msgsInDate.forEach { msg ->
-                            if (msg.id == firstUnreadSupportMsg.id) {
-                                // Если это то самое сообщение, скроллим к разделителю (позиция itemPosition)
-                                // или к самому сообщению (itemPosition + 1)
-                                return@loop
+            if (!initialScrollDone) {
+                // Initial scroll to first unread or bottom
+                if (firstUnreadSupportMsg != null) {
+                    var itemPosition = 0
+                    run loop@{
+                        messages.forEach { (_, msgsInDate) ->
+                            itemPosition++ // date header
+                            msgsInDate.forEach { msg ->
+                                if (msg.id == firstUnreadSupportMsg.id) return@loop
+                                itemPosition++
                             }
-                            itemPosition++
                         }
                     }
+                    listState.scrollToItem(itemPosition)
+                } else {
+                    val totalItemsCount = messages.size + allMessagesFlat.size
+                    if (totalItemsCount > 0) {
+                        listState.scrollToItem(totalItemsCount - 1)
+                    }
                 }
-                listState.scrollToItem(itemPosition)
-            } else {
+                initialScrollDone = true
+            } else if (isNewMessageAdded) {
+                // Smart autoscroll for new messages
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
                 val totalItemsCount = messages.size + allMessagesFlat.size
-                if (totalItemsCount > 0) {
-                    listState.scrollToItem(totalItemsCount - 1)
+                val isNearBottom = lastVisibleItem >= totalItemsCount - 3
+                val isMyMessage = allMessagesFlat.lastOrNull()?.isSupport == false
+
+                if (isNearBottom || isMyMessage) {
+                    listState.animateScrollToItem(totalItemsCount - 1)
                 }
             }
         }
+        lastMessageCount = newMessagesCount
     }
 
     LazyColumn(
@@ -377,12 +389,10 @@ private fun Preview() {
             chat = null
         ),
         snackbarHostState = snackBarState,
-        isShowScrollArrow = true,
         onAction = {},
         onAttachFile = {},
         onAttachImage = {},
-        onAttachCamera = {},
-        updateShowScrollArrow = {}
+        onAttachCamera = {}
     )
 }
 
@@ -461,9 +471,6 @@ private fun ChatWithMessagesPreview() {
         onAction = {},
         onAttachFile = {},
         onAttachImage = {},
-        onAttachCamera = {},
-        updateShowScrollArrow = {},
-        isShowScrollArrow = false
+        onAttachCamera = {}
     )
 }
-

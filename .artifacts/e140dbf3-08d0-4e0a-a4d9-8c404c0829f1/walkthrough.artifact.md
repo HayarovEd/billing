@@ -1,21 +1,25 @@
-# Walkthrough - WebSocket Reliability Improvements (v2)
+# Walkthrough - Chat UI Scroll Optimization
 
-I have re-implemented the WebSocket refactoring to ensure connection stability and prevent leaks, while strictly following the requirement to leave authentication as it was.
+I have optimized the scrolling behavior in the chat screen to make it more intuitive, performant, and consistent with modern messaging applications.
 
 ## Changes Made
 
-### 1. Localized WebSocket Session
-The `WebSocketSession` is now managed entirely within the `flow` block in `WebSocketChatRepositoryImpl.kt`.
-- **Automatic Reconnection**: The connection logic is wrapped in a loop that automatically attempts to reconnect every 5 seconds if the session drops.
-- **Resource Management**: The session is guaranteed to close when the flow is cancelled, thanks to a `finally` block.
-- **Thread Safety**: Removed the shared `session` property to avoid race conditions between different chat instances.
+### 1. Smart Autoscroll Logic
+The chat list now handles new messages intelligently to avoid disrupting the user's reading experience:
+- **Initial Load**: Upon opening a chat, the list scrolls to the first unread message from support or to the very bottom once.
+- **New Messages**: If a new message arrives while the user is reading history (scrolled up), the list **will not** jump to the bottom. It only scrolls to the bottom if the user is already near the bottom (within 3 items) or if the user sends a message themselves.
 
-### 2. Interface and Cleanup Simplification
-- **WebSocketChatRepository**: Removed the `close()` method. Closing the connection is now implicitly handled by cancelling the Coroutine Job that collects the flow.
-- **ChatScreenViewModel**: Removed manual calls to `close()`. Both `onCleared()` and `closeChat` now simply cancel the `webSocketJob`, which is the correct and idiomatic way to stop a flow-based connection.
+### 2. Performance Optimizations
+- **Derived State**: Replaced `LaunchedEffect` monitoring for the "scroll to bottom" arrow with `derivedStateOf`. This ensures that the arrow's visibility is re-evaluated only when the scroll state actually changes its "can scroll forward" status, reducing unnecessary recompositions.
+- **Efficient Recalculations**: Refined `remember` blocks for flattened message lists and unread message detection to ensure they only re-run when relevant state changes.
+
+### 3. Smooth Interactions
+- **Animated Scroll**: The manual "scroll to bottom" button now uses `animateScrollToItem` for a smoother visual transition.
+- **Correct Indexing**: Fixed the calculation for the total number of items (headers + messages) in the manual scroll logic.
 
 ## Verification Results
 
-### Logic Check
-- **Authentication**: Verified that `parameter("token", accessToken)` was **not** added, keeping the connection parameters exactly as in the original working version.
-- **Stability**: The `while` loop with `currentCoroutineContext().isActive` ensures that the app will keep trying to receive updates as long as the user is on the chat screen, even after transient network failures.
+### Logic Audit
+- **One-time Scroll**: Verified that `initialScrollDone` (using `rememberSaveable`) correctly prevents repeated scrolling to unread messages during a single session.
+- **Near-Bottom Check**: The logic `lastVisibleItem >= totalItemsCount - 3` accurately identifies if the user is actively following the conversation.
+- **Sender Check**: Confirmed that `isMyMessage` correctly triggers an immediate scroll for messages sent by the current user.

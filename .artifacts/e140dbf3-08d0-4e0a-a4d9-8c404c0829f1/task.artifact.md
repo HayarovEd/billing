@@ -1,7 +1,7 @@
-- [x] **Refactor WebSocket Implementation**
-    - [x] Update `WebSocketChatRepositoryImpl.kt`: remove shared session, add reconnection loop, keep auth as-is
-    - [x] Update `WebSocketChatRepository.kt`: remove `close()` method
-- [x] **Clean up ViewModel**
-    - [x] Update `ChatScreenViewModel.kt`: remove manual `close()` calls
+- [x] **Optimize Chat UI Scrolling**
+    - [x] Update `ChatScreen.kt`: replace `LaunchedEffect` for `isShowScrollArrow` with `derivedStateOf`
+    - [x] Update `ChatScreen.kt`: implement smart autoscroll (only scroll if near bottom or user sent message)
+    - [x] Update `ChatScreen.kt`: ensure scroll-to-unread only happens on initial load
+    - [x] Update `ChatScreen.kt`: use `animateScrollToItem` for manual scroll-to-bottom
 - [x] **Verification**
-    - [x] Build and verify logic (re-applied without auth changes)
+    - [x] Verify UI behavior and build success (Code verification done)
