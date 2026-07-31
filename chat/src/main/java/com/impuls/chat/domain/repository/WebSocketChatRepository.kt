@@ -10,6 +10,4 @@ interface WebSocketChatRepository {
         accessToken: String,
         chatId: String
     ): Flow<ResultWork<WebSocketChatMessage, ChatDataError.WebSocketErrorChat>>
-
-    suspend fun close()
 }

@@ -232,7 +232,6 @@ class ChatScreenViewModel(
 
     private suspend fun closeChat() {
         webSocketJob?.cancel()
-        webSocketChatRepository.close()
         eventChannel.send(NavigateToLogin)
     }
 
@@ -368,8 +367,5 @@ class ChatScreenViewModel(
     override fun onCleared() {
         super.onCleared()
         webSocketJob?.cancel()
-        viewModelScope.launch {
-            webSocketChatRepository.close()
-        }
     }
 }

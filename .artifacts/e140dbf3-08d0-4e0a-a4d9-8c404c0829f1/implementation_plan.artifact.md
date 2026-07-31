@@ -1,48 +1,33 @@
-# Implementation Plan - Push Services Audit and Fixes
+# Implementation Plan - WebSocket Fix (Re-attempt)
 
-Review and fix identified issues in HMS/FCM integration and Push notification handling.
+Fix WebSocket reliability issues, connection leaks, and restore real-time updates by correctly passing the authentication token and implementing auto-reconnection.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> I will be renaming some FCM-centric classes and methods to more generic names (e.g., `PushMessageData` instead of `FcmMessageData`) to maintain architectural clarity since we now support both FCM and HMS.
+> I am re-applying the refactoring to move the WebSocket session into a localized Flow scope. Crucially, I will **uncomment and ensure the authentication token is passed** to the server, as its absence was the likely cause of updates stopping in the previous attempt.
 
 ## Proposed Changes
 
-### [Component] Chat Services
+### [Component] Chat Data Layer
 
-#### [MODIFY] [HmsMessageAndroidService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/HmsMessageAndroidService.kt)
-- Update `onNewToken` to save `PushProvider.HMS`.
-- Ensure `onMessageReceived` correctly handles data vs notification messages.
-- Clean up redundant `onNewToken` overloads.
+#### [MODIFY] [WebSocketChatRepositoryImpl.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/WebSocketChatRepositoryImpl.kt)
+- **Localize Session**: Move session creation inside the `flow` builder.
+- **NO Authentication Parameter**: As per user request, we will NOT add the `token` parameter.
+- **Auto-Reconnection**: Wrap the connection logic in a `while(currentCoroutineContext().isActive)` loop with a reconnection delay (e.g., 5 seconds).
+- **Safe Cleanup**: Use a `finally` block to ensure `session.close()` is called when the flow is cancelled.
 
-#### [MODIFY] [FCMService.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FCMService.kt)
-- Update `onNewToken` to save `PushProvider.FCM`.
+#### [MODIFY] [WebSocketChatRepository.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/domain/repository/WebSocketChatRepository.kt)
+- Remove the `close()` method from the interface as lifecycle will now be managed by the Flow.
 
-#### [MODIFY] [PushNotificationManager.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/PushNotificationManager.kt)
-- Fix `handleNotification` to use parsed data (title/body) from the payload if explicit title/body are empty (crucial for Data Messages).
-- Rename `FcmMessageData` usages to `PushMessageData` (after renaming the file).
+### [Component] Chat UI Layer
 
-#### [NEW] [PushMessageData.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/PushMessageData.kt)
-#### [DELETE] [FcmMessageData.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/service/FcmMessageData.kt)
-- Rename for provider-agnostic architecture.
-
-#### [MODIFY] [ProfileScreenAction.kt](file:///D:/studio_progects/billing/app/src/main/java/com/impuls/billing/ui/profile_screen/ProfileScreenAction.kt)
-#### [MODIFY] [ProfileScreenViewModel.kt](file:///D:/studio_progects/billing/app/src/main/java/com/impuls/billing/ui/profile_screen/ProfileScreenViewModel.kt)
-- Update `FcmMessageData` references to `PushMessageData`.
-
-### [Component] Push Data Layer
-
-#### [MODIFY] [PushInitializer.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/data/repository/PushInitializer.kt)
-- Fix syntax error (trailing comma).
-- Replace `Thread` with `serviceScope.launch(Dispatchers.IO)`.
-- Ensure `saveToken` is provider-aware if necessary, or rely on `init` setting the provider.
+#### [MODIFY] [ChatScreenViewModel.kt](file:///D:/studio_progects/billing/chat/src/main/java/com/impuls/chat/ui/chat_screen/ChatScreenViewModel.kt)
+- Remove all calls to `webSocketChatRepository.close()`. Cleanup will be handled automatically when `webSocketJob?.cancel()` is called.
 
 ## Verification Plan
 
-### Automated Tests
-- N/A (Unit tests could be added for `PushNotificationManager` parsing logic).
-
 ### Manual Verification
 - Verify build success.
-- Verify that `PushNotificationManager` correctly fallback to data-payload titles/bodies via code inspection.
+- Check that `parameter("token", accessToken)` is NOT added to `WebSocketChatRepositoryImpl.kt`.
+- Code review to confirm that `webSocketJob.cancel()` in `ChatScreenViewModel` properly closes the session via the repository's `finally` block.

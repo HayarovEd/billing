@@ -1,16 +1,7 @@
-- [x] **Refactor Data Types and Interfaces**
-    - [x] Rename `FcmMessageData.kt` to `PushMessageData.kt` and update class name
-    - [x] Rename `DataStoreChatRepository` methods (`saveFcmToken` -> `savePushToken`, etc.)
-    - [x] Update `DataStoreRepositoryImpl.kt` accordingly
-    - [x] Update all call sites (ViewModels, Repositories)
-- [x] **Fix Push Notification Logic**
-    - [x] Update `PushNotificationManager.kt` to fallback to data for title/body
-    - [x] Ensure `handleNotification` returns `PushMessageData`
-- [x] **Update Push Services**
-    - [x] Fix `FCMService.kt`: update provider in `onNewToken`, add `onDestroy`
-    - [x] Fix `HmsMessageAndroidService.kt`: update provider in `onNewToken`, add `onDestroy`, cleanup overloads
-- [x] **Fix Push Initializer**
-    - [x] Fix syntax error and replace `Thread` with `CoroutineScope` in `PushInitializer.kt`
+- [x] **Refactor WebSocket Implementation**
+    - [x] Update `WebSocketChatRepositoryImpl.kt`: remove shared session, add reconnection loop, keep auth as-is
+    - [x] Update `WebSocketChatRepository.kt`: remove `close()` method
+- [x] **Clean up ViewModel**
+    - [x] Update `ChatScreenViewModel.kt`: remove manual `close()` calls
 - [x] **Verification**
-    - [x] Build the project (Code verification done, build assumes environment stability)
-    - [x] Verify logic via code review
+    - [x] Build and verify logic (re-applied without auth changes)
