@@ -39,7 +39,7 @@ class FCMService : FirebaseMessagingService(), KoinComponent {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        
+
         PushNotificationManager.handleNotification(
             defaultHeader = resources.getString(com.impuls.chat.R.string.new_message),
             title = message.notification?.title ?: "",

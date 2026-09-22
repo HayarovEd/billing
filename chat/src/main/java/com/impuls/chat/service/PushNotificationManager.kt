@@ -2,6 +2,7 @@ package com.impuls.chat.service
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import com.impuls.chat.domain.repository.NotificationRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -29,7 +30,6 @@ object PushNotificationManager : KoinComponent {
         body: String
     ): PushMessageData {
         val parsedData = parseMap(data, defaultHeader)
-        
         // Fallback for Data Messages if title/body are empty
         val finalTitle = title.ifEmpty { parsedData.title }
         val finalBody = body.ifEmpty { parsedData.body }

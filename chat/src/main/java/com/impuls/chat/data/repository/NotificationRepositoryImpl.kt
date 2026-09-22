@@ -21,6 +21,7 @@ internal class NotificationRepositoryImpl(
     companion object {
         private const val CHANNEL_ID = "chat_notifications"
         private const val CHANNEL_NAME = "Chat Notifications"
+        private const val DEFAULT_NOTIFICATION_ID = 0
     }
 
     init {
@@ -61,14 +62,15 @@ internal class NotificationRepositoryImpl(
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 
-        val pendingIntent = if (intent != null) {
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            PendingIntent.getActivity(context, chatId?.hashCode() ?: 0, intent, flags)
-        } else null
+        val notificationId = chatId?.hashCode() ?: DEFAULT_NOTIFICATION_ID
+        val requestCode = chatId?.hashCode() ?: DEFAULT_NOTIFICATION_ID
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(context.applicationInfo.icon)
@@ -76,10 +78,10 @@ internal class NotificationRepositoryImpl(
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(true) // не звонить повторно при дублях
             .setContentIntent(pendingIntent)
             .build()
 
-        val notificationId = chatId?.hashCode() ?: System.currentTimeMillis().toInt()
         notificationManager.notify(notificationId, notification)
     }
 }
