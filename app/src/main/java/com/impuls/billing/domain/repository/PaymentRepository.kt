@@ -1,0 +1,59 @@
+package com.impuls.billing.domain.repository
+
+import com.impuls.billing.domain.model.payment.CheckPaymentStatus
+import com.impuls.billing.domain.model.payment.CompanyPayment
+import com.impuls.billing.domain.model.payment.ImageData
+import com.impuls.billing.domain.model.payment.PaymentCard
+import com.impuls.billing.domain.model.payment.PaymentSber
+import com.impuls.billing.domain.model.payment.PaymentSbp
+import com.impuls.billing.domain.model.payment.ResultCheck
+import com.impuls.billing.domain.utils.DataError
+import com.impuls.billing.domain.utils.ResultWork
+
+interface PaymentRepository {
+    suspend fun loadPaymentData(providerNumber: String): ResultWork<CompanyPayment, DataError>
+    suspend fun loadLogoUrl(
+        category: String,
+        service: String
+    ): ResultWork<ImageData, DataError>
+    suspend fun checkAccount(
+        providerNumber: String,
+        number: String
+    ): ResultWork<ResultCheck, DataError>
+    suspend fun payCard(
+        providerNumber: String,
+        amount: Int,
+        comission: Int = 0,
+        greenZone: Boolean = false,
+        offline: Boolean = false,
+        payCurrency: String = "RUB",
+        type: String = "NEW_CARD",
+        ledgerAccount: String
+    ): ResultWork<PaymentCard, DataError>
+
+    suspend fun paySber(
+        providerNumber: String,
+        amount: Int,
+        comission: Int = 0,
+        greenZone: Boolean = false,
+        offline: Boolean = false,
+        payCurrency: String = "RUB",
+        type: String = "SBERPAY",
+        ledgerAccount: String,
+        phone: String
+    ): ResultWork<PaymentSber, DataError>
+
+    suspend fun checkStatusPayment(
+        regPayNum: String
+    ): ResultWork<CheckPaymentStatus, DataError>
+    suspend fun paySbp(
+        providerNumber: String,
+        amount: Int,
+        commission: Int = 0,
+        greenZone: Boolean = false,
+        offline: Boolean = false,
+        payCurrency: String = "RUB",
+        type: String = "SBP",
+        ledgerAccount: String
+    ): ResultWork<PaymentSbp, DataError>
+}

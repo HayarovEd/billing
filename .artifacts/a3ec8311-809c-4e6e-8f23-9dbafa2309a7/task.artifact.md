@@ -1,0 +1,11 @@
+- `[x]` Storage Safety & Cleanup in `DownloadRepositoryImpl.kt`
+    - `[x]` Add space check logic
+    - `[x]` Add cleanup of old APKs
+    - `[x]` Implement progress throttling for in-app updates
+- `[x]` Enhance Installer in `Installer.kt` and `InstallerImpl.kt`
+    - `[x]` Add `canRequestPackageInstalls` check
+    - `[x]` Improve error logging and return types
+- `[x]` Improve Resilience in `DownloadUpdateWorker.kt`
+    - `[x]` Add space check before background download
+    - `[x]` Add basic retry logic or better error handling
+- `[x]` Sync and Verify Build

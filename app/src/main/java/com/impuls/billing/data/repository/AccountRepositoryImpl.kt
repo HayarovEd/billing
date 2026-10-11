@@ -1,0 +1,388 @@
+package com.impuls.billing.data.repository
+
+import com.impuls.billing.data.handler.handleResponse
+import com.impuls.billing.data.mapper.toClientAccount
+import com.impuls.billing.data.mapper.toClientInfo
+import com.impuls.billing.data.mapper.toClientNotices
+import com.impuls.billing.data.mapper.toClientVGroup
+import com.impuls.billing.data.mapper.toSharedPost
+import com.impuls.billing.data.remote.ClientInfoDto
+import com.impuls.billing.data.remote.PasswordDto
+import com.impuls.billing.data.remote.SharedPostDto
+import com.impuls.billing.data.remote.SuccessDto
+import com.impuls.billing.data.remote.SuccessRecordDto
+import com.impuls.billing.data.remote.client_account.ClientAccountResponse
+import com.impuls.billing.data.remote.client_vgroup.ClientVgroupFullResponse
+import com.impuls.billing.data.remote.notices.ClientNoticesDto
+import com.impuls.billing.data.remote.requests.ClientNoticesRequest
+import com.impuls.billing.data.remote.requests.CodeRequest
+import com.impuls.billing.data.remote.requests.EmailRequest
+import com.impuls.billing.data.remote.requests.MobilePhoneRequest
+import com.impuls.billing.data.remote.requests.NoticesRequest
+import com.impuls.billing.data.remote.requests.UpdatePasswordRequest
+import com.impuls.billing.domain.model.ClientAccount
+import com.impuls.billing.domain.model.ClientInfo
+import com.impuls.billing.domain.model.ClientNotices
+import com.impuls.billing.domain.model.ClientVroup
+import com.impuls.billing.domain.model.SharedPost
+import com.impuls.billing.domain.repository.AccountRepository
+import com.impuls.billing.domain.utils.DataError
+import com.impuls.billing.domain.utils.ResultWork
+import com.impuls.billing.domain.utils.toBillingFormat
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
+
+class AccountRepositoryImpl(
+    private val client: HttpClient,
+) : AccountRepository {
+    override suspend fun getClientAccount(
+        token: String
+    ): ResultWork<ClientAccount, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<ClientAccountResponse>().toClientAccount()
+                }
+            )
+        }
+    }
+
+    override suspend fun setClientMobilePhone(
+        token: String,
+        uid: Long,
+        phone: String
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/clientMobilePhone") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            MobilePhoneRequest(
+                                phone = phone,
+                                uid = uid
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+
+    override suspend fun validateClientMobileNumber(token: String): ResultWork<Long, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/validationClientMobileNumber") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<SuccessRecordDto>().recordNumber
+                }
+            )
+        }
+    }
+
+    override suspend fun confirmValidateClientMobileNumber(
+        token: String,
+        id: Long,
+        code: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/confirmationClientMobileNumber") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            CodeRequest(
+                                id = id,
+                                code = code
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+    override suspend fun setClientEmail(
+        token: String,
+        uid: Long,
+        email: String
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/clientEmail") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            EmailRequest(
+                                uid = uid,
+                                email = email
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+
+    override suspend fun validateClientEmail(token: String): ResultWork<Long, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/validationClientEmail") {
+                        bearerAuth(token)
+                    }
+                },
+                data = {
+                    it.body<SuccessRecordDto>().recordNumber
+                }
+            )
+        }
+    }
+
+    override suspend fun confirmValidateClientEmail(
+        token: String,
+        id: Long,
+        code: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/confirmationClientEmail") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            CodeRequest(
+                                id = id,
+                                code = code
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+    override suspend fun getVGroups(
+        token: String,
+        agrmId: Long?,
+        vgId: Long?,
+    ): ResultWork<List<ClientVroup>, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/vgroup") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        agrmId?.let {
+                            parameter("agrmid", it)
+                        }
+                        vgId?.let {
+                            parameter("vgid", vgId)
+                        }
+                    }
+                },
+                data = {
+                    it.body<List<ClientVgroupFullResponse>>().map { it.toClientVGroup() }
+                }
+            )
+        }
+    }
+
+    override suspend fun getClientInfo(
+        token: String
+    ): ResultWork<ClientInfo, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/info") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                    }
+                },
+                data = {
+                    it.body<ClientInfoDto>().toClientInfo()
+                }
+            )
+        }
+    }
+
+    override suspend fun getClientNotices(
+        token: String,
+        userid: Long,
+    ): ResultWork<ClientNotices, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/notices") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("userid", userid)
+                    }
+                },
+                data = {
+                    it.body<ClientNoticesDto>().toClientNotices()
+                }
+            )
+        }
+    }
+
+    override suspend fun updateClientNotices(
+        token: String,
+        clientNotices: ClientNotices,
+    ): ResultWork<Long, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/notices") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            ClientNoticesRequest(
+                                uid = clientNotices.uid,
+                                notices = clientNotices.notices.map {
+                                    NoticesRequest(
+                                        descr = it.descr,
+                                        isEmail = it.email,
+                                        isMessenger = it.messenger,
+                                        name = it.name,
+                                        isSms = it.sms,
+                                        type = it.type,
+                                        value = it.value
+                                    )
+                                }
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<Long>()
+                }
+            )
+        }
+    }
+
+    override suspend fun updatePassword(
+        token: String,
+        oldPassword: String,
+        newPassword: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.post("account/password") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            UpdatePasswordRequest(
+                                newPassword = newPassword,
+                                oldPassword = oldPassword
+                            )
+                        )
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+    override suspend fun logOut(
+        token: String,
+    ): ResultWork<Boolean, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.delete("account/logout") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                    }
+                },
+                data = {
+                    it.body<SuccessDto>().success
+                }
+            )
+        }
+    }
+
+    override suspend fun getClientVgroupPassword(
+        token: String,
+        vgId: Long,
+    ): ResultWork<String, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("account/vgroupPassword") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        parameter("vgid", vgId)
+                    }
+                },
+                data = {
+                    it.body<PasswordDto>().password
+                }
+            )
+        }
+    }
+
+    override suspend fun getClientSharedPosts(
+        token: String,
+        dateFrom: LocalDate?,
+    ): ResultWork<List<SharedPost>, DataError> {
+        return withContext(Dispatchers.IO) {
+            handleResponse(
+                request = {
+                    client.get("post") {
+                        bearerAuth(token)
+                        contentType(ContentType.Application.Json)
+                        dateFrom?.let {
+                            parameter("date_from", dateFrom.toBillingFormat())
+                        }
+
+                    }
+                },
+                data = {
+                    it.body<List<SharedPostDto>>().map { sp -> sp.toSharedPost() }
+                }
+            )
+        }
+    }
+
+}

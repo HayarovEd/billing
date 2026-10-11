@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven ( "https://developer.huawei.com/repo/")
     }
 }
 plugins {
@@ -19,9 +20,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
+        maven ( "https://developer.huawei.com/repo/")
     }
 }
 
 rootProject.name = "billing"
 include(":app")
- 
+include(":download_install")
+include(":chat")

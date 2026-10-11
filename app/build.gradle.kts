@@ -1,22 +1,24 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
 
+val appId = "com.impuls.billing"
+val vCode = 1
+val vName = "0.003"
+
 android {
-    namespace = "com.impuls.billing"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    namespace = appId
+    compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.impuls.billing"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = appId
+        minSdk = 26
+        targetSdk = 37
+        versionCode = vCode
+        versionName = vName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +41,16 @@ android {
     }
 }
 
+base {
+    archivesName.set("Billing_${vName}")
+}
+
+
 dependencies {
+    implementation(project(":download_install"))
+    implementation(project(":chat"))
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -48,11 +59,53 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
+
+    //ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.andriod)
+    implementation(libs.ktor.serialization.kotlinx.xml)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+
+    //Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
+
+    // Coil
+    implementation(libs.coil.compose)
+
+    //date-time
+    implementation(libs.kotlinx.datetime)
+
+    //navigation
+    implementation(libs.androidx.navigation.compose)
+
+    //jsoup
+    implementation(libs.jsoup)
+
+
+    implementation(libs.compose)
+
+
+
 }
