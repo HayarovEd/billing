@@ -54,11 +54,10 @@ class AuthUseCase(
             } else {
                 when (val resultRefresh = repository.onRefresh(token.refresh)) {
                     is ResultWork.Error -> {
-                        onError(resultRefresh.error)
                         dataStoreRepository.removeToken()
                         val userBillingData = getUserBillingData()
                         if (userBillingData == null) {
-                            onError(ChatDataError.Network.UNKNOWN)
+                            onError(resultRefresh.error)
                             return
                         }
                         val (name, username, password, email, billingToken) = userBillingData
@@ -75,7 +74,8 @@ class AuthUseCase(
 
                             is ResultWork.Success -> {
                                 dataStoreRepository.saveTokens(resultLogin.data)
-                                function(resultLogin.data.access)
+                                withContext(Dispatchers.IO) { function(resultLogin.data.access) }
+                                withContext(Dispatchers.IO) { sendPushToken(resultLogin.data.access) }
                             }
                         }
                     }

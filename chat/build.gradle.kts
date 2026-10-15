@@ -32,6 +32,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.services.base)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 

@@ -54,8 +54,9 @@ class MainScreenViewModel(
                         val chatsResult = chatsDeferred.await()
 
                         if (themesResult && chatsResult) {
-                            _state.update { it.copy(status = MainStatus.SUCCESS) }
+                              _state.update { it.copy(status = MainStatus.SUCCESS) }
                         } else {
+                            Log.e("TAG222", "error load data")
                             _state.update { it.copy(status = MainStatus.ERROR) }
                         }
                     }
@@ -204,6 +205,7 @@ class MainScreenViewModel(
                 login = _state.value.login
             )) {
                 is ResultWork.Error -> {
+                    Log.e("TAG222", "groups: ${result.error}")
                     eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 }
                 is ResultWork.Success -> {

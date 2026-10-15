@@ -1,18 +1,19 @@
 package com.impuls.billing.data.repository
 
-import com.impuls.billing.domain.model.ClientAccount
 import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.*
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
+import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.*
+import io.ktor.client.request.HttpRequestData
+import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -22,7 +23,6 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class AccountRepositoryImplTest {
 
-    private val testDispatcher = UnconfinedTestDispatcher()
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -94,7 +94,7 @@ class AccountRepositoryImplTest {
                 )
             }
 
-            val repository = AccountRepositoryImpl(client, testDispatcher)
+            val repository = AccountRepositoryImpl(client)
             val result = repository.getClientAccount("token")
 
             assertTrue(result is ResultWork.Success)
@@ -114,7 +114,7 @@ class AccountRepositoryImplTest {
                 )
             }
 
-            val repository = AccountRepositoryImpl(client, testDispatcher)
+            val repository = AccountRepositoryImpl(client)
             val result = repository.getClientAccount("token")
 
             assertTrue(result is ResultWork.Error)
@@ -139,7 +139,7 @@ class AccountRepositoryImplTest {
                 )
             }
 
-            val repository = AccountRepositoryImpl(client, testDispatcher)
+            val repository = AccountRepositoryImpl(client)
             val result = repository.setClientMobilePhone("token", 123L, "1234567890")
 
             assertTrue(result is ResultWork.Success)
@@ -173,7 +173,7 @@ class AccountRepositoryImplTest {
                 )
             }
 
-            val repository = AccountRepositoryImpl(client, testDispatcher)
+            val repository = AccountRepositoryImpl(client)
             val result = repository.getClientInfo("token")
 
             assertTrue(result is ResultWork.Success)
@@ -221,7 +221,7 @@ class AccountRepositoryImplTest {
                 )
             }
 
-            val repository = AccountRepositoryImpl(client, testDispatcher)
+            val repository = AccountRepositoryImpl(client)
             val result = repository.getClientSharedPosts("token", kotlinx.datetime.LocalDate(2026, 7, 29))
 
             assertTrue(result is ResultWork.Success)
