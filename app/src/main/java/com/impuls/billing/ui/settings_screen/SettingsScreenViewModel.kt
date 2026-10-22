@@ -1,6 +1,5 @@
 package com.impuls.billing.ui.settings_screen
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -146,11 +145,6 @@ class SettingsScreenViewModel(
             }
 
             is SettingsScreenAction.UpdateValue -> {
-                Log.d("CHECK ERRORS", "-----------------------------------")
-                _state.value.clientNotices?.notices?.forEach {
-                    Log.d("CHECK ERRORS", "notice $it")
-                }
-
                 _state.update { currentState ->
                     currentState.clientNotices?.let { client ->
                         val existingNotice = client.notices.find { it.type == action.typeId }
@@ -169,19 +163,12 @@ class SettingsScreenViewModel(
                                 value = action.value
                             )
                         }
-                        Log.d("CHECK ERRORS", "-----------------------------------")
-
-                        Log.d("CHECK ERRORS", "updatedNotices $updatedNotices")
                         currentState.copy(
                             clientNotices = client.copy(
                                 notices = updatedNotices
                             )
                         )
                     } ?: currentState
-                }
-                Log.d("CHECK ERRORS", "-----------------------------------")
-                _state.value.clientNotices?.notices?.forEach {
-                    Log.d("CHECK ERRORS", "updated notice $it")
                 }
             }
 
