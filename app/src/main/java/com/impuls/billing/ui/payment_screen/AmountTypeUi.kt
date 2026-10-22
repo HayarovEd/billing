@@ -69,11 +69,11 @@ fun AmountTypeUi(
         )
 
         // Карточка компании
-        if (companyPayment != null && imageData != null) {
+        if (companyPayment != null) {
             TitleCompany(
                 name = companyPayment.name,
-                image = imageData.image,
-                colorString = imageData.color,
+                image = imageData?.image,
+                colorString = imageData?.color,
                 modifier = Modifier.fillMaxWidth()
             )
         }

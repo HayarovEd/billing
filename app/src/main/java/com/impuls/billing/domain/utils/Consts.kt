@@ -13,7 +13,7 @@ const val NUMBER_PTK = "111-18874-1" //20964
 //const val CONTENT_TYPE = "Content-Type"
 //const val CONTENT_TYPE_X_GWT = "text/x-gwt-rpc; charset=UTF-8"
 //const val BODY_CKASSA_INIT_SERVICE = "7|1|6|$X_GWT_MODULE_BASE_VALUE|$X_GWT_PERMUTATION_VALUE|_|searchProviderByCode|8m|$NUMBER_NPO_CODIT|1|2|3|4|1|5|6|"
-
+//https://pfapi.ckassa.ru/api-shop/rs/payform/provider-info/111-16915-2
 
 const val LAST_EMAIL = "last_email"
 const val LAST_PASSWORD = "last_password"

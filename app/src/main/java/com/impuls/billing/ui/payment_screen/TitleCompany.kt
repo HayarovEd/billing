@@ -34,12 +34,12 @@ private const val BASE64_SUBSTRING = "base64,"
 fun TitleCompany(
     modifier: Modifier = Modifier,
     name: String,
-    image: String,
-    colorString: String
+    image: String?,
+    colorString: String?
 ) {
-    val color = colorString.toComposeColor()
+    val color = colorString?.toComposeColor()?: MaterialTheme.colorScheme.onSurface
 
-    val base64ImageByteArray = Base64.decode(image.substringAfter(BASE64_SUBSTRING))
+    val base64ImageByteArray = image?.let {  Base64.decode(image.substringAfter(BASE64_SUBSTRING))}
 
     Card(
         modifier = modifier
@@ -81,16 +81,19 @@ fun TitleCompany(
             )
 
             // Иконка компании
-            AsyncImage(
-                modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White),
-                model = base64ImageByteArray,
-                contentDescription = "Логотип компании",
-                contentScale = ContentScale.Crop
-            )
+            base64ImageByteArray?.let {
+                AsyncImage(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White),
+                    model = base64ImageByteArray,
+                    contentDescription = "Логотип компании",
+                    contentScale = ContentScale.Crop
+                )
+            }
+
         }
     }
 }
