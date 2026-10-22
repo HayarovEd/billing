@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -59,6 +60,7 @@ fun SharedPostsCard(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSurface),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
