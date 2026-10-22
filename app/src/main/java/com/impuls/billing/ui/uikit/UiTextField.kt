@@ -113,12 +113,12 @@ fun UiTextField(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UiTextField2(
     modifier: Modifier = Modifier,
     content: String,
     label: String,
+    textSize: TextUnit? = null,
     leadingText: String? = null,
     trailingIcon: ImageVector? = null,
     enabled: Boolean = true,
@@ -152,12 +152,14 @@ fun UiTextField2(
         },
         enabled = enabled,
         readOnly = readOnly,
-        textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+        textStyle = Typography.bodyLarge
+            .copy(color = colorScheme.primary)
+            .copy(fontSize = textSize?:Typography.bodyLarge.fontSize),
         isError = isError,
         placeholder = {
             Text(
                 text = label,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = colorScheme.onSurfaceVariant
             )
         },
         visualTransformation = visualTransformation,
@@ -172,7 +174,7 @@ fun UiTextField2(
                 UiIconButton(
                     icon = trailingIcon,
                     onClick = onClickTrailingIcon,
-                    color = MaterialTheme.colorScheme.primary
+                    color = colorScheme.primary
                 )
             }
         },
@@ -182,7 +184,7 @@ fun UiTextField2(
                     text = it,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = colorScheme.primary
                 )
             }
         },

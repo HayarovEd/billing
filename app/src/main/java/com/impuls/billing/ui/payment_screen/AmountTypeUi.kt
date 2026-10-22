@@ -100,6 +100,7 @@ fun AmountTypeUi(
                 onClickContent = {
                     updateAmount(it)
                 },
+                textSize = 22.sp,
                 label = "0.00",
                 leadingText = "₽",
                 keyboardType = KeyboardType.Decimal,
