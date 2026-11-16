@@ -74,10 +74,6 @@ internal class RefresherImpl(
             }
             send(DownloadStatus.Started)
             val workerRequest = OneTimeWorkRequestBuilder<DownloadUpdateWorker>()
-                /*.setBackoffCriteria(
-                    backoffPolicy = BackoffPolicy.LINEAR,
-                    duration = Duration.ofSeconds(15)
-                )*/
                 .setInputData(workerData.build())
                 .build()
             val workManager = WorkManager.getInstance(application)
@@ -87,7 +83,7 @@ internal class RefresherImpl(
                 workerRequest
             )
             
-            launch {
+            val job = launch {
                 workManager.getWorkInfoByIdFlow(workerRequest.id).collect { it ->
                     when (it?.state) {
                         WorkInfo.State.RUNNING -> {
@@ -116,7 +112,7 @@ internal class RefresherImpl(
                 }
             }
             awaitClose {
-                workManager.cancelWorkById(workerRequest.id)
+                job.cancel()
             }
         }
     }

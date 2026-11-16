@@ -28,8 +28,7 @@ val downloadUpdateModule = module {
     }
     worker {
         DownloadUpdateWorker(
-            notificationBuilder = get(),
-            application = get(),
+            context = get(),
             workerParameters = get()
         )
     }

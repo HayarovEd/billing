@@ -1,12 +1,10 @@
 package com.edurda77.download_install.worker
 
-import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Builder
 import androidx.work.CoroutineWorker
@@ -27,23 +25,25 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class DownloadUpdateWorker(
-    private val notificationBuilder: Builder,
-    private val application: Application,
+    private val context: Context,
     private val workerParameters: WorkerParameters
-) : CoroutineWorker(application, workerParameters) {
+) : CoroutineWorker(context, workerParameters) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            val notificationManager = application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notificationId = 1001
             try {
                 val fileUrl = workerParameters.inputData.getString(FILE_URL)
+                    ?: return@withContext Result.failure(workDataOf(KEY_ERROR to DownloadDataError.Network.BAD_REQUEST))
                 val fileName = workerParameters.inputData.getString(FILE_NAME)
-                val apkFilePath = application.pathToDownloadFile("$fileName")
-                val outputStream = FileOutputStream(apkFilePath)
+                    ?: return@withContext Result.failure(workDataOf(KEY_ERROR to DownloadDataError.Network.BAD_REQUEST))
+
+                val apkFilePath = context.pathToDownloadFile(fileName)
                 val url = URL(fileUrl)
                 val connection = url.openConnection() as HttpURLConnection
+                connection.connectTimeout = 15_000
+                connection.readTimeout = 30_000
                 connection.connect()
 
                 val contentLength = connection.contentLength.toLong()
@@ -52,50 +52,52 @@ class DownloadUpdateWorker(
                     throw Exception("Not enough space on device")
                 }
                 
-                cleanupOldApks(fileName ?: "")
+                cleanupOldApks(fileName)
 
-                val inputStream = connection.inputStream
+                val channelName = context.resources.getString(R.string.download_update)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(DOWNLOAD_UPDATE_CHANNEL, channelName, NotificationManager.IMPORTANCE_LOW)
+                    notificationManager.createNotificationChannel(channel)
+                }
 
-                val data = ByteArray(1024)
-                var totalDownloaded: Long = 0
-                var count: Int
-                var lastProgress = -1
-
-                val channelName = application.resources.getString(R.string.download_update)
-                val channel = NotificationChannel(DOWNLOAD_UPDATE_CHANNEL, channelName, NotificationManager.IMPORTANCE_LOW)
-                notificationManager.createNotificationChannel(channel)
-
-                val builder = Builder(application, DOWNLOAD_UPDATE_CHANNEL)
+                val builder = Builder(context, DOWNLOAD_UPDATE_CHANNEL)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setContentTitle(channelName)
                     .setOngoing(true)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
 
-                while (inputStream.read(data).also { count = it } != -1) {
-                    totalDownloaded += count.toLong()
-                    outputStream.write(data, 0, count)
-                    if (contentLength > 0) {
-                        val progress = (totalDownloaded * 100 / contentLength).toInt()
-                        if (progress > lastProgress) {
-                            lastProgress = progress
-                            builder
-                                .setContentText("${fileName}: $progress%")
-                                .setProgress(100, progress, false)
-                            notificationManager.notify(notificationId, builder.build())
-                            setProgress(workDataOf(KEY_PROGRESS to progress))
+                val data = ByteArray(8192)
+                var totalDownloaded: Long = 0
+                var count: Int
+                var lastProgress = -1
+
+                connection.inputStream.use { inputStream ->
+                    FileOutputStream(apkFilePath).use { outputStream ->
+                        while (inputStream.read(data).also { count = it } != -1) {
+                            totalDownloaded += count.toLong()
+                            outputStream.write(data, 0, count)
+                            if (contentLength > 0) {
+                                val progress = (totalDownloaded * 100 / contentLength).toInt()
+                                if (progress > lastProgress) {
+                                    lastProgress = progress
+                                    builder
+                                        .setContentText("$fileName: $progress%")
+                                        .setProgress(100, progress, false)
+                                    notificationManager.notify(notificationId, builder.build())
+                                    setProgress(workDataOf(KEY_PROGRESS to progress))
+                                }
+                            }
                         }
                     }
                 }
-                inputStream.close()
-                outputStream.close()
-                
+
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(application, application.resources.getString(R.string.download_finished), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.resources.getString(R.string.download_finished), Toast.LENGTH_LONG).show()
                 }
 
                 builder
-                    .setContentTitle(application.resources.getString(R.string.download_finished))
-                    .setContentText(application.resources.getString(R.string.update_downloaded))
+                    .setContentTitle(context.resources.getString(R.string.download_finished))
+                    .setContentText(context.resources.getString(R.string.update_downloaded))
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)
                     .setOngoing(false)
                     .setProgress(0, 0, false)
@@ -104,10 +106,10 @@ class DownloadUpdateWorker(
                 Result.success()
             } catch (e: Exception) {
                 e.printStackTrace()
-                val builder = Builder(application, DOWNLOAD_UPDATE_CHANNEL)
+                val builder = Builder(context, DOWNLOAD_UPDATE_CHANNEL)
                     .setSmallIcon(android.R.drawable.stat_notify_error)
-                    .setContentTitle(application.resources.getString(R.string.download_error))
-                    .setContentText(e.message)
+                    .setContentTitle(context.resources.getString(R.string.download_error))
+                    .setContentText(e.message ?: context.resources.getString(R.string.unknown))
                     .setOngoing(false)
                 notificationManager.notify(notificationId, builder.build())
                 Result.failure(workDataOf(KEY_ERROR to DownloadDataError.Network.SERVER_ERROR))
@@ -116,7 +118,7 @@ class DownloadUpdateWorker(
     }
 
     private fun checkAvailableSpace(requiredBytes: Long): Boolean {
-        val path = application.externalCacheDir?.absolutePath ?: application.cacheDir.absolutePath
+        val path = (context.externalCacheDir ?: context.cacheDir).absolutePath
         return try {
             val stat = android.os.StatFs(path)
             val availableBytes = stat.availableBlocksLong * stat.blockSizeLong
@@ -128,7 +130,7 @@ class DownloadUpdateWorker(
 
     private fun cleanupOldApks(currentFileName: String) {
         try {
-            val dir = application.externalCacheDir ?: application.cacheDir
+            val dir = context.externalCacheDir ?: context.cacheDir
             dir.listFiles()?.forEach { file ->
                 if (file.name.endsWith(".apk") && file.name != currentFileName) {
                     file.delete()

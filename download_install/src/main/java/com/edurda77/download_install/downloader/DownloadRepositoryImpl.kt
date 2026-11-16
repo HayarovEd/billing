@@ -35,13 +35,19 @@ internal class DownloadRepositoryImpl(
     override suspend fun getLastUpdateVersion(url: String): ResultDownloadWork<LastVersionApp, DownloadDataError> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = httpClient.get(url/*"${DOWNLOAD_URL}version"*/) {
+                val response = httpClient.get(url) {
                     contentType(ContentType.Application.Json)
                 }.call
                 if (response.response.status.isSuccess()) {
                     val content = response.response.body<VersionResponse>()
-                    val version =
-                        (content.groupResponseDto.name + "." + content.name).toDoubleOrNull()
+                    val versionStr = "${content.groupResponseDto.name}.${content.name}"
+                    val version = versionStr.toDoubleOrNull()
+                        ?: versionStr.replace(Regex("[^0-9.]"), "").let { clean ->
+                            val parts = clean.split(".")
+                            if (parts.size >= 2) "${parts[0]}.${parts[1]}".toDoubleOrNull()
+                            else parts.firstOrNull()?.toDoubleOrNull()
+                        }
+
                     if (version == null) {
                         ResultDownloadWork.Error(DownloadDataError.Network.UNKNOWN_VERSION)
                     } else {
@@ -55,9 +61,7 @@ internal class DownloadRepositoryImpl(
                     ResultDownloadWork.Error(DownloadDataError.Network.UNKNOWN)
                 }
             } catch (e: ClientRequestException) {
-                when (e.response.status.value) {
-                    else -> ResultDownloadWork.Error(DownloadDataError.Network.BAD_REQUEST)
-                }
+                ResultDownloadWork.Error(DownloadDataError.Network.BAD_REQUEST)
             } catch (e: ServerResponseException) {
                 e.printStackTrace()
                 ResultDownloadWork.Error(DownloadDataError.Network.SERVER_ERROR)
@@ -86,12 +90,10 @@ internal class DownloadRepositoryImpl(
                 var lastEmittedProgress = -1
                 
                 val response = httpClient.get(url) {
-                    contentType(ContentType.Application.Json)
                     onDownload { bytesSentTotal, contentLength ->
                         contentLength?.let {
                             if (!checkAvailableSpace(contentLength)) {
                                 trySend(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
-                                // Note: We can't easily cancel the Ktor call here without more architecture
                                 return@onDownload
                             }
                             
@@ -113,12 +115,13 @@ internal class DownloadRepositoryImpl(
                 close()
             } catch (e: Exception) {
                 send(DownloadStatus.Error(DownloadDataError.Network.SERVER_ERROR))
+                close()
             }
         }
     }
 
     private fun checkAvailableSpace(requiredBytes: Long): Boolean {
-        val path = application.externalCacheDir?.absolutePath ?: application.cacheDir.absolutePath
+        val path = (application.externalCacheDir ?: application.cacheDir).absolutePath
         return try {
             val stat = StatFs(path)
             val availableBytes = stat.availableBlocksLong * stat.blockSizeLong

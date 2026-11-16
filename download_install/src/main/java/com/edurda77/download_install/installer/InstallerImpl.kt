@@ -2,6 +2,9 @@ package com.edurda77.download_install.installer
 
 import android.app.Application
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.core.content.FileProvider
 import com.edurda77.download_install.utils.pathToDownloadFile
@@ -12,7 +15,7 @@ internal class InstallerImpl(
 ): Installer {
 
     override fun canRequestPackageInstalls(): Boolean {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             application.packageManager.canRequestPackageInstalls()
         } else {
             true
@@ -20,6 +23,23 @@ internal class InstallerImpl(
     }
 
     override fun installAPK(downloadedFileName: String) {
+        if (!canRequestPackageInstalls()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                try {
+                    val settingsIntent = Intent(
+                        Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:${application.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    application.startActivity(settingsIntent)
+                } catch (e: Exception) {
+                    Log.e("InstallerImpl", "Failed to open unknown app sources settings: ${e.message}")
+                }
+            }
+            return
+        }
+
         val file = File(application.pathToDownloadFile(downloadedFileName))
         if (file.exists()) {
             val authority = "${application.packageName}.provider"
