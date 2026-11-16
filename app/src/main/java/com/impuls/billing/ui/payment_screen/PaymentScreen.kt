@@ -1,5 +1,7 @@
 package com.impuls.billing.ui.payment_screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.openSbpUrl
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
 
 @Composable
 fun PaymentScreenRoot(
@@ -79,6 +82,7 @@ private fun PaymentScreen(
     onAction: (PaymentScreenAction) -> Unit,
     navigateToBack: () -> Unit,
 ) {
+    val context =LocalContext.current
     BackHandler {
         onAction(
             PaymentScreenAction.UpdatePaymentScreenType(
@@ -149,7 +153,17 @@ private fun PaymentScreen(
                                         )
                                     },
                                     updateScreen = {
-                                        onAction(PaymentScreenAction.Payment)
+                                        if (state.chosenMethod == TypePayment.CARD) {
+                                            state.paymentCard?.wayToPay?.url?.let {
+                                                val intent = Intent(Intent.ACTION_VIEW, it.toUri()).apply {
+                                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                }
+                                                context.startActivity(intent)
+                                            }
+
+                                        } else {
+                                            onAction(PaymentScreenAction.Payment)
+                                        }
                                     },
                                     updateSelectedMethod = {
                                         onAction(PaymentScreenAction.UpdateMethodPayment(it))

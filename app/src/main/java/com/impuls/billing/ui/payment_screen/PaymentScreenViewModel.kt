@@ -75,6 +75,9 @@ class PaymentScreenViewModel(
                     chosenMethod = action.typePayment,
                 )
                     .updateState()
+                if (action.typePayment== TypePayment.CARD) {
+                    requestCardPay()
+                }
             }
 
             PaymentScreenAction.Payment -> {
@@ -145,7 +148,7 @@ class PaymentScreenViewModel(
                 service = service
             )) {
                 is ResultWork.Error -> {
-                    eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
+                   // eventChannel.send(PaymentScreenEvent.OnMessage(result.error.asUiText()))
                 }
 
                 is ResultWork.Success -> {
@@ -239,7 +242,7 @@ class PaymentScreenViewModel(
                                 is ResultWork.Success -> {
                                     _state.value.copy(
                                         isLoading = false,
-                                        paymentScreenType = PaymentScreenType.CARD,
+                                        //paymentScreenType = PaymentScreenType.CARD,
                                         paymentCard = result.data
                                     )
                                         .updateState()

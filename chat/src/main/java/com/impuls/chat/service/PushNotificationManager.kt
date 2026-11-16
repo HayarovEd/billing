@@ -51,9 +51,13 @@ object PushNotificationManager : KoinComponent {
      * Used in UI components to react to a notification click.
      */
     fun handleIntent(defaultHeader: String, intent: Intent?): PushMessageData {
-        val bundle = intent?.extras ?: Bundle.EMPTY
+        val rawBundle = intent?.extras ?: Bundle.EMPTY
+
+        // Создаем копию Bundle. Этот процесс принудительно десериализует все Parcel$LazyValue в реальные типы
+        val bundle = Bundle(rawBundle)
+
         val data = bundle.keySet().associateWith { bundle.getString(it) }
-        
+
         val parsedData = parseMap(data, defaultHeader)
         return PushMessageData(chatId = parsedData.chatId)
     }
