@@ -26,9 +26,7 @@ import com.impuls.billing.domain.utils.toLocalDateTime
 fun CompanyPaymentResponse.convertCompanyPayment(): CompanyPayment {
     return CompanyPayment(
         amountMode = amountMode,
-        bankAccount = bankAccount,
-        bic = bic,
-        comissions = comissionDtos.map {
+        commissions = commissions.map {
             Comission(
                 comissionType = it.comissionType,
                 maxAmount = it.maxAmount,
@@ -45,10 +43,7 @@ fun CompanyPaymentResponse.convertCompanyPayment(): CompanyPayment {
         },
         currency = currency,
         dynCom = dynCom,
-        inn = inn,
-        kpp = kpp,
-        logoUrl = logoUrl,
-        maskDtos = maskDtos.map {
+        masks = masks.map {
             Mask(
                 editable = it.editable,
                 maskType = it.maskType,
@@ -65,8 +60,6 @@ fun CompanyPaymentResponse.convertCompanyPayment(): CompanyPayment {
         multiCurrency = multiCurrency,
         name = name,
         offline = offline,
-        orgCode = orgCode,
-        orgName = orgName,
         pfAds = pfAds,
         readOnlyAmount = readOnlyAmount,
         receivingCurrency = receivingCurrency,

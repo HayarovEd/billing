@@ -1,6 +1,7 @@
 package com.impuls.billing.ui.profile_screen
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +49,7 @@ import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ContentExitDialog
 import com.impuls.billing.ui.uikit.ObserveAsEvents
 import com.impuls.billing.ui.uikit.UiIconButton
+import com.impuls.chat.service.PushNotificationManager
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -59,7 +62,8 @@ fun ProfileScreenRoot(
     onNavigateToSettings: (Long) -> Unit,
     onNavigateToBlocking: (Long) -> Unit,
     onClickPromisePayment: (Long) -> Unit,
-    onNavigateToMainChat: (String, String, String, String, Long) -> Unit
+    onNavigateToMainChat: (String, String, String, Long) -> Unit,
+    onNavigateToChat: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snakeBarHostState = remember { SnackbarHostState() }
@@ -76,6 +80,27 @@ fun ProfileScreenRoot(
 
             ProfileScreenEvent.NavigateEvent -> {
                 onNavigateToLogin()
+            }
+
+            is ProfileScreenEvent.NavigateChat -> {
+                Log.e("Test FCM", "NavigateChat: ${event.chatId}")
+                onNavigateToChat(
+                    event.chatId,
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = context.intent
+        if (intent != null) {
+            val pushData = PushNotificationManager.handleIntent(
+                defaultHeader = context.resources.getString(
+                    com.impuls.chat.R.string.new_message
+                ), intent = intent
+            )
+            if (pushData.chatId != null) {
+                viewModel.onAction(ProfileScreenAction.FcmMessage(pushData))
             }
         }
     }
@@ -117,8 +142,7 @@ private fun ProfileScreenScreen(
         name: String,
         login: String,
         password: String,
-        email: String,
-        operId: Long
+        operId: Long,
     ) -> Unit
 ) {
 
@@ -161,8 +185,7 @@ private fun ProfileScreenScreen(
                                 acc.account.name,
                                 acc.account.login,
                                 acc.account.password,
-                                acc.account.email,
-                                acc.agreements.first().operId
+                                acc.agreements.first().operId,
                             )
                         }
                     }
@@ -371,7 +394,7 @@ private fun Preview() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _ -> },
         )
     }
 }
@@ -495,7 +518,7 @@ private fun Preview1() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _,-> },
         )
     }
 }
@@ -598,7 +621,7 @@ private fun Preview1_1() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _ -> },
         )
     }
 }
@@ -625,7 +648,7 @@ private fun Preview2() {
             updateVisibilityDialog = {},
             onNavigateToBlocking = {},
             onClickPromisePayment = {},
-            onNavigateToMainChat = { _, _, _, _, _ -> },
+            onNavigateToMainChat = { _, _, _, _ -> },
         )
     }
 }

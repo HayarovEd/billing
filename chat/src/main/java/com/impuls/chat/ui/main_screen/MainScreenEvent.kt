@@ -1,6 +1,6 @@
 package com.impuls.chat.ui.main_screen
 
-import com.impuls.billing.ui.uikit.UiText
+import com.impuls.chat.ui.uikit.UiText
 
 sealed interface MainScreenEvent {
     data class OnMessage(val message: UiText) :MainScreenEvent

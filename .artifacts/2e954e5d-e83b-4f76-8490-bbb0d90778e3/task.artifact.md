@@ -1,0 +1,5 @@
+- [x] Add test dependencies to `libs.versions.toml`
+- [x] Add test dependencies to `app/build.gradle.kts`
+- [x] Refactor `AccountRepositoryImpl.kt` to inject `CoroutineDispatcher`
+- [x] Create unit tests in `AccountRepositoryImplTest.kt`
+- [x] Verify by running unit tests

@@ -1,4 +1,3 @@
-
 <resources>
     <string name="no_internet">Отсутствует интернет</string>
     <string name="server_error">Ошибка сервера</string>
@@ -35,4 +34,23 @@
     <string name="create_chat_button">Открыть чат</string>
     <string name="your_chats">Ваши чаты</string>
     <string name="support_unavailable">Служба поддержки недоступна</string>
+    <string name="write_file_error">Ошибка записи файла</string>
+    <string name="read_file_error">Ошибка чтения файла</string>
+    <string name="download_file_error">Ошибка загрузки файла</string>
+    <string name="unread_messages">Непрочитанные сообщения</string>
+    <string-array name="month">
+        <item>января</item>
+        <item>февраля</item>
+        <item>марта</item>
+        <item>апреля</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>августа</item>
+        <item>сентября</item>
+        <item>октября</item>
+        <item>ноября</item>
+        <item>декабря</item>
+    </string-array>
+    <string name="new_message">Новое сообщение</string>
 </resources>

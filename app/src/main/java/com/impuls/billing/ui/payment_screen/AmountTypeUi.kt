@@ -69,11 +69,11 @@ fun AmountTypeUi(
         )
 
         // Карточка компании
-        if (companyPayment != null && imageData != null) {
+        if (companyPayment != null) {
             TitleCompany(
                 name = companyPayment.name,
-                image = imageData.image,
-                colorString = imageData.color,
+                image = imageData?.image,
+                colorString = imageData?.color,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -100,6 +100,7 @@ fun AmountTypeUi(
                 onClickContent = {
                     updateAmount(it)
                 },
+                textSize = 22.sp,
                 label = "0.00",
                 leadingText = "₽",
                 keyboardType = KeyboardType.Decimal,
@@ -159,20 +160,13 @@ private fun Preview() {
             ),
             companyPayment = CompanyPayment(
                 amountMode = "pay_amount",
-                bankAccount = "40702810604000000852",
-                bic = "40702810604000000852",
-                comissions = emptyList(),
+                commissions = emptyList(),
                 currency = "RUB",
                 dynCom = "OFFLINE",
-                inn = "5903061324",
-                kpp = "590301001",
-                logoUrl = "",
-                maskDtos = emptyList(),
+                masks = emptyList(),
                 multiCurrency = false,
                 name = "НПО ЦОДИТ, Телинт, Инновационный центр Верхнекамья, НПО Импульс",
                 offline = false,
-                orgCode = 16915,
-                orgName = "ООО НАУЧНО-ПРОИЗВОДСТВЕННОЕ ОБЪЕДИНЕНИЕ ИМПУЛЬС",
                 pfAds = "{\"success\":{\"link\":\"https://share.flocktory.com/exchange/login?ssid=5092&bid=14416\",\"logoMob\":\"floctory/flocktory_mob.svg\",\"logoWeb\":\"floctory/flocktory_web.svg\"}}",
                 readOnlyAmount = false,
                 receivingCurrency = "RUB",

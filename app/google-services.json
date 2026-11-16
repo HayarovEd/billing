@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "895266387008",
+    "project_id": "impuls-help-desk",
+    "storage_bucket": "impuls-help-desk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895266387008:android:91d670e7d8ef949beadba5",
+        "android_client_info": {
+          "package_name": "com.impuls.billing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEctlKKJbaKmjheRsRUeYvCbG8dAgL2Ck"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

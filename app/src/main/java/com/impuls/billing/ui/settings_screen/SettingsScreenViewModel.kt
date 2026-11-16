@@ -1,6 +1,5 @@
 package com.impuls.billing.ui.settings_screen
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -166,7 +165,7 @@ class SettingsScreenViewModel(
                         }
                         currentState.copy(
                             clientNotices = client.copy(
-                                notices = updatedNotices.filter { it.email || it.sms }
+                                notices = updatedNotices
                             )
                         )
                     } ?: currentState
@@ -660,7 +659,7 @@ class SettingsScreenViewModel(
                 ).collect { collector ->
                     when (collector) {
                         is DownloadStatus.Error -> {
-                            eventChannel.send(SettingsScreenEvent.OnUpdateMessage(collector.error.asUiResultText()))
+                          //  eventChannel.send(SettingsScreenEvent.OnUpdateMessage(collector.error.asUiResultText()))
                         }
 
                         is DownloadStatus.InProgress -> {

@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
+private val FIELD_LAST_EMAIL = stringPreferencesKey(LAST_EMAIL)
+private val FIELD_LAST_PASSWORD = stringPreferencesKey(LAST_PASSWORD)
+private val FIELD_LABEL_BEARER = stringPreferencesKey(LABEL_BEARER)
+
 class DataStoreRepositoryImpl(
     private val dataStore: DataStore<Preferences>
 ) : DataStoreRepository {
@@ -72,13 +76,5 @@ class DataStoreRepositoryImpl(
         dataStore.edit { preferences ->
             preferences.remove(FIELD_LABEL_BEARER)
         }
-    }
-
-
-    companion object {
-        val FIELD_LAST_EMAIL = stringPreferencesKey(LAST_EMAIL)
-        val FIELD_LAST_PASSWORD = stringPreferencesKey(LAST_PASSWORD)
-        val FIELD_LABEL_BEARER = stringPreferencesKey(LABEL_BEARER)
-
     }
 }

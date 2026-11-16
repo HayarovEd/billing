@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.impuls.billing" />
+                  <option name="mobileSdkAppId" value="1:895266387008:android:91d670e7d8ef949beadba5" />
+                  <option name="projectId" value="impuls-help-desk" />
+                  <option name="projectNumber" value="895266387008" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

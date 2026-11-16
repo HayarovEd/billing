@@ -1,0 +1,6 @@
+- `[x]` Refactor `ProfileScreenViewModel` to use suspend functions
+    - `[x]` Convert `loadData` to suspend
+    - `[x]` Convert all data-fetching sub-methods to suspend
+    - `[x]` Update `onAction` and `onStart` callers
+    - `[x]` Fix `handleIntent` to await data loading
+- `[x]` Verify build and functionality

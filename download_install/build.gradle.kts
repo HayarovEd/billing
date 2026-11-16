@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.edurda77.download_install"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24

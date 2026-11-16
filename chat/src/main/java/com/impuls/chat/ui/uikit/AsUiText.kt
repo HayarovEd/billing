@@ -1,7 +1,6 @@
 package com.impuls.chat.ui.uikit
 
-import com.impuls.billing.ui.uikit.UiText
-import com.impuls.billing.ui.uikit.UiText.*
+import com.impuls.chat.ui.uikit.UiText.*
 import com.impuls.chat.R
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
@@ -53,6 +52,22 @@ internal fun ChatDataError.asUiText(): UiText {
             )
         }
         is ChatDataError.CustomErrorChat -> DynamicString(message)
+        ChatDataError.FileErrorChat.WRITE_ERROR -> {
+            StringResource(
+                R.string.write_file_error
+            )
+        }
+        ChatDataError.FileErrorChat.READ_ERROR -> {
+            StringResource(
+                R.string.read_file_error
+            )
+        }
+
+        ChatDataError.Network.DOWNLOAD_FILE_ERROR -> {
+            StringResource(
+                R.string.download_file_error
+            )
+        }
     }
 }
 

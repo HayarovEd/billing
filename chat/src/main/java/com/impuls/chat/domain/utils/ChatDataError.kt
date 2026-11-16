@@ -11,11 +11,17 @@ sealed interface ChatDataError : RootError {
         BAD_REQUEST,
         NOT_FOUND,
         REQUEST_TIMEOUT,
+        DOWNLOAD_FILE_ERROR,
         UNKNOWN
     }
 
     enum class WebSocketErrorChat : ChatDataError {
         NOT_CONNECT,
+    }
+
+    enum class FileErrorChat : ChatDataError {
+        WRITE_ERROR,
+        READ_ERROR,
     }
 
     /*enum class CridentialError: DataError {

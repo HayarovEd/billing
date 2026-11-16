@@ -13,5 +13,7 @@ data class LoginFromAppRequest(
     @SerialName("password")
     val password: String,
     @SerialName("username")
-    val username: String
+    val username: String,
+    @SerialName("token")
+    val token: String
 )

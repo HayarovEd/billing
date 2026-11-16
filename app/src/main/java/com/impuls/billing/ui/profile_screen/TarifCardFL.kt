@@ -1,5 +1,6 @@
 package com.impuls.billing.ui.profile_screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -83,6 +84,7 @@ fun TarifCardFL(
          //   containerColor = containerColorColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSurface),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )

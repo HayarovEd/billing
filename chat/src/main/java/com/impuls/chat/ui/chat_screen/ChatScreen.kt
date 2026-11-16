@@ -1,17 +1,24 @@
 package com.impuls.chat.ui.chat_screen
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,34 +32,45 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.impuls.chat.R
+import com.impuls.chat.domain.model.BaseMessage
 import com.impuls.chat.domain.model.Chat
 import com.impuls.chat.domain.model.Connection
+import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Message
 import com.impuls.chat.domain.model.Role
 import com.impuls.chat.domain.model.StatusMessage
-import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.User
 import com.impuls.chat.domain.utils.Utils
 import com.impuls.chat.ui.uikit.ObserveAsEvents
 import com.impuls.chat.ui.uikit.UiIconButton
-import com.impuls.chat.ui.uikit.UiTextField
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 import kotlin.time.Clock
 
 @Composable
@@ -64,6 +82,43 @@ fun ChatScreenRoot(
     val context = LocalContext.current
     val snackBarState = remember { SnackbarHostState() }
 
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+    }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+            uri?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+        }
+
+    val cameraImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraImageUri.value?.let { viewModel.onAction(ChatScreenAction.AttachFile(it)) }
+        }
+    }
+
+    fun onAttachFile() {
+        filePickerLauncher.launch("*/*")
+    }
+
+    fun onAttachImage() {
+        imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+    }
+
+    fun onAttachCamera() {
+        val directory = context.externalCacheDir ?: context.cacheDir
+        val file =
+            File.createTempFile("camera_image_${System.currentTimeMillis()}", ".jpg", directory)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        cameraImageUri.value = uri
+        cameraLauncher.launch(uri)
+    }
+
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             ChatScreenEvent.NavigateToLogin -> onNavigateToLogin()
@@ -74,13 +129,28 @@ fun ChatScreenRoot(
                     )
                 )
             }
+
+            is ChatScreenEvent.OpenAnotherApp -> {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(event.uri, event.mimeType.mimeType)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(intent, "Открыть файл"))
+            }
         }
+    }
+
+    BackHandler {
+        onNavigateToLogin()
     }
 
     ChatScreen(
         state = state,
         snackbarHostState = snackBarState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onAttachFile = ::onAttachFile,
+        onAttachImage = ::onAttachImage,
+        onAttachCamera = ::onAttachCamera
     )
 }
 
@@ -91,7 +161,25 @@ private fun ChatScreen(
     state: ChatScreenState,
     snackbarHostState: SnackbarHostState,
     onAction: (ChatScreenAction) -> Unit,
+    onAttachFile: () -> Unit,
+    onAttachImage: () -> Unit,
+    onAttachCamera: () -> Unit,
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    val listState = rememberLazyListState()
+    val allMessagesFlat = remember(state.allMessages) { state.allMessages.values.flatten() }
+    val firstUnreadSupportMsg = remember(allMessagesFlat) {
+        allMessagesFlat.find { it.isSupport && it.statusMessage != StatusMessage.READED }
+    }
+    val scope = rememberCoroutineScope()
+
+    val isShowScrollArrow by remember {
+        derivedStateOf {
+            listState.canScrollForward
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -110,43 +198,128 @@ private fun ChatScreen(
             ChatInput(
                 modifier = Modifier.navigationBarsPadding(),
                 message = state.currentMessage,
+                attachedFiles = state.attachedFiles,
+                menuExpanded = menuExpanded,
                 onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
-                onSend = { onAction(ChatScreenAction.SendMessage(it)) }
+                onSend = { onAction(ChatScreenAction.SendMessage(it)) },
+                onAttachFile = onAttachFile,
+                onAttachImage = onAttachImage,
+                onAttachCamera = onAttachCamera,
+                onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) },
+                updateMenuExpanded = {
+                    menuExpanded = it
+                }
             )
         }
     ) { paddingValues ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
             MessageList(
                 messages = state.allMessages,
+                token = state.token,
+                listState = listState,
+                allMessagesFlat = allMessagesFlat,
+                firstUnreadSupportMsg = firstUnreadSupportMsg,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .fillMaxWidth(),
                 onAction = onAction
             )
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterEnd),
+                enter = fadeIn(),
+                exit = fadeOut(),
+                visible = isShowScrollArrow
+            ) {
+                UiIconButton(
+                    modifier = Modifier
+                        .size(48.dp),
+                    buttonColor = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                    icon = ImageVector.vectorResource(R.drawable.arrow_circle_down_48dp),
+                    size = 48.dp,
+                    onClick = {
+                        scope.launch {
+                            val totalItemsCount = state.allMessages.size + allMessagesFlat.size
+                            if (totalItemsCount > 0) {
+                                listState.animateScrollToItem(totalItemsCount - 1)
+                            }
+                        }
+                    }
+                )
+            }
 
             if (state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }
+
+    if (state.selectedFile != null) {
+        MediaDialog(
+            file = state.selectedFile,
+            token = state.token,
+            onDismiss = { onAction(ChatScreenAction.ViewMedia(null)) }
+        )
+    }
 }
 
 @Composable
 private fun MessageList(
-    messages: List<Message>,
+    messages: Map<LocalDate, List<BaseMessage>>,
+    token: String,
+    allMessagesFlat: List<BaseMessage>,
+    firstUnreadSupportMsg: BaseMessage?,
+    listState: LazyListState,
     modifier: Modifier = Modifier,
     onAction: (ChatScreenAction) -> Unit
 ) {
-    val listState = rememberLazyListState()
+    val monthRes = stringArrayResource(R.array.month)
+    var initialScrollDone by rememberSaveable { mutableStateOf(false) }
+    var lastMessageCount by remember { mutableStateOf(allMessagesFlat.size) }
 
-    LaunchedEffect(messages.size) {
+    LaunchedEffect(allMessagesFlat) {
+        val newMessagesCount = allMessagesFlat.size
+        val isNewMessageAdded = newMessagesCount > lastMessageCount
+        
         if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+            if (!initialScrollDone) {
+                // Initial scroll to first unread or bottom
+                if (firstUnreadSupportMsg != null) {
+                    var itemPosition = 0
+                    run loop@{
+                        messages.forEach { (_, msgsInDate) ->
+                            itemPosition++ // date header
+                            msgsInDate.forEach { msg ->
+                                if (msg.id == firstUnreadSupportMsg.id) return@loop
+                                itemPosition++
+                            }
+                        }
+                    }
+                    listState.scrollToItem(itemPosition)
+                } else {
+                    val totalItemsCount = messages.size + allMessagesFlat.size
+                    if (totalItemsCount > 0) {
+                        listState.scrollToItem(totalItemsCount - 1)
+                    }
+                }
+                initialScrollDone = true
+            } else if (isNewMessageAdded) {
+                // Smart autoscroll for new messages
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                val totalItemsCount = messages.size + allMessagesFlat.size
+                val isNearBottom = lastVisibleItem >= totalItemsCount - 3
+                val isMyMessage = allMessagesFlat.lastOrNull()?.isSupport == false
+
+                if (isNearBottom || isMyMessage) {
+                    listState.animateScrollToItem(totalItemsCount - 1)
+                }
+            }
         }
+        lastMessageCount = newMessagesCount
     }
 
     LazyColumn(
@@ -155,110 +328,56 @@ private fun MessageList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         reverseLayout = false
     ) {
-        items(messages.sortedBy { it.date }) { message ->
-            MessageItem(message = message, onAction = onAction)
-        }
-    }
-}
-
-@Composable
-private fun MessageItem(
-    message: Message,
-    onAction: (ChatScreenAction) -> Unit
-) {
-    LaunchedEffect(message.id, message.statusMessage) {
-        if (message.isSupport && message.statusMessage != StatusMessage.READED) {
-            onAction(ChatScreenAction.SetMessageAsRead(message.id))
-        }
-    }
-    val alignment = if (message.isSupport) Alignment.Start else Alignment.End
-    val backgroundColor = if (message.isSupport) {
-        MaterialTheme.colorScheme.surfaceVariant
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
-    }
-    val textColor = if (message.isSupport) {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    } else {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = if (message.isSupport) 0.dp else 16.dp,
-                        bottomEnd = if (message.isSupport) 16.dp else 0.dp
+        messages.forEach { (date, messagesByTime) ->
+            stickyHeader {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clip(shape = RoundedCornerShape(20.dp))
+                            .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+                            .padding(3.dp),
+                        text = "${date.day} ${monthRes[date.month.number - 1]}",
+                        fontSize = 20.sp,
                     )
-                )
-                .background(backgroundColor)
-                .padding(12.dp)
-        ) {
-            Column {
-                Text(text = message.text, color = textColor)
-                if (!message.isSupport) {
-                    StatusIndicator(status = message.statusMessage)
                 }
             }
+            items(
+                items = messagesByTime,
+                key = { it.id }
+            ) { message ->
+                if (message.id == firstUnreadSupportMsg?.id) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.unread_messages),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+                MessageItem(
+                    message = message,
+                    token = token,
+                    onAction = onAction
+                )
+            }
         }
-        Text(
-            text = message.date.toString().substring(11, 16),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(top = 2.dp)
-        )
     }
 }
 
-@Composable
-private fun StatusIndicator(status: StatusMessage) {
-    val text = when (status) {
-        StatusMessage.SENDED -> "..."
-        StatusMessage.DELIVERED -> "✓"
-        StatusMessage.ERROR_SEND -> "!"
-        StatusMessage.READED -> "✓✓"
-    }
-    Text(
-        text = text,
-        fontSize = 10.sp,
-        modifier = Modifier.padding(top = 2.dp),
-        color = MaterialTheme.colorScheme.primary
-    )
-}
-
-@Composable
-private fun ChatInput(
-    modifier: Modifier = Modifier,
-    message: String,
-    onMessageChange: (String) -> Unit,
-    onSend: (String) -> Unit
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        UiTextField(
-            content = message,
-            label = stringResource(R.string.message_label),
-            modifier = Modifier.weight(1f),
-            onClickContent = onMessageChange
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.send_24dp),
-            onClick = { if (message.isNotBlank()) onSend(message) },
-            enabled = message.isNotBlank()
-        )
-    }
-}
 
 @Preview(showSystemUi = true)
 @Composable
@@ -270,7 +389,10 @@ private fun Preview() {
             chat = null
         ),
         snackbarHostState = snackBarState,
-        onAction = {}
+        onAction = {},
+        onAttachFile = {},
+        onAttachImage = {},
+        onAttachCamera = {}
     )
 }
 
@@ -296,21 +418,24 @@ private fun ChatWithMessagesPreview() {
             id = "1",
             isSupport = false,
             text = "Здравствуйте, у меня проблема с приложением",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         ),
         Message(
             date = now,
             id = "2",
             isSupport = true,
             text = "Добрый день! Опишите, пожалуйста, подробнее.",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         ),
         Message(
             date = now,
             id = "3",
             isSupport = false,
             text = "Не загружается список чатов на главном экране",
-            statusMessage = StatusMessage.DELIVERED
+            statusMessage = StatusMessage.DELIVERED,
+            files = emptyList()
         )
     )
 
@@ -343,7 +468,9 @@ private fun ChatWithMessagesPreview() {
             currentMessage = "Печатаю ответ..."
         ),
         snackbarHostState = snackBarState,
-        onAction = {}
+        onAction = {},
+        onAttachFile = {},
+        onAttachImage = {},
+        onAttachCamera = {}
     )
 }
-

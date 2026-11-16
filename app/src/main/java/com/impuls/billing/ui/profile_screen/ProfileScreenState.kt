@@ -15,6 +15,7 @@ data class ProfileScreenState(
     val vGroupUsbBoxes: List<VgroupUsbBox> = emptyList(),
     val vGroupPassword: String = "",
     val sharedPosts: List<SharedPost> = emptyList(),
+    val token: String = "",
 ) {
     val clientVGroups = vGroups.firstOrNull()
     val filteredSharedPosts = sharedPosts.filter { it.status == 1 }

@@ -1,11 +1,14 @@
 package com.impuls.billing.ui.navigation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.impuls.billing.ui.blocking_screen.BlockingScreenRoot
 import com.impuls.billing.ui.home_screen.HomeScreenRoot
 import com.impuls.billing.ui.login_screen.LoginScreenRoot
@@ -24,9 +27,9 @@ import com.impuls.chat.ui.navigation.NavigationChatRoute
 
 @Composable
 fun NavController(
-    startDestination: NavigationRoute = NavigationRoute.SplashRoute,/*Payment("595142026")*/
+    navController: NavHostController = rememberNavController(),
+    startDestination: NavigationRoute = NavigationRoute.SplashRoute,
 ) {
-    val navController = rememberNavController()
     PortraitOnly()
     NavHost(
         navController = navController,
@@ -74,7 +77,11 @@ fun NavController(
                 }
             )
         }
-        composable<NavigationRoute.ProfileRoute> {
+        composable<NavigationRoute.ProfileRoute>(
+            deepLinks = listOf(
+                navDeepLink<NavigationRoute.ProfileRoute>(basePath = "billing://profile/")
+            )
+        ) {
             ProfileScreenRoot(
                 onNavigateToPayment = { number, operId ->
                     navController.navigate(
@@ -121,14 +128,20 @@ fun NavController(
                         )
                     )
                 },
-                onNavigateToMainChat = { name, login, password, email, groupName ->
+                onNavigateToMainChat = { name, login, email, groupName ->
                     navController.navigate(
                         NavigationChatRoute.MainRoute(
                             name = name,
                             login = login,
-                            password = password,
                             email = email,
-                            operId = groupName
+                            operId = groupName,
+                        )
+                    )
+                },
+                onNavigateToChat = { chatId ->
+                    navController.navigate(
+                        NavigationChatRoute.ChatRoute(
+                            chatId = chatId,
                         )
                     )
                 }
@@ -209,14 +222,10 @@ fun NavController(
         //chat
         composable<NavigationChatRoute.MainRoute> {
             MainScreenRoot(
-                onNavigateToChat = { chatId, name, login, password, email ->
+                onNavigateToChat = { chatId->
                     navController.navigate(
                         NavigationChatRoute.ChatRoute(
                             chatId = chatId,
-                            name = name,
-                            login = login,
-                            password = password,
-                            email = email
                         )
                     )
                 }

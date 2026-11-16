@@ -1,5 +1,6 @@
 package com.impuls.chat.ui.main_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,9 +37,8 @@ class MainScreenViewModel(
         MainScreenState(
             name = routeData.name,
             login = routeData.login,
-            password = routeData.password,
             email = routeData.email,
-            operId = routeData.operId
+            operId = routeData.operId,
         )
     )
     val state = _state
@@ -54,8 +54,9 @@ class MainScreenViewModel(
                         val chatsResult = chatsDeferred.await()
 
                         if (themesResult && chatsResult) {
-                            _state.update { it.copy(status = MainStatus.SUCCESS) }
+                              _state.update { it.copy(status = MainStatus.SUCCESS) }
                         } else {
+                            Log.e("TAG222", "error load data")
                             _state.update { it.copy(status = MainStatus.ERROR) }
                         }
                     }
@@ -106,11 +107,6 @@ class MainScreenViewModel(
                     createChat(it)
                 }
             }
-          /*  is MainScreenAction.OnChatClick -> {
-                viewModelScope.launch {
-                    eventChannel.send(MainScreenEvent.NavigateEvent(action.chatId))
-                }
-            }*/
         }
     }
 
@@ -120,7 +116,6 @@ class MainScreenViewModel(
         viewModelScope.launch {
             delay(500.milliseconds)
             val currentState = _state.value
-           // _state.update { it.copy(isLoading = true) }
             authUseCase.invoke(
                 function = {
                     action(it)
@@ -128,12 +123,9 @@ class MainScreenViewModel(
                 onError = {
                     eventChannel.send(MainScreenEvent.OnMessage(it.asUiText()))
                 },
-                name = currentState.name,
-                username = currentState.login,
-                email = currentState.email,
-                password = currentState.password,
+                currentName = currentState.name,
+                currentEmail = currentState.email,
             )
-            //_state.update { it.copy(isLoading = false) }
         }
     }
 
@@ -145,6 +137,7 @@ class MainScreenViewModel(
                 operId = oi
             )) {
                 is ResultWork.Error -> {
+                    Log.e("TAG222", "getThemes: ${result.error}")
                     eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                     false
                 }
@@ -166,6 +159,7 @@ class MainScreenViewModel(
             login = _state.value.login
         )) {
             is ResultWork.Error -> {
+                Log.e("TAG222", "getUserChats: ${result.error}")
                 eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 false
             }
@@ -211,7 +205,8 @@ class MainScreenViewModel(
                 login = _state.value.login
             )) {
                 is ResultWork.Error -> {
-                   // eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
+                    Log.e("TAG222", "groups: ${result.error}")
+                    eventChannel.send(MainScreenEvent.OnMessage(result.error.asUiText()))
                 }
                 is ResultWork.Success -> {
                     _state.update { st ->

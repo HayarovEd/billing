@@ -1,17 +1,22 @@
 package com.impuls.chat.domain.repository
 
 import com.impuls.chat.domain.model.Chat
+import com.impuls.chat.domain.model.DeviceData
+import com.impuls.chat.domain.model.DownloadType
 import com.impuls.chat.domain.model.Group
 import com.impuls.chat.domain.model.Token
 import com.impuls.chat.domain.utils.ChatDataError
 import com.impuls.chat.domain.utils.ResultWork
+import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface RemoteChatRepository {
     suspend fun onLoginFromApp(
         name: String,
         username: String,
         email: String,
-        password: String
+        password: String,
+        token: String,
     ): ResultWork<Token, ChatDataError>
 
     suspend fun onRefresh(refresh: String): ResultWork<Token, ChatDataError>
@@ -37,8 +42,9 @@ interface RemoteChatRepository {
 
     suspend fun sendMessage(
         accessToken: String,
-        message: String,
-        chatId: String
+        message: String?,
+        chatId: String,
+        files: List<File>?
     ): ResultWork<Unit, ChatDataError>
 
     suspend fun closeChat(
@@ -50,5 +56,13 @@ interface RemoteChatRepository {
     suspend fun markMessageAsRead(
         accessToken: String,
         messageId: String
+    ): ResultWork<Unit, ChatDataError>
+
+    suspend fun downloadFile(accessToken: String, fileName: String): Flow<DownloadType>
+    suspend fun registerPushToken(
+        pushToken: String,
+        accessToken: String,
+        deviceData: DeviceData,
+        platform: String,
     ): ResultWork<Unit, ChatDataError>
 }
