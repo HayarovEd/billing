@@ -351,7 +351,9 @@ internal class RemoteRepositoryImpl(
         }
     }
 
-    private fun extractRefreshTokenFromResponse(response: HttpResponse): String? {
+    private suspend fun extractRefreshTokenFromResponse(response: HttpResponse): String? {
+        val a = response.bodyAsText()
+        println(a)
         return response.setCookie()
             .find { it.name.equals("refreshToken", ignoreCase = true) }
             ?.value

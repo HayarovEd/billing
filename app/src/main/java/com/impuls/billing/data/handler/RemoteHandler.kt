@@ -24,14 +24,34 @@ suspend fun <D> handleResponse(
             ResultWork.Success(data(response))
         } else {
             when (response.status.value) {
-                400 -> ResultWork.Error(DataError.CustomError(response.body<ErrorDto>().message))
+                400 -> {
+                    val errorMessage = runCatching {
+                        val dto = response.body<ErrorDto>()
+                        dto.message ?: dto.error ?: dto.detail
+                    }.getOrNull()
+                    if (!errorMessage.isNullOrBlank()) {
+                        ResultWork.Error(DataError.CustomError(errorMessage))
+                    } else {
+                        ResultWork.Error(DataError.Network.BAD_REQUEST)
+                    }
+                }
                 401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(DataError.Network.UNKNOWN)
             }
         }
     } catch (e: ClientRequestException) {
         when (e.response.status.value) {
-            400 -> ResultWork.Error(DataError.Network.BAD_REQUEST)
+            400 -> {
+                val errorMessage = runCatching {
+                    val dto = e.response.body<ErrorDto>()
+                    dto.message ?: dto.error ?: dto.detail
+                }.getOrNull()
+                if (!errorMessage.isNullOrBlank()) {
+                    ResultWork.Error(DataError.CustomError(errorMessage))
+                } else {
+                    ResultWork.Error(DataError.Network.BAD_REQUEST)
+                }
+            }
             401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(DataError.Network.UNKNOWN)
         }

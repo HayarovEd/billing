@@ -11,6 +11,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.isSuccess
+import io.ktor.serialization.JsonConvertException
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ClosedByteChannelException
 import java.net.ConnectException
@@ -26,7 +27,17 @@ internal suspend fun <D> handleResponse(
         } else {
             Log.e("TAG", "Server returned error: ${response.status.value}")
             when (response.status.value) {
-                400 -> ResultWork.Error(ChatDataError.CustomErrorChat(response.body<ErrorDto>().message))
+                400 -> {
+                    val errorMessage = runCatching {
+                        val dto = response.body<ErrorDto>()
+                        dto.message ?: dto.error ?: dto.detail
+                    }.getOrNull()
+                    if (!errorMessage.isNullOrBlank()) {
+                        ResultWork.Error(ChatDataError.CustomErrorChat(errorMessage))
+                    } else {
+                        ResultWork.Error(ChatDataError.Network.BAD_REQUEST)
+                    }
+                }
                 401 -> ResultWork.Error(ChatDataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(ChatDataError.Network.UNKNOWN)
             }
@@ -34,7 +45,17 @@ internal suspend fun <D> handleResponse(
     } catch (e: ClientRequestException) {
         Log.e("TAG", "ClientRequestException: ${e.response.status.value}", e)
         when (e.response.status.value) {
-            400 -> ResultWork.Error(ChatDataError.Network.BAD_REQUEST)
+            400 -> {
+                val errorMessage = runCatching {
+                    val dto = e.response.body<ErrorDto>()
+                    dto.message ?: dto.error ?: dto.detail
+                }.getOrNull()
+                if (!errorMessage.isNullOrBlank()) {
+                    ResultWork.Error(ChatDataError.CustomErrorChat(errorMessage))
+                } else {
+                    ResultWork.Error(ChatDataError.Network.BAD_REQUEST)
+                }
+            }
             401 -> ResultWork.Error(ChatDataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(ChatDataError.Network.UNKNOWN)
         }
@@ -53,7 +74,10 @@ internal suspend fun <D> handleResponse(
     } catch (e: UnresolvedAddressException) {
         Log.e("TAG", "UnresolvedAddressException", e)
         ResultWork.Error(ChatDataError.Network.NO_INTERNET)
-    }  catch (e: Exception) {
+    } catch (e: JsonConvertException) {
+        Log.e("TAG", "JsonConvertException", e)
+        ResultWork.Error(ChatDataError.Network.UNKNOWN)
+    } catch (e: Exception) {
         Log.e("TAG", "General Exception in handleResponse", e)
         ResultWork.Error(ChatDataError.Network.UNKNOWN)
     }
