@@ -21,12 +21,12 @@ interface RemoteChatRepository {
 
     suspend fun onRefresh(refresh: String): ResultWork<Token, ChatDataError>
     suspend fun getGroupByOperId(
-        accessToken: String,
+        accessToken: String = "",
         operId: Long
     ): ResultWork<Group, ChatDataError>
 
     suspend fun createChat(
-        accessToken: String,
+        accessToken: String = "",
         groupId: String,
         name: String,
         phone: String,
@@ -36,32 +36,32 @@ interface RemoteChatRepository {
     ): ResultWork<Chat, ChatDataError>
 
     suspend fun getOpenChatsByUser(
-        accessToken: String,
+        accessToken: String = "",
         login: String,
     ): ResultWork<List<Chat>, ChatDataError>
 
     suspend fun sendMessage(
-        accessToken: String,
+        accessToken: String = "",
         message: String?,
         chatId: String,
         files: List<File>?
     ): ResultWork<Unit, ChatDataError>
 
     suspend fun closeChat(
-        accessToken: String,
+        accessToken: String = "",
         chatId: String
     ): ResultWork<Unit, ChatDataError>
 
-    suspend fun getChatById(accessToken: String, chatId: String): ResultWork<Chat, ChatDataError>
+    suspend fun getChatById(accessToken: String = "", chatId: String): ResultWork<Chat, ChatDataError>
     suspend fun markMessageAsRead(
-        accessToken: String,
+        accessToken: String = "",
         messageId: String
     ): ResultWork<Unit, ChatDataError>
 
-    suspend fun downloadFile(accessToken: String, fileName: String): Flow<DownloadType>
+    suspend fun downloadFile(accessToken: String = "", fileName: String): Flow<DownloadType>
     suspend fun registerPushToken(
         pushToken: String,
-        accessToken: String,
+        accessToken: String = "",
         deviceData: DeviceData,
         platform: String,
     ): ResultWork<Unit, ChatDataError>

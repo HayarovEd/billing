@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PushTokenRequest (
     @SerialName("token") val token: String,
-    @SerialName("deviceName") val deviceName: String,
-    @SerialName("deviceId") val deviceId: String,
+    @SerialName("device_name") val deviceName: String,
+    @SerialName("device_id") val deviceId: String,
     @SerialName("platform") val platform: String,
 )
