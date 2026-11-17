@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -34,12 +35,13 @@ private const val BASE64_SUBSTRING = "base64,"
 fun TitleCompany(
     modifier: Modifier = Modifier,
     name: String,
+    nameFontSize: TextUnit = 14.sp,
     image: String?,
     colorString: String?
 ) {
-    val color = colorString?.toComposeColor()?: MaterialTheme.colorScheme.onSurface
+    val color = colorString?.toComposeColor() ?: MaterialTheme.colorScheme.onSurface
 
-    val base64ImageByteArray = image?.let {  Base64.decode(image.substringAfter(BASE64_SUBSTRING))}
+    val base64ImageByteArray = image?.let { Base64.decode(image.substringAfter(BASE64_SUBSTRING)) }
 
     Card(
         modifier = modifier
@@ -73,7 +75,7 @@ fun TitleCompany(
                 text = name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
+                fontSize = nameFontSize,
                 lineHeight = 20.sp,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,

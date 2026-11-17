@@ -73,7 +73,7 @@ fun ItemPaymentMethod(
                         .padding(horizontal = 6.dp, vertical = 2.dp),
                     text = "${stringResource(R.string.commission)} $commission%",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = if (isChosenMethod) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondaryContainer
+                    color = if (isChosenMethod) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

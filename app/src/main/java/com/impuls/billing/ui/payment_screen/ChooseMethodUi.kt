@@ -53,6 +53,7 @@ fun ChooseMethodUi(
             Spacer(modifier = Modifier.height(10.dp))
             TitleCompany(
                 name = "$amount ${stringResource(R.string.rub_symbol)}",
+                nameFontSize = 25.sp,
                 image = it.image,
                 colorString = it.color
             )
