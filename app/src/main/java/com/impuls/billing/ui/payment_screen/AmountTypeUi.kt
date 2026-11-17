@@ -15,9 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +26,6 @@ import com.impuls.billing.domain.model.payment.CompanyPayment
 import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.ProfileRow
-import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.UiTextField2
 
 @Composable
@@ -41,26 +38,15 @@ fun AmountTypeUi(
     typeErrorAmount: TypeErrorAmount,
     updateAmount: (String) -> Unit,
     updateScreen: () -> Unit,
-    onBack: () -> Unit,
+    onBack: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(15.dp), // Консистентный отступ 15.dp
+            .padding(vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
-        Text(
-            text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
         // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),

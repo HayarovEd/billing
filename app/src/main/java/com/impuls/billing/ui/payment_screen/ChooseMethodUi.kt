@@ -16,9 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,7 +26,6 @@ import com.impuls.billing.domain.model.payment.ImageData
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.TitleMethodContent
 import com.impuls.billing.ui.uikit.TitleMethodContentCard
-import com.impuls.billing.ui.uikit.UiIconButton
 
 @Composable
 fun ChooseMethodUi(
@@ -36,29 +33,15 @@ fun ChooseMethodUi(
     imageData: ImageData?,
     chosenMethod: TypePayment?,
     amount: String,
-    onBack: () -> Unit,
+    onBack: () -> Unit = {},
     updateScreen: () -> Unit,
     updateSelectedMethod: (TypePayment) -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(15.dp)
+            .padding(vertical = 10.dp)
     ) {
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
         // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
@@ -79,11 +62,12 @@ fun ChooseMethodUi(
 
         Text(
             text = stringResource(R.string.choose_payment),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
         )
-        
+
         Spacer(modifier = Modifier.height(10.dp))
-        
+
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(15.dp)
@@ -111,9 +95,9 @@ fun ChooseMethodUi(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.weight(1f))
-        
+
         Button(
             modifier = Modifier
                 .fillMaxWidth()

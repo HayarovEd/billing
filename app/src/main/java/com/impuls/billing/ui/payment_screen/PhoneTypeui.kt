@@ -13,9 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,9 +25,7 @@ import com.impuls.billing.domain.utils.MASK
 import com.impuls.billing.domain.utils.MASK_NUMBER
 import com.impuls.billing.ui.theme.BillingTheme
 import com.impuls.billing.ui.uikit.PhoneVisualTransformation
-import com.impuls.billing.ui.uikit.UiIconButton
 import com.impuls.billing.ui.uikit.UiTextField2
-
 
 @Composable
 fun PhoneTypeUi(
@@ -38,28 +34,14 @@ fun PhoneTypeUi(
     phone: String,
     amount: String,
     updatePhone: (String) -> Unit,
-    onBack: () -> Unit,
+    onBack: () -> Unit = {},
     updateScreen: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(15.dp)
+            .padding(vertical = 10.dp)
     ) {
-        UiIconButton(
-            icon = ImageVector.vectorResource(R.drawable.arrow_back_24dp),
-            onClick = onBack,
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = stringResource(R.string.add_balance),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
         // Описание
         Text(
             text = stringResource(R.string.add_balance_desc),
@@ -80,7 +62,8 @@ fun PhoneTypeUi(
 
         Text(
             text = stringResource(R.string.sberpay_payment),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
         )
 
         Spacer(modifier = Modifier.height(10.dp))
