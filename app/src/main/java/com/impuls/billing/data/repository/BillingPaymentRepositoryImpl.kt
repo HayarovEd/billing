@@ -162,7 +162,7 @@ class BillingPaymentRepositoryImpl(
                     client.get("payment/debits") {
                         bearerAuth(token)
                         contentType(ContentType.Application.Json)
-                        parameter("armgid", agrmId)
+                        parameter("agrmid", agrmId)
                         parameter("tarifid", tarifId)
                         parameter("vgid", vgId)
                         parameter(

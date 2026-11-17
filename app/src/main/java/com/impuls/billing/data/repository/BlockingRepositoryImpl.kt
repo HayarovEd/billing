@@ -22,7 +22,6 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.number
 
 class BlockingRepositoryImpl(
     private val client: HttpClient,
@@ -45,7 +44,7 @@ class BlockingRepositoryImpl(
                             BlockingRequest(
                                 agrmId = agrmId,
                                 blkReq = blkReq,
-                                changeTime = "${changeTime.year}-${changeTime.month.number}-${changeTime.day}",
+                                changeTime = "${changeTime.toBillingFormat()} 00:00:00",
                                 vgId = vgId
                             )
                         )
