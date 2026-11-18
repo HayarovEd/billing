@@ -6,22 +6,23 @@ import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
 import com.impuls.billing.domain.repository.HomeRepository
 import com.impuls.billing.domain.repository.JwtRepository
+import com.impuls.billing.domain.utils.DataError
 import com.impuls.billing.domain.utils.ResultWork
 import com.impuls.billing.ui.uikit.asUiText
 import com.impuls.chat.domain.repository.DataStoreChatRepository
 import com.impuls.chat.service.PushMessageData
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -180,7 +181,12 @@ class ProfileScreenViewModel(
                     isLoading = false,
                 )
                     .updateState()
-                eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                if (isAuthError(result.error)) {
+                    dataStoreRepository.removeBearer()
+                    eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                } else {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
             }
 
             is ResultWork.Success -> {
@@ -218,7 +224,12 @@ class ProfileScreenViewModel(
                     phone = phone
                 )) {
                     is ResultWork.Error -> {
-                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        if (isAuthError(result.error)) {
+                            dataStoreRepository.removeBearer()
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        } else {
+                            eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        }
                     }
 
                     is ResultWork.Success -> {
@@ -235,7 +246,12 @@ class ProfileScreenViewModel(
         viewModelScope.launch {
             when (val result = accountRepository.validateClientMobileNumber(token)) {
                 is ResultWork.Error -> {
-                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    if (isAuthError(result.error)) {
+                        dataStoreRepository.removeBearer()
+                        eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                    } else {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
                 }
 
                 is ResultWork.Success -> {
@@ -260,7 +276,12 @@ class ProfileScreenViewModel(
                     code = code
                 )) {
                     is ResultWork.Error -> {
-                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        if (isAuthError(result.error)) {
+                            dataStoreRepository.removeBearer()
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        } else {
+                            eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        }
                     }
 
                     is ResultWork.Success -> {
@@ -285,7 +306,12 @@ class ProfileScreenViewModel(
                     email = email
                 )) {
                     is ResultWork.Error -> {
-                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        if (isAuthError(result.error)) {
+                            dataStoreRepository.removeBearer()
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        } else {
+                            eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        }
                     }
 
                     is ResultWork.Success -> {
@@ -302,7 +328,12 @@ class ProfileScreenViewModel(
         viewModelScope.launch {
             when (val result = accountRepository.validateClientEmail(token)) {
                 is ResultWork.Error -> {
-                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    if (isAuthError(result.error)) {
+                        dataStoreRepository.removeBearer()
+                        eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                    } else {
+                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                    }
                 }
 
                 is ResultWork.Success -> {
@@ -327,7 +358,12 @@ class ProfileScreenViewModel(
                     code = code
                 )) {
                     is ResultWork.Error -> {
-                        eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        if (isAuthError(result.error)) {
+                            dataStoreRepository.removeBearer()
+                            eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                        } else {
+                            eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                        }
                     }
 
                     is ResultWork.Success -> {
@@ -361,18 +397,17 @@ class ProfileScreenViewModel(
         navigate: () -> Unit
     ) {
         val token = dataStoreRepository.getBearer().firstOrNull()
-        if (token != null) {
+        if (!token.isNullOrBlank()) {
             val expired = jwtRepository.decodeJwt(token)?.expired
-            expired?.let { exp ->
-                if (exp < Clock.System.now().epochSeconds) {
-                    dataStoreRepository.removeBearer()
-                    navigate()
-                } else {
-                    _state.update { it.copy(token = token) }
-                    action(token)
-                }
+            if (expired == null || expired < Clock.System.now().epochSeconds) {
+                dataStoreRepository.removeBearer()
+                navigate()
+            } else {
+                _state.update { it.copy(token = token) }
+                action(token)
             }
         } else {
+            dataStoreRepository.removeBearer()
             navigate()
         }
     }
@@ -391,7 +426,12 @@ class ProfileScreenViewModel(
                     isLoading = false,
                 )
                     .updateState()
-                eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                if (isAuthError(result.error)) {
+                    dataStoreRepository.removeBearer()
+                    eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                } else {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
             }
 
             is ResultWork.Success -> {
@@ -431,7 +471,12 @@ class ProfileScreenViewModel(
             vgId = vgId
         )) {
             is ResultWork.Error -> {
-                eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                if (isAuthError(result.error)) {
+                    dataStoreRepository.removeBearer()
+                    eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                } else {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
             }
 
             is ResultWork.Success -> {
@@ -452,7 +497,12 @@ class ProfileScreenViewModel(
             vgId = vgId
         )) {
             is ResultWork.Error -> {
-                eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                if (isAuthError(result.error)) {
+                    dataStoreRepository.removeBearer()
+                    eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                } else {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
             }
 
             is ResultWork.Success -> {
@@ -467,7 +517,12 @@ class ProfileScreenViewModel(
     private suspend fun loadSharePosts(token: String) {
         when (val result = accountRepository.getClientSharedPosts(token = token)) {
             is ResultWork.Error -> {
-                eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                if (isAuthError(result.error)) {
+                    dataStoreRepository.removeBearer()
+                    eventChannel.send(ProfileScreenEvent.NavigateEvent)
+                } else {
+                    eventChannel.send(ProfileScreenEvent.OnMessage(result.error.asUiText()))
+                }
             }
 
             is ResultWork.Success -> {
@@ -507,6 +562,15 @@ class ProfileScreenViewModel(
                 )
             }
         }
+    }
+
+    private fun isAuthError(error: DataError): Boolean {
+        return error == DataError.Network.UNAUTHORIZED ||
+                (error is DataError.CustomError &&
+                        (error.message.contains("авториз", ignoreCase = true) ||
+                                error.message.contains("token", ignoreCase = true) ||
+                                error.message.contains("error_auth", ignoreCase = true) ||
+                                error.message.contains("unauthorized", ignoreCase = true)))
     }
 
     private fun ProfileScreenState.updateState() {

@@ -1,5 +1,6 @@
 package com.impuls.billing.data.repository
 
+import android.util.Log
 import com.impuls.billing.data.handler.handleResponse
 import com.impuls.billing.data.mapper.toClientAccount
 import com.impuls.billing.data.mapper.toClientInfo
@@ -37,6 +38,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
@@ -379,6 +381,8 @@ class AccountRepositoryImpl(
                     }
                 },
                 data = {
+                    val a = it.bodyAsText()
+                    Log.d("TEST ERROR APP", "body share posts $a")
                     it.body<List<SharedPostDto>>().map { sp -> sp.toSharedPost() }
                 }
             )

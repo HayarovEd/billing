@@ -15,7 +15,6 @@ class SplashScreenViewModel(
     private val jwtRepository: JwtRepository
 ) : ViewModel() {
 
-
     private val eventChannel = Channel<SplashScreenEvent>()
     val events = eventChannel.receiveAsFlow()
 
@@ -27,27 +26,19 @@ class SplashScreenViewModel(
         viewModelScope.launch {
             delay(2000)
             dataStoreRepository.getBearer().collect { userToken ->
-                if (userToken!=null) {
+                if (!userToken.isNullOrBlank()) {
                     val expired = jwtRepository.decodeJwt(userToken)?.expired
-                    expired?.let { exp ->
-                        if (exp < Clock.System.now().epochSeconds) {
-                            dataStoreRepository.removeBearer()
-                            eventChannel.send(SplashScreenEvent.LoginNavigateEvent)
-                        } else {
-                            eventChannel.send(SplashScreenEvent.ProfileNavigateEvent)
-                        }
-                    } ?: {
-                        viewModelScope.launch {
-                            dataStoreRepository.removeBearer()
-                            eventChannel.send(SplashScreenEvent.LoginNavigateEvent)
-                        }
+                    if (expired == null || expired < Clock.System.now().epochSeconds) {
+                        dataStoreRepository.removeBearer()
+                        eventChannel.send(SplashScreenEvent.LoginNavigateEvent)
+                    } else {
+                        eventChannel.send(SplashScreenEvent.ProfileNavigateEvent)
                     }
-                } else  {
+                } else {
                     dataStoreRepository.removeBearer()
                     eventChannel.send(SplashScreenEvent.LoginNavigateEvent)
                 }
             }
         }
     }
-
 }

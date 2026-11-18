@@ -29,13 +29,15 @@ suspend fun <D> handleResponse(
                         val dto = response.body<ErrorDto>()
                         dto.message ?: dto.error ?: dto.detail
                     }.getOrNull()
-                    if (!errorMessage.isNullOrBlank()) {
+                    if (isAuthErrorMessage(errorMessage)) {
+                        ResultWork.Error(DataError.Network.UNAUTHORIZED)
+                    } else if (!errorMessage.isNullOrBlank()) {
                         ResultWork.Error(DataError.CustomError(errorMessage))
                     } else {
                         ResultWork.Error(DataError.Network.BAD_REQUEST)
                     }
                 }
-                401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
+                401, 403 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
                 else -> ResultWork.Error(DataError.Network.UNKNOWN)
             }
         }
@@ -46,13 +48,15 @@ suspend fun <D> handleResponse(
                     val dto = e.response.body<ErrorDto>()
                     dto.message ?: dto.error ?: dto.detail
                 }.getOrNull()
-                if (!errorMessage.isNullOrBlank()) {
+                if (isAuthErrorMessage(errorMessage)) {
+                    ResultWork.Error(DataError.Network.UNAUTHORIZED)
+                } else if (!errorMessage.isNullOrBlank()) {
                     ResultWork.Error(DataError.CustomError(errorMessage))
                 } else {
                     ResultWork.Error(DataError.Network.BAD_REQUEST)
                 }
             }
-            401 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
+            401, 403 -> ResultWork.Error(DataError.Network.UNAUTHORIZED)
             else -> ResultWork.Error(DataError.Network.UNKNOWN)
         }
     } catch (e: ClosedByteChannelException) {
@@ -77,4 +81,13 @@ suspend fun <D> handleResponse(
         e.printStackTrace()
         ResultWork.Error(DataError.Network.UNKNOWN)
     }
+}
+
+private fun isAuthErrorMessage(message: String?): Boolean {
+    if (message.isNullOrBlank()) return false
+    val lower = message.lowercase()
+    return lower == "error_auth" ||
+            lower.contains("error_auth") ||
+            lower.contains("unauthorized") ||
+            lower.contains("авториз")
 }

@@ -121,7 +121,7 @@ class LoginScreenViewModel(
         viewModelScope.launch {
             when (val result = dataStoreRepository.readStateLocalAuthorization()) {
                 is ResultWork.Error -> {
-                    eventChannel.send(LoginScreenEvent.OnMessage(result.error.asUiText()))
+                    // Игнорируем ошибку, если локальные учетные данные еще не сохранены
                 }
 
                 is ResultWork.Success -> {
@@ -132,7 +132,6 @@ class LoginScreenViewModel(
                         .updateState()
                 }
             }
-
         }
     }
 

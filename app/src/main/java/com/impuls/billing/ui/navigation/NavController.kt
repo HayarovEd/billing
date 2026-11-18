@@ -1,6 +1,5 @@
 package com.impuls.billing.ui.navigation
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -63,17 +62,29 @@ fun NavController(
         composable<NavigationRoute.SplashRoute> {
             SplashScreenRoot(
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.LoginRoute)
+                    navController.navigate(NavigationRoute.LoginRoute) {
+                        popUpTo<NavigationRoute.SplashRoute> {
+                            inclusive = true
+                        }
+                    }
                 },
                 onNavigateToProfile = {
-                    navController.navigate(NavigationRoute.ProfileRoute)
+                    navController.navigate(NavigationRoute.ProfileRoute) {
+                        popUpTo<NavigationRoute.SplashRoute> {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
         composable<NavigationRoute.LoginRoute> {
             LoginScreenRoot(
                 onNavigateToAccounts = {
-                    navController.navigate(NavigationRoute.ProfileRoute)
+                    navController.navigate(NavigationRoute.ProfileRoute) {
+                        popUpTo<NavigationRoute.LoginRoute> {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
@@ -92,8 +103,11 @@ fun NavController(
                     )
                 },
                 onNavigateToLogin = {
-                    navController.navigate(NavigationRoute.LoginRoute)
-                    // navController.popBackStack(NavigationRoute.Login, false)
+                    navController.navigate(NavigationRoute.LoginRoute) {
+                        popUpTo<NavigationRoute.ProfileRoute> {
+                            inclusive = true
+                        }
+                    }
                 },
                 onNavigateToMore = {
                     navController.navigate(NavigationRoute.HomeRoute(it))
