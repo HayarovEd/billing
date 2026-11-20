@@ -1,5 +1,5 @@
 [versions]
-agp = "9.2.1"
+agp = "9.5.1"
 coilSvg = "3.5.0"
 compose = "2.10.1"
 composeVersion = "1.1.4"
