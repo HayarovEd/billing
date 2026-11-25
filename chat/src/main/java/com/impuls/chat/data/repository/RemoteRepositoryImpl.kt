@@ -231,27 +231,31 @@ internal class RemoteRepositoryImpl(
                     client.submitFormWithBinaryData(
                         url = "${BASE_CHAT_URL}chats/$chatId/message/client",
                         formData = formData {
-                            if (!message.isNullOrEmpty()) {
-                                append(
-                                    key = "data",
-                                    value = Json.encodeToString(MessageRequest(message)),
-                                    headers = Headers.build {
-                                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                                    }
-                                )
-                            }
+                            // 1. Всегда отправляем часть "data", даже если текст пустой (иначе бэкенд выбросит NPE)
+                            val textContent = if (!message.isNullOrBlank()) message else " "
+                            append(
+                                key = "data",
+                                value = Json.encodeToString(MessageRequest(text = textContent)),
+                                headers = Headers.build {
+                                    append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                                }
+                            )
+
+                            // 2. Файлы
                             files?.forEach { file ->
                                 val fileBytes = file.readBytes()
                                 Log.d("RemoteRepositoryImpl", "sendMessage file: ${file.name}, size: ${fileBytes.size}")
+
+                                val mimeType = getMimeTypeExtended(file)
+                                    .substringBefore(";")
+
                                 append(
                                     key = "files",
                                     value = fileBytes,
                                     headers = Headers.build {
-                                        append(
-                                            HttpHeaders.ContentDisposition,
-                                            """form-data; name="files"; filename="${file.name}""""
-                                        )
-                                        append(HttpHeaders.ContentType, getMimeTypeExtended(file))
+                                        // Указываем ТОЛЬКО filename, так как "form-data; name=files" Ktor добавляет сам
+                                        append(HttpHeaders.ContentDisposition, """filename="${file.name}"""")
+                                        append(HttpHeaders.ContentType, mimeType)
                                     }
                                 )
                             }
