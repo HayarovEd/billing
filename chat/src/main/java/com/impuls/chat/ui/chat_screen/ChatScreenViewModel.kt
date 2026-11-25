@@ -139,6 +139,19 @@ class ChatScreenViewModel(
                         )
                     }
                 }
+
+                is ChatScreenAction.RetrySendMessage -> {
+                    withAuth {
+                        retrySendMessage(
+                            accessToken = it,
+                            messageId = action.messageId
+                        )
+                    }
+                }
+
+                is ChatScreenAction.DeleteTmpMessage -> {
+                    deleteTmpMessage(action.messageId)
+                }
             }
         }
     }
@@ -194,39 +207,84 @@ class ChatScreenViewModel(
         message: String,
         uriFiles: List<Uri>
     ) {
-        val newMessage = TmpMessage(urisFile = uriFiles)
+        val newMessage = TmpMessage(
+            text = message,
+            urisFile = uriFiles
+        )
         _state.update {
             it.copy(
                 currentMessage = "",
                 attachedFiles = emptyList(),
-                tmpMessage = newMessage
+                tmpMessages = it.tmpMessages + newMessage
             )
         }
 
-        val files = uriFiles.mapNotNull { fileRepository.getFileFromUri(it) }
+        executeSendMessage(
+            accessToken = accessToken,
+            tmpMessage = newMessage
+        )
+    }
+
+    private suspend fun retrySendMessage(
+        accessToken: String,
+        messageId: String
+    ) {
+        val targetMessage = _state.value.tmpMessages.find { it.id == messageId } ?: return
+
+        _state.update { state ->
+            state.copy(
+                tmpMessages = state.tmpMessages.map { tmp ->
+                    if (tmp.id == messageId) tmp.copy(statusMessage = StatusMessage.SENDED) else tmp
+                }
+            )
+        }
+
+        executeSendMessage(
+            accessToken = accessToken,
+            tmpMessage = targetMessage
+        )
+    }
+
+    private suspend fun executeSendMessage(
+        accessToken: String,
+        tmpMessage: TmpMessage
+    ) {
+        val files = tmpMessage.urisFile.mapNotNull { fileRepository.getFileFromUri(it) }
 
         when (val result = remoteRepository.sendMessage(
             accessToken = accessToken,
             chatId = routeData.chatId,
-            message = message,
+            message = tmpMessage.text,
             files = files.ifEmpty { null }
         )) {
             is ResultWork.Error -> {
                 eventChannel.send(OnMessage(result.error.asUiText()))
-                _state.update {
-                    it.copy(
-                        tmpMessage = it.tmpMessage?.copy(statusMessage = StatusMessage.ERROR_SEND)
+                _state.update { state ->
+                    state.copy(
+                        tmpMessages = state.tmpMessages.map { tmp ->
+                            if (tmp.id == tmpMessage.id) tmp.copy(statusMessage = StatusMessage.ERROR_SEND) else tmp
+                        }
                     )
                 }
             }
 
             is ResultWork.Success -> {
-                _state.update {
-                    it.copy(
-                        tmpMessage = it.tmpMessage?.copy(statusMessage = StatusMessage.DELIVERED)
+                _state.update { state ->
+                    state.copy(
+                        tmpMessages = state.tmpMessages.map { tmp ->
+                            if (tmp.id == tmpMessage.id) tmp.copy(statusMessage = StatusMessage.DELIVERED) else tmp
+                        }
                     )
                 }
             }
+        }
+    }
+
+    private fun deleteTmpMessage(messageId: String) {
+        _state.update { state ->
+            state.copy(
+                tmpMessages = state.tmpMessages.filterNot { it.id == messageId }
+            )
         }
     }
 
@@ -269,7 +327,7 @@ class ChatScreenViewModel(
                 //   newMsgs = mergeResult.second
 
             state.copy(
-                tmpMessage = null,
+                tmpMessages = state.tmpMessages.filter { it.statusMessage == StatusMessage.ERROR_SEND },
                 chat = mergeResult.first
             )
         }

@@ -2,6 +2,7 @@ package com.impuls.chat.ui.chat_screen
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,19 +15,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +59,8 @@ fun MessageItem(
     token: String,
     onAction: (ChatScreenAction) -> Unit
 ) {
+    var showRetryDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(message.id, message.statusMessage) {
         if (message.isSupport && message.statusMessage != StatusMessage.READED) {
             onAction(ChatScreenAction.SetMessageAsRead(message.id))
@@ -75,6 +86,11 @@ fun MessageItem(
     ) {
         Box(
             modifier = Modifier
+                .then(
+                    if (message.statusMessage == StatusMessage.ERROR_SEND) {
+                        Modifier.clickable { showRetryDialog = true }
+                    } else Modifier
+                )
                 .drawBehind {
                     val cornerRadius = 16.dp.toPx()
                     val tailSize = 8.dp.toPx()
@@ -147,19 +163,86 @@ fun MessageItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (!message.isSupport) {
-                        StatusIndicator(status = message.statusMessage)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        if (message.statusMessage == StatusMessage.ERROR_SEND) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = "Ошибка отправки",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .clickable { showRetryDialog = true }
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        } else {
+                            StatusIndicator(status = message.statusMessage)
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
                     }
                     Text(
                         text = message.date.toString().substring(11, 16),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline,
+                        color = if (message.statusMessage == StatusMessage.ERROR_SEND) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        },
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
 
             }
         }
+    }
+
+    if (showRetryDialog && message is TmpMessage) {
+        AlertDialog(
+            onDismissRequest = { showRetryDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.ErrorOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(text = "Ошибка отправки")
+            },
+            text = {
+                Text(text = "Не удалось отправить сообщение. Повторить отправку?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRetryDialog = false
+                        onAction(ChatScreenAction.RetrySendMessage(message.id))
+                    }
+                ) {
+                    Text(text = "Повторить")
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(
+                        onClick = {
+                            showRetryDialog = false
+                            onAction(ChatScreenAction.DeleteTmpMessage(message.id))
+                        }
+                    ) {
+                        Text(
+                            text = "Удалить",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(
+                        onClick = { showRetryDialog = false }
+                    ) {
+                        Text(text = "Отмена")
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -254,7 +337,7 @@ private fun StatusIndicator(status: StatusMessage) {
         text = text,
         fontSize = 10.sp,
         modifier = Modifier.padding(top = 2.dp),
-        color = MaterialTheme.colorScheme.primary
+        color = if (status == StatusMessage.ERROR_SEND) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     )
 }
 
@@ -301,6 +384,28 @@ private fun MessageItemSupportPreview() {
                     text = "Добрый день! Слушаю вас.",
                     statusMessage = StatusMessage.READED,
                     files = emptyList()
+                ),
+                token = "",
+                onAction = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessageItemErrorPreview() {
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    MaterialTheme {
+        Box(modifier = Modifier.padding(8.dp)) {
+            MessageItem(
+                message = TmpMessage(
+                    date = now,
+                    id = "err_1",
+                    isSupport = false,
+                    text = "Сообщение, которое не удалось отправить",
+                    statusMessage = StatusMessage.ERROR_SEND,
+                    urisFile = emptyList()
                 ),
                 token = "",
                 onAction = {}

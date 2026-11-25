@@ -10,13 +10,15 @@ data class ChatScreenState(
     val chat: Chat? = null,
     val isLoading: Boolean = false,
     val currentMessage: String = "",
-    val tmpMessage: TmpMessage? = null,
+    val tmpMessages: List<TmpMessage> = emptyList(),
     val token: String = "",
     val selectedFile: MessageFile? = null,
     val attachedFiles: List<Uri> = emptyList(),
     val progressDownload: String = "",
 ) {
-    val allMessages = (collectMessages(chat?.connections ?: emptyList()) + listOfNotNull(tmpMessage))
+    val tmpMessage: TmpMessage? get() = tmpMessages.lastOrNull()
+
+    val allMessages = (collectMessages(chat?.connections ?: emptyList()) + tmpMessages)
         .sortedBy { it.date }
         .groupBy { it.date.date }
 }

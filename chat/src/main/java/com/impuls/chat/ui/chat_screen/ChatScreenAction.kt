@@ -21,4 +21,6 @@ sealed interface ChatScreenAction {
         val fileName: String,
         val originalName: String,
     ) : ChatScreenAction
+    data class RetrySendMessage(val messageId: String) : ChatScreenAction
+    data class DeleteTmpMessage(val messageId: String) : ChatScreenAction
 }
