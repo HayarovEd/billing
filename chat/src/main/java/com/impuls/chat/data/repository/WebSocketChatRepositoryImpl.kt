@@ -72,7 +72,7 @@ internal class WebSocketChatRepositoryImpl(
                 } catch (e: Exception) {
                     if (!currentCoroutineContext().isActive) throw e
                     Log.e("WS_CHAT", "Connection failed: ${e.message}")
-                    emit(ResultWork.Error(ChatDataError.WebSocketErrorChat.NOT_CONNECT))
+                    //emit(ResultWork.Error(ChatDataError.WebSocketErrorChat.NOT_CONNECT))
                 }
                 
                 // Wait before reconnecting
