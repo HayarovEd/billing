@@ -12,6 +12,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -24,12 +26,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -182,40 +186,58 @@ private fun ChatScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = state.chat?.group?.name ?: "") },
-                actions = {
-                    UiIconButton(
-                        icon = ImageVector.vectorResource(R.drawable.close_24dp),
-                        onClick = { onAction(ChatScreenAction.CloseChat) }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                TopAppBar(
+                    title = { Text(text = state.chat?.group?.name ?: "") },
+                    actions = {
+                        UiIconButton(
+                            icon = ImageVector.vectorResource(R.drawable.close_24dp),
+                            onClick = { onAction(ChatScreenAction.CloseChat) }
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
                     )
-                }
-            )
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                    thickness = 0.5.dp
+                )
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            ChatInput(
-                modifier = Modifier.navigationBarsPadding(),
-                message = state.currentMessage,
-                attachedFiles = state.attachedFiles,
-                menuExpanded = menuExpanded,
-                onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
-                onSend = { onAction(ChatScreenAction.SendMessage(it)) },
-                onAttachFile = onAttachFile,
-                onAttachImage = onAttachImage,
-                onAttachCamera = onAttachCamera,
-                onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) },
-                updateMenuExpanded = {
-                    menuExpanded = it
-                }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+                    .navigationBarsPadding()
+            ) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                    thickness = 0.5.dp
+                )
+                ChatInput(
+                    message = state.currentMessage,
+                    attachedFiles = state.attachedFiles,
+                    menuExpanded = menuExpanded,
+                    onMessageChange = { onAction(ChatScreenAction.UpdateCurrentMessage(it)) },
+                    onSend = { onAction(ChatScreenAction.SendMessage(it)) },
+                    onAttachFile = onAttachFile,
+                    onAttachImage = onAttachImage,
+                    onAttachCamera = onAttachCamera,
+                    onRemoveFile = { onAction(ChatScreenAction.RemoveFile(it)) },
+                    updateMenuExpanded = {
+                        menuExpanded = it
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         Box(
-            modifier = modifier
-                .padding(paddingValues)
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             MessageList(
                 messages = state.allMessages,
@@ -223,6 +245,10 @@ private fun ChatScreen(
                 listState = listState,
                 allMessagesFlat = allMessagesFlat,
                 firstUnreadSupportMsg = firstUnreadSupportMsg,
+                contentPadding = PaddingValues(
+                    top = paddingValues.calculateTopPadding() + 8.dp,
+                    bottom = paddingValues.calculateBottomPadding() + 8.dp
+                ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .fillMaxWidth(),
@@ -275,6 +301,7 @@ private fun MessageList(
     firstUnreadSupportMsg: BaseMessage?,
     listState: LazyListState,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onAction: (ChatScreenAction) -> Unit
 ) {
     val monthRes = stringArrayResource(R.array.month)
@@ -324,6 +351,7 @@ private fun MessageList(
 
     LazyColumn(
         state = listState,
+        contentPadding = contentPadding,
         modifier = modifier.padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         reverseLayout = false
