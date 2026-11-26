@@ -28,8 +28,8 @@ fun UpdateCard(
     modifier: Modifier = Modifier,
     isUpdating: Boolean,
     percentUpdate: Int,
-    currentVersion: Double?,
-    releaseVersion: Double,
+    currentVersion: String?,
+    releaseVersion: String,
     onUpdateApk: () -> Unit,
 ) {
     Card(
@@ -97,9 +97,9 @@ private fun Preview() {
         UpdateCard(
             isUpdating = false,
             percentUpdate = 0,
-            currentVersion = 1.0,
+            currentVersion = "1.0",
             onUpdateApk = {},
-            releaseVersion = 2.0
+            releaseVersion = "2.0"
         )
     }
 }
@@ -111,9 +111,9 @@ private fun Preview2() {
         UpdateCard(
             isUpdating = true,
             percentUpdate = 55,
-            currentVersion = 1.0,
+            currentVersion = "1.0",
             onUpdateApk = {},
-            releaseVersion = 2.0
+            releaseVersion = "2.0"
         )
     }
 }

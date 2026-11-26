@@ -2,6 +2,8 @@ package com.impuls.billing
 
 import android.app.Application
 import androidx.work.Configuration
+import com.edurda77.download_install.model.UpdateConfig
+import com.edurda77.download_install.refresher.Refresher
 import com.impuls.billing.di.baseModule
 import com.impuls.billing.di.downloadUpdateModule
 import com.impuls.billing.di.repoModule
@@ -23,7 +25,7 @@ class BillingApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        startKoin {
+        val koin = startKoin {
             androidLogger()
             androidContext(this@BillingApp)
             modules(
@@ -35,7 +37,13 @@ class BillingApp : Application(), Configuration.Provider {
                 repoChatModule
             )
             workManagerFactory()
-        }
+        }.koin
+
+        val refresher: Refresher = koin.get()
+        val updateConfig: UpdateConfig = koin.get()
+        refresher.schedulePeriodicUpdateCheck(updateConfig)
+        refresher.checkUpdatesInBackground(updateConfig, forceNotify = false)
+
         PushInitializer.init(applicationContext)
     }
 }

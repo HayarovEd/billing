@@ -17,7 +17,7 @@ data class SettingsScreenState(
     val enableUpdate: Boolean = false,
     val percentUpdate: Int = 0,
     val isUpdating: Boolean = false,
-    val currentVersion: Double? = null,
+    val currentVersion: String? = null,
 )
 
 

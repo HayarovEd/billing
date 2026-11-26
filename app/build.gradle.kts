@@ -47,7 +47,7 @@ base {
 
 
 dependencies {
-    implementation(project(":download_install"))
+    implementation(libs.download.install)
     implementation(project(":chat"))
 
 

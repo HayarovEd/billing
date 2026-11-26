@@ -173,7 +173,7 @@ private fun SettingsScreen(
                         isUpdating = state.isUpdating,
                         percentUpdate = state.percentUpdate,
                         currentVersion = state.currentVersion,
-                        releaseVersion = state.release?.lastVersion?:0.0,
+                        releaseVersion = state.release?.lastVersion.orEmpty(),
                         onUpdateApk = {
                             onAction(SettingsScreenAction.UpdateApp)
                         }

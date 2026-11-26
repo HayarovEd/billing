@@ -13,14 +13,15 @@ activityCompose = "1.13.0"
 kotlin = "2.4.0"
 composeBom = "2026.06.00"
 datastorePreferences = "1.2.1"
-ktorVersion = "3.5.0"
+ktorVersion = "3.6.0"
 navigationCompose = "2.9.8"
 kotlinxDatetime = "0.8.0"
 koinVersion = "4.2.2"
 media3 = "1.5.1"
 mockk = "1.13.12"
 kotlinxCoroutinesTest = "1.10.1"
-ktorClientMock = "3.5.0"
+ktorClientMock = "3.6.0"
+downloadInstall = "1.0.2"
 
 appcompat = "1.7.1"
 workRuntimeKtx = "2.11.2"
@@ -83,6 +84,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 pdfviewer-compose = { module = "com.github.bhuvaneshw.pdfviewer:compose", version.ref = "composeVersion" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
+download-install = { module = "com.github.HayarovEd:download_install", version.ref = "downloadInstall" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

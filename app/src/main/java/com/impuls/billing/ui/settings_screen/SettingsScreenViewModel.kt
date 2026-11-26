@@ -9,6 +9,9 @@ import com.edurda77.download_install.utils.APK_EXT
 import com.edurda77.download_install.utils.DownloadStatus
 import com.edurda77.download_install.utils.ResultDownloadWork
 import com.edurda77.download_install.utils.asUiResultText
+import com.edurda77.download_install.utils.isNewVersionAvailable
+import com.impuls.billing.di.DOWNLOAD_FILE_URL
+import com.impuls.billing.di.DOWNLOAD_VERSION_URL
 import com.impuls.billing.domain.model.Notice
 import com.impuls.billing.domain.repository.AccountRepository
 import com.impuls.billing.domain.repository.DataStoreRepository
@@ -29,12 +32,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
-
-const val DOWNLOAD_VERSION_URL =
-    "https://apps.kvadroks.ru/api/links/7ef64b79-d5e5-4399-a30c-8d0653ed8d8b/version"
-
-const val DOWNLOAD_FILE_URL =
-    "https://apps.kvadroks.ru/api/links/7ef64b79-d5e5-4399-a30c-8d0653ed8d8b/file"
 
 class SettingsScreenViewModel(
     private val accountRepository: AccountRepository,
@@ -640,7 +637,10 @@ class SettingsScreenViewModel(
                     val currentVersion = serviceRepository.getVersionName()
                     currentVersion?.let {
                         _state.value.copy(
-                            enableUpdate = currentVersion < result.data.lastVersion,
+                            enableUpdate = isNewVersionAvailable(
+                                currentVersion = currentVersion,
+                                latestVersion = result.data.lastVersion
+                            ),
                             currentVersion = currentVersion
                         )
                             .updateState()
@@ -654,7 +654,7 @@ class SettingsScreenViewModel(
         viewModelScope.launch {
             state.value.release?.let { release ->
                 refresher.updateInBackground(
-                    url = DOWNLOAD_FILE_URL,
+                    downloadUrl = DOWNLOAD_FILE_URL,
                     downloadedFileName = "${release.name}-${release.lastVersion}.$APK_EXT"
                 ).collect { collector ->
                     when (collector) {
